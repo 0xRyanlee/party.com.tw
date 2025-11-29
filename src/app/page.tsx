@@ -211,19 +211,19 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-sm"
+              className="bg-white rounded-[32px] p-4 sm:p-6 border border-gray-100 shadow-sm"
             >
               <div className="flex items-center gap-2 mb-4 text-gray-400">
                 <History className="w-4 h-4" />
                 <h3 className="text-xs font-bold tracking-wider uppercase">{t('home.sidebar.recentlyViewed')}</h3>
               </div>
-              <div className="space-y-4">
+              <div className="space-y-3 sm:space-y-4">
                 {[1, 2].map((i) => (
-                  <div key={i} className="flex gap-3 group cursor-pointer">
-                    <div className="w-16 h-16 rounded-2xl bg-gray-100 bg-cover bg-center shrink-0" style={{ backgroundImage: `url(${mockEvents[i].image})` }} />
+                  <div key={i} className="flex gap-2 sm:gap-3 group cursor-pointer">
+                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gray-100 bg-cover bg-center shrink-0" style={{ backgroundImage: `url(${mockEvents[i].image})` }} />
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-sm truncate group-hover:text-emerald-600 transition-colors">{mockEvents[i].title}</h4>
-                      <p className="text-xs text-gray-400 mt-1">{mockEvents[i].date}</p>
+                      <h4 className="font-bold text-xs sm:text-sm truncate group-hover:text-emerald-600 transition-colors">{mockEvents[i].title}</h4>
+                      <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1">{mockEvents[i].date}</p>
                     </div>
                   </div>
                 ))}
@@ -236,23 +236,26 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.35 }}
-              className="bg-white rounded-[32px] p-6 border border-gray-100 shadow-sm space-y-3"
+              className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-[32px] p-4 sm:p-6 text-white shadow-lg"
             >
-              <Link href="/host/edit" className="w-full">
-                <Button className="w-full justify-start h-14 text-base font-medium bg-black text-white hover:bg-gray-800">
-                  <Plus className="w-5 h-5 mr-3" /> 辦個自己的活動
-                </Button>
-              </Link>
-              <Link href="/settings" className="w-full">
-                <Button variant="outline" className="w-full justify-start h-14 text-base font-medium border-gray-200 hover:bg-gray-50">
-                  <Briefcase className="w-5 h-5 mr-3 text-gray-500" /> 成為貢獻者
-                </Button>
-              </Link>
-              <Link href="/club" className="w-full">
-                <Button variant="outline" className="w-full justify-start h-14 text-base font-medium border-gray-200 hover:bg-gray-50">
-                  <Users className="w-5 h-5 mr-3 text-gray-500" /> 成為社群領袖
-                </Button>
-              </Link>
+              <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">快速操作</h3>
+              <div className="space-y-2 sm:space-y-3">
+                <Link href="/host/edit">
+                  <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-2xl p-3 sm:p-4 text-left transition-all text-xs sm:text-sm font-medium">
+                    辦個自己的活動
+                  </button>
+                </Link>
+                <Link href="/settings">
+                  <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-2xl p-3 sm:p-4 text-left transition-all text-xs sm:text-sm font-medium">
+                    成為貢獻者
+                  </button>
+                </Link>
+                <Link href="/club">
+                  <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-2xl p-3 sm:p-4 text-left transition-all text-xs sm:text-sm font-medium">
+                    成為社群領袖
+                  </button>
+                </Link>
+              </div>
             </motion.div>
 
             {/* Map Preview Widget */}
@@ -262,33 +265,33 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
               onClick={() => setIsMapOpen(true)}
-              className="bg-white rounded-[32px] p-2 border border-gray-100 shadow-sm h-[300px] relative overflow-hidden group cursor-pointer"
+              className="bg-white rounded-[24px] sm:rounded-[32px] p-2 border border-gray-100 shadow-sm h-[250px] sm:h-[300px] relative overflow-hidden group cursor-pointer"
             >
-              <div className="absolute inset-2 rounded-[24px] overflow-hidden">
+              <div className="absolute inset-2 rounded-[16px] sm:rounded-[24px] overflow-hidden">
                 <div className="absolute inset-0 bg-[url('https://docs.mapbox.com/mapbox-gl-js/assets/streets-v11.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-80" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                <div className="absolute bottom-0 left-0 right-0 p-6">
+                <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
                   <div className="flex items-center justify-between">
                     <div>
-                      <p className="text-white/80 text-xs font-medium mb-1">地圖預覽</p>
-                      <h3 className="text-white text-lg font-bold">探索附近活動</h3>
+                      <p className="text-white/80 text-[10px] sm:text-xs font-medium mb-0.5 sm:mb-1">地圖預覽</p>
+                      <h3 className="text-white text-sm sm:text-lg font-bold">探索附近活動</h3>
                     </div>
-                    <div className="w-12 h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-                      <MapPin className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
+                      <MapPin className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                     </div>
                   </div>
-                  <p className="text-white/60 text-xs mt-2">2公里內有 {mockEvents.length} 個活動</p>
+                  <p className="text-white/60 text-[10px] sm:text-xs mt-1 sm:mt-2">2公里內有 {mockEvents.length} 個活動</p>
                 </div>
               </div>
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
             </motion.div>
 
             {/* Quick Stats */}
-            <div className="bg-black text-white rounded-[32px] p-8">
-              <h3 className="text-xl font-bold mb-2">{t('home.sidebar.yourVibe')}</h3>
-              <p className="text-gray-400 text-sm mb-6">You've joined 3 events this month.</p>
-              <div className="space-y-3">
-                <div className="flex justify-between items-center p-3 bg-white/10 rounded-xl text-sm">
+            <div className="bg-black text-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8">
+              <h3 className="text-lg sm:text-xl font-bold mb-2">{t('home.sidebar.yourVibe')}</h3>
+              <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">You've joined 3 events this month.</p>
+              <div className="space-y-2 sm:space-y-3">
+                <div className="flex justify-between items-center p-2 sm:p-3 bg-white/10 rounded-xl text-xs sm:text-sm">
                   <span>🔥 Hot Tags</span>
                   <span className="font-bold">Tech, Party</span>
                 </div>

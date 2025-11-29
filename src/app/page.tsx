@@ -105,11 +105,12 @@ export default function Home() {
         {/* Hero Carousel */}
         <HeroCarousel />
 
-        <div className="grid lg:grid-cols-12 gap-8">
-          {/* Left Column - Main Content */}
-          <div className="lg:col-span-8 space-y-10">
+        {/* Main Content Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+          {/* Left Column - Main Feed */}
+          <div className="lg:col-span-8 space-y-6 lg:space-y-8">
 
-            {/* UPCOMING CAROUSEL (4.2 items) */}
+            {/* Upcoming Events Section */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
@@ -124,15 +125,15 @@ export default function Home() {
               {/* Foolproof Carousel Container */}
               <div className="relative -mx-4 sm:mx-0">
                 {/* Left Fade Gradient */}
-                <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none hidden sm:block" />
+                <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-12 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none hidden sm:block" />
                 {/* Right Fade Gradient */}
-                <div className="absolute right-0 top-0 bottom-0 w-24 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
 
-                <div className="flex gap-4 overflow-x-auto pb-8 pt-2 px-4 sm:px-0 scrollbar-hide snap-x clip-path-padding">
+                <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-6 sm:pb-8 pt-2 px-4 sm:px-0 scrollbar-hide snap-x clip-path-padding">
                   {otherEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="min-w-[85%] sm:min-w-[30%] lg:min-w-[22%] snap-start shrink-0 bg-white rounded-[20px] overflow-hidden border border-gray-100 hover:shadow-lg transition-all cursor-pointer group/card flex flex-col"
+                      className="min-w-[280px] sm:min-w-[320px] lg:min-w-[22%] snap-start shrink-0 bg-white rounded-2xl sm:rounded-[20px] overflow-hidden border border-gray-100 hover:shadow-lg transition-all cursor-pointer group/card flex flex-col"
                     >
                       <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden">
                         <div
@@ -203,7 +204,7 @@ export default function Home() {
           </div>
 
           {/* Right Column - Sidebar */}
-          <div className="lg:col-span-4 space-y-8">
+          <div className="lg:col-span-4 space-y-6 lg:space-y-8 px-4 sm:px-0">
 
             {/* Recently Viewed Widget */}
             <motion.div

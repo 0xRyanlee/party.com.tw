@@ -1,0 +1,196 @@
+export interface Organizer {
+    id: string;
+    name: string;
+    avatar?: string;
+    role: 'member' | 'vendor' | 'supplier';
+    verified?: boolean;
+}
+
+export interface Event {
+    id: string;
+    title: string;
+    type: 'gathering' | 'meetup' | 'workshop' | 'lecture' | 'conference' | 'event' | 'party' | 'rave' | 'potluck' | 'popup' | 'exhibition' | 'performance' | 'hackathon' | 'networking' | 'retreat' | 'coholding' | 'meeting' | 'sport' | 'expo' | 'festival' | 'marathon' | 'training_camp' | 'language_exchange' | 'flea_market' | 'farmers_market';
+    format: 'indoor' | 'outdoor' | 'online';
+    attributes: string[]; // e.g., ['free', 'pet_friendly']
+    date: string; // Display date e.g. "Today", "Nov 25"
+    fullDate: string; // ISO date for sorting e.g. "2023-11-24"
+    dayOfWeek: string; // e.g. "Mon", "Tue"
+    time: string;
+    location: string;
+    distance: number; // km
+    attendees: number;
+    capacity: number;
+    image: string;
+    tags: string[];
+    description: string;
+    price: string;
+    organizer: Organizer; // Changed from string to Organizer object
+    vendors?: Organizer[]; // Optional array of vendors/suppliers
+    isPromoted?: boolean;
+}
+
+export const mockEvents: Event[] = [
+    {
+        id: '1',
+        title: '週五下班小酌 - 信義區',
+        type: 'party',
+        format: 'indoor',
+        attributes: ['public', 'pay_at_door', 'adults_only'],
+        date: 'Today',
+        fullDate: '2023-11-24',
+        dayOfWeek: 'Fri',
+        time: '19:30',
+        location: 'Draft Land, Xinyi',
+        distance: 0.3,
+        attendees: 12,
+        capacity: 20,
+        image: 'https://images.unsplash.com/photo-1572116469696-31de0f17cc34?q=80&w=2874&auto=format&fit=crop',
+        tags: ['Social', 'Drinks', 'Nightlife'],
+        description: '下班後的輕鬆時光，認識新朋友！',
+        price: 'NT$ 300',
+        organizer: {
+            id: 'org1',
+            name: 'Party.com.tw',
+            avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=PT',
+            role: 'member',
+            verified: true,
+        },
+        vendors: [
+            {
+                id: 'vendor1',
+                name: 'DJ Mike',
+                avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=Mike',
+                role: 'vendor',
+            },
+            {
+                id: 'vendor2',
+                name: '花藝工作室',
+                avatar: 'https://api.dicebear.com/7.x/bottts/svg?seed=Flower',
+                role: 'vendor',
+            },
+        ],
+        isPromoted: true,
+    },
+    {
+        id: '2',
+        title: 'React 開發者交流會',
+        type: 'meetup',
+        format: 'indoor',
+        attributes: ['public', 'free', 'english'],
+        date: 'Tomorrow',
+        fullDate: '2023-11-25',
+        dayOfWeek: 'Sat',
+        time: '14:00',
+        location: 'AppWorks, Taipei',
+        distance: 1.5,
+        attendees: 45,
+        capacity: 50,
+        image: 'https://images.unsplash.com/photo-1515187029135-18ee286d815b?q=80&w=2940&auto=format&fit=crop',
+        tags: ['Tech', 'Coding', 'Networking'],
+        description: '每月一次的 React 開發者聚會，這次邀請到資深工程師分享 Next.js 14 的實戰經驗。',
+        price: 'Free',
+        organizer: { id: 'org2', name: 'React Taiwan', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=RT', role: 'member', verified: true },
+    },
+    {
+        id: '3',
+        title: '週末河濱晨跑',
+        type: 'gathering',
+        format: 'outdoor',
+        attributes: ['public', 'free', 'pet_friendly'],
+        date: 'Nov 26',
+        fullDate: '2023-11-26',
+        dayOfWeek: 'Sun',
+        time: '06:00',
+        location: 'Dajia Riverside Park',
+        distance: 2.8,
+        attendees: 8,
+        capacity: 15,
+        image: 'https://images.unsplash.com/photo-1476480862126-209bfaa8edc8?q=80&w=2940&auto=format&fit=crop',
+        tags: ['Sports', 'Running', 'Morning'],
+        description: '享受清晨的陽光與微風，一起在河濱公園慢跑 5K。',
+        price: 'Free',
+        organizer: { id: 'org3', name: 'Taipei Runners', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=TR', role: 'member' },
+    },
+    {
+        id: '4',
+        title: '手沖咖啡體驗課',
+        type: 'workshop',
+        format: 'indoor',
+        attributes: ['public', 'prepaid'],
+        date: 'Nov 27',
+        fullDate: '2023-11-27',
+        dayOfWeek: 'Mon',
+        time: '10:00',
+        location: 'Simple Kaffa',
+        distance: 0.8,
+        attendees: 6,
+        capacity: 8,
+        image: 'https://images.unsplash.com/photo-1495474472287-4d71bcdd2085?q=80&w=2940&auto=format&fit=crop',
+        tags: ['Coffee', 'Workshop', 'Lifestyle'],
+        description: '從選豆到沖煮，專業咖啡師手把手教學，帶你進入手沖咖啡的世界。',
+        price: '$800',
+        organizer: { id: 'org7', name: 'Art Space Taipei', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=AS', role: 'supplier', verified: true },
+    },
+    {
+        id: '5',
+        title: '創業思維讀書會',
+        type: 'meetup',
+        format: 'indoor',
+        attributes: ['public', 'free_reservation'],
+        date: 'Nov 28',
+        fullDate: '2023-11-28',
+        dayOfWeek: 'Tue',
+        time: '19:00',
+        location: 'Eslite Bookstore',
+        distance: 1.2,
+        attendees: 15,
+        capacity: 20,
+        image: 'https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=2940&auto=format&fit=crop',
+        tags: ['Books', 'Business', 'Learning'],
+        description: '本週導讀《精實創業》，歡迎創業者與對創業有興趣的朋友一起交流。',
+        price: '$200',
+        organizer: { id: 'org3', name: 'Taipei Runners', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=TR', role: 'member' },
+    },
+    {
+        id: '6',
+        title: '週三爵士夜',
+        type: 'party',
+        format: 'indoor',
+        attributes: ['public', 'door', 'adults_only'],
+        date: 'Nov 29',
+        fullDate: '2023-11-29',
+        dayOfWeek: 'Wed',
+        time: '20:00',
+        location: 'Blue Note Taipei',
+        distance: 2.0,
+        attendees: 30,
+        capacity: 60,
+        image: 'https://images.unsplash.com/photo-1514525253440-b393452e8d26?q=80&w=2874&auto=format&fit=crop',
+        tags: ['Music', 'Jazz', 'Nightlife'],
+        description: '台北最經典的爵士樂現場，今晚有特別嘉賓演出。',
+        price: '$600',
+        organizer: { id: 'org6', name: 'Taipei Food Lovers', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=TF', role: 'member' },
+    },
+    {
+        id: '7',
+        title: '瑜伽伸展放鬆',
+        type: 'workshop',
+        format: 'indoor',
+        attributes: ['public', 'prepaid', 'lady_free'],
+        date: 'Nov 30',
+        fullDate: '2023-11-30',
+        dayOfWeek: 'Thu',
+        time: '19:30',
+        location: 'Yoga Space',
+        distance: 1.0,
+        attendees: 10,
+        capacity: 12,
+        image: 'https://images.unsplash.com/photo-1544367563-12123d8965cd?q=80&w=2940&auto=format&fit=crop',
+        tags: ['Sports', 'Yoga', 'Wellness'],
+        description: '透過瑜伽伸展釋放一整天的壓力，適合所有程度的學員。',
+        price: '$400',
+        organizer: { id: 'org5', name: 'Yoga with Love', avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=YL', role: 'vendor' },
+    },
+];
+
+export const tags = ['All', 'Social', 'Tech', 'Sports', 'Music', 'Art', 'Food', 'Business', 'Lifestyle'];

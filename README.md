@@ -1,36 +1,38 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Party.com.tw
 
-## Getting Started
+台灣派對聚合平台 - 發現身邊的精彩聚會
 
-First, run the development server:
+## 🚀 快速開始
 
 ```bash
+# 安裝依賴
+npm install
+
+# 啟動開發服務器
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+
+# 構建生產版本
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🌐 部署狀態
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- **GitHub**: <https://github.com/0xRyanlee/party.com.tw>
+- **Vercel**: 部署中
+- **域名**: party.com.tw
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 📦 技術棧
 
-## Learn More
+- Next.js 16.0.3
+- TypeScript
+- Tailwind CSS
+- Framer Motion
+- Supabase
 
-To learn more about Next.js, take a look at the following resources:
+## 🔑 環境變量
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+複製 `.env.example` 到 `.env.local` 並填入您的 API 密鑰。
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## 📝 License
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Private

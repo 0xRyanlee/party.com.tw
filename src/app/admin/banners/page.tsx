@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -17,8 +17,8 @@ const bannerSchema = z.object({
     title: z.string().min(1, "Title is required"),
     image_url: z.string().url("Must be a valid URL"),
     link_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
-    display_order: z.coerce.number().default(0),
-    is_active: z.boolean().default(true),
+    display_order: z.number(),
+    is_active: z.boolean(),
 });
 
 type BannerFormValues = z.infer<typeof bannerSchema>;
@@ -163,7 +163,7 @@ export default function BannersPage() {
 
                             <div className="space-y-2">
                                 <Label htmlFor="display_order">Display Order</Label>
-                                <Input type="number" id="display_order" {...form.register("display_order")} />
+                                <Input type="number" id="display_order" {...form.register("display_order", { valueAsNumber: true })} />
                             </div>
 
                             <div className="flex items-center space-x-2">

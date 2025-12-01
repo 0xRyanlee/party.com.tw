@@ -6,7 +6,7 @@ import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, List, Navigation } from "lucide-react";
 import Link from "next/link";
-import { events } from "@/lib/mock-data";
+import { mockEvents as events } from "@/lib/mock-data";
 import EventDetailModal from "@/components/EventDetailModal";
 import { Event } from "@/lib/mock-data";
 

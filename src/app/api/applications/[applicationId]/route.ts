@@ -7,9 +7,10 @@ import { createClient } from '@/lib/supabase/server';
  */
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { applicationId: string } }
+    props: { params: Promise<{ applicationId: string }> }
 ) {
-    const supabase = createClient();
+    const params = await props.params;
+    const supabase = await createClient();
     const { applicationId } = params;
 
     try {
@@ -79,9 +80,10 @@ export async function PATCH(
  */
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { applicationId: string } }
+    props: { params: Promise<{ applicationId: string }> }
 ) {
-    const supabase = createClient();
+    const params = await props.params;
+    const supabase = await createClient();
     const { applicationId } = params;
 
     try {

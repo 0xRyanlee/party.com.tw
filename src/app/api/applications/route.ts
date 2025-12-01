@@ -6,7 +6,7 @@ import { createClient } from '@/lib/supabase/server';
  * 提交申請（申請角色或資源）
  */
 export async function POST(request: NextRequest) {
-    const supabase = createClient();
+    const supabase = await createClient();
 
     try {
         const body = await request.json();
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
  * 獲取當前用戶的申請列表
  */
 export async function GET(request: NextRequest) {
-    const supabase = createClient();
+    const supabase = await createClient();
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status'); // 可選篩選
 

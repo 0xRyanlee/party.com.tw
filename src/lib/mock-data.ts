@@ -17,6 +17,8 @@ export interface Event {
     dayOfWeek: string; // e.g. "Mon", "Tue"
     time: string;
     location: string;
+    lat: number;
+    lng: number;
     distance: number; // km
     attendees: number;
     capacity: number;
@@ -41,6 +43,8 @@ export const mockEvents: Event[] = [
         dayOfWeek: 'Fri',
         time: '19:30',
         location: 'Draft Land, Xinyi',
+        lat: 25.0355,
+        lng: 121.5645,
         distance: 0.3,
         attendees: 12,
         capacity: 20,
@@ -82,6 +86,8 @@ export const mockEvents: Event[] = [
         dayOfWeek: 'Sat',
         time: '14:00',
         location: 'AppWorks, Taipei',
+        lat: 25.0426,
+        lng: 121.5649,
         distance: 1.5,
         attendees: 45,
         capacity: 50,
@@ -102,6 +108,8 @@ export const mockEvents: Event[] = [
         dayOfWeek: 'Sun',
         time: '06:00',
         location: 'Dajia Riverside Park',
+        lat: 25.0753,
+        lng: 121.5525,
         distance: 2.8,
         attendees: 8,
         capacity: 15,
@@ -122,6 +130,8 @@ export const mockEvents: Event[] = [
         dayOfWeek: 'Mon',
         time: '10:00',
         location: 'Simple Kaffa',
+        lat: 25.0445,
+        lng: 121.5295,
         distance: 0.8,
         attendees: 6,
         capacity: 8,
@@ -142,6 +152,8 @@ export const mockEvents: Event[] = [
         dayOfWeek: 'Tue',
         time: '19:00',
         location: 'Eslite Bookstore',
+        lat: 25.0378,
+        lng: 121.5652,
         distance: 1.2,
         attendees: 15,
         capacity: 20,
@@ -162,6 +174,8 @@ export const mockEvents: Event[] = [
         dayOfWeek: 'Wed',
         time: '20:00',
         location: 'Blue Note Taipei',
+        lat: 25.0195,
+        lng: 121.5298,
         distance: 2.0,
         attendees: 30,
         capacity: 60,
@@ -182,6 +196,8 @@ export const mockEvents: Event[] = [
         dayOfWeek: 'Thu',
         time: '19:30',
         location: 'Yoga Space',
+        lat: 25.0418,
+        lng: 121.5503,
         distance: 1.0,
         attendees: 10,
         capacity: 12,

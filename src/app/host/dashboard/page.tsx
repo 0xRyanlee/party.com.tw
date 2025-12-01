@@ -74,6 +74,8 @@ export default function HostDashboard() {
                             dayOfWeek: startDate.toLocaleDateString('en-US', { weekday: 'short' }),
                             time: startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
                             location: dbEvent.venue_name || 'TBD',
+                            lat: dbEvent.gps_lat || 25.0330,
+                            lng: dbEvent.gps_lng || 121.5654,
                             distance: 0,
                             attendees: dbEvent.registered_count || 0,
                             capacity: dbEvent.capacity_total || 100,

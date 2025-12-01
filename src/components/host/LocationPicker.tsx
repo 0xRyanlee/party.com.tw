@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { MapPin, Search, Navigation, Loader2, X } from 'lucide-react';
-import { Loader } from '@googlemaps/js-api-loader';
+import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
 
 interface LocationPickerProps {
     value?: {
@@ -53,7 +53,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
     // 初始化 Google Maps API
     useEffect(() => {
         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-        
+
         if (!apiKey) {
             console.log('Google Maps API Key not found, using fallback mode');
             setIsLoading(false);
@@ -61,26 +61,29 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
             return;
         }
 
-        const loader = new Loader({
-            apiKey,
-            version: 'weekly',
-            libraries: ['places', 'geocoding'],
-        });
+        (async () => {
+            try {
+                setOptions({
+                    key: apiKey,
+                    v: 'weekly',
+                    libraries: ['places', 'geocoding'],
+                });
 
-        loader.load().then(() => {
-            autocompleteService.current = new google.maps.places.AutocompleteService();
-            const div = document.createElement('div');
-            placesService.current = new google.maps.places.PlacesService(div);
-            geocoder.current = new google.maps.Geocoder();
-            
-            setUseGoogleMaps(true);
-            setIsLoading(false);
-            console.log('Google Maps API loaded successfully');
-        }).catch((err) => {
-            console.error('Failed to load Google Maps:', err);
-            setUseGoogleMaps(false);
-            setIsLoading(false);
-        });
+                await importLibrary('places');
+                autocompleteService.current = new google.maps.places.AutocompleteService();
+                const div = document.createElement('div');
+                placesService.current = new google.maps.places.PlacesService(div);
+                geocoder.current = new google.maps.Geocoder();
+
+                setUseGoogleMaps(true);
+                setIsLoading(false);
+                console.log('Google Maps API loaded successfully');
+            } catch (err) {
+                console.error('Failed to load Google Maps:', err);
+                setUseGoogleMaps(false);
+                setIsLoading(false);
+            }
+        })();
     }, []);
 
     // Google Maps 搜索
@@ -142,7 +145,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
         navigator.geolocation.getCurrentPosition(
             async (position) => {
                 const { latitude, longitude } = position.coords;
-                
+
                 // 如果有 Google Maps，使用反向地理編碼
                 if (useGoogleMaps && geocoder.current) {
                     const request: google.maps.GeocoderRequest = {
@@ -187,9 +190,9 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
 
     // 篩選熱門地點
     const filteredPopularLocations = searchQuery.length > 0
-        ? POPULAR_LOCATIONS.filter(loc => 
+        ? POPULAR_LOCATIONS.filter(loc =>
             loc.name.includes(searchQuery) || loc.address.includes(searchQuery)
-          )
+        )
         : POPULAR_LOCATIONS;
 
     if (isLoading) {

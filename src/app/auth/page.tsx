@@ -7,7 +7,7 @@ import { Label } from "@/components/ui/label";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import AuthButton from "@/components/auth/AuthButton";
-import { Mail } from "lucide-react";
+import { Mail, Loader2 } from "lucide-react";
 
 export default function AuthPage() {
     const { t } = useLanguage();

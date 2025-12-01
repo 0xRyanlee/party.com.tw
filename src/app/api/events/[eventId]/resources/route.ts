@@ -7,9 +7,10 @@ import { createClient } from '@/lib/supabase/server';
  */
 export async function POST(
     request: NextRequest,
-    { params }: { params: { eventId: string } }
+    props: { params: Promise<{ eventId: string }> }
 ) {
-    const supabase = createClient();
+    const params = await props.params;
+    const supabase = await createClient();
     const { eventId } = params;
 
     try {
@@ -81,9 +82,10 @@ export async function POST(
  */
 export async function GET(
     request: NextRequest,
-    { params }: { params: { eventId: string } }
+    props: { params: Promise<{ eventId: string }> }
 ) {
-    const supabase = createClient();
+    const params = await props.params;
+    const supabase = await createClient();
     const { eventId } = params;
 
     try {

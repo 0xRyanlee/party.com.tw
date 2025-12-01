@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { createClient } from "@/utils/supabase/client";
+import { createClient } from "@/lib/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
@@ -18,7 +18,7 @@ const announcementSchema = z.object({
     title: z.string().min(1, "Title is required"),
     content: z.string().optional(),
     type: z.enum(["info", "warning", "alert"]),
-    is_active: z.boolean().default(true),
+    is_active: z.boolean(),
 });
 
 type AnnouncementFormValues = z.infer<typeof announcementSchema>;

@@ -55,6 +55,8 @@ export default function EventsPage() {
               dayOfWeek: dayOfWeek,
               time: timeStr,
               location: dbEvent.venue_name || dbEvent.address || 'TBD',
+              lat: dbEvent.gps_lat || 25.0330,
+              lng: dbEvent.gps_lng || 121.5654,
               distance: 0, // Calculate if user location is available
               attendees: dbEvent.registered_count || 0,
               capacity: dbEvent.capacity_total || 100,

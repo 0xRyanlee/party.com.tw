@@ -15,6 +15,8 @@ import PageTransition from '@/components/PageTransition';
 import { motion } from 'framer-motion';
 import HeroCarousel from '@/components/HeroCarousel';
 import MapModal from '@/components/MapModal';
+import QuickActions from '@/components/QuickActions';
+import CategoryFilter from '@/components/CategoryFilter';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -109,6 +111,13 @@ export default function Home() {
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           {/* Left Column - Main Feed */}
           <div className="lg:col-span-8 space-y-6 lg:space-y-8">
+
+            {/* Category Filter */}
+            <CategoryFilter
+              tags={tags}
+              activeTag={activeTag}
+              onSelectTag={setActiveTag}
+            />
 
             {/* Upcoming Events Section */}
             <motion.section
@@ -237,26 +246,8 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.35 }}
-              className="bg-gradient-to-br from-emerald-500 to-emerald-600 rounded-[32px] p-4 sm:p-6 text-white shadow-lg"
             >
-              <h3 className="text-base sm:text-lg font-bold mb-3 sm:mb-4">快速操作</h3>
-              <div className="space-y-2 sm:space-y-3">
-                <Link href="/host/edit">
-                  <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-2xl p-3 sm:p-4 text-left transition-all text-xs sm:text-sm font-medium">
-                    辦個自己的活動
-                  </button>
-                </Link>
-                <Link href="/settings">
-                  <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-2xl p-3 sm:p-4 text-left transition-all text-xs sm:text-sm font-medium">
-                    成為貢獻者
-                  </button>
-                </Link>
-                <Link href="/club">
-                  <button className="w-full bg-white/20 hover:bg-white/30 backdrop-blur-sm rounded-2xl p-3 sm:p-4 text-left transition-all text-xs sm:text-sm font-medium">
-                    成為社群領袖
-                  </button>
-                </Link>
-              </div>
+              <QuickActions />
             </motion.div>
 
             {/* Map Preview Widget */}
@@ -349,6 +340,13 @@ export default function Home() {
           <OnboardingModal open={showOnboarding} onOpenChange={setShowOnboarding} />
         </div>
       )}
+
+      {/* Map Modal */}
+      <MapModal
+        isOpen={isMapOpen}
+        onClose={() => setIsMapOpen(false)}
+        events={filteredEvents}
+      />
     </main>
   );
 }

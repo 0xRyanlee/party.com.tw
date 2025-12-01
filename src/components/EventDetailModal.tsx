@@ -4,7 +4,13 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Clock, Users, X, Share2, Heart } from "lucide-react";
-import { Event } from "@/lib/mock-data";
+import { Event } from "@/lib/mock-data"; // This import might need to be updated if Event type is moved
+import MapComponent from "@/components/MapComponent";
+import { useState, useEffect } from "react"; // Added useEffect
+import { useToast } from "@/components/ui/use-toast"; // Assuming this exists or we mock it
+import AsyncButton from "@/components/ui/AsyncButton";
+import CollaborationOpportunities from "@/components/CollaborationOpportunities";
+import { EventRole, EventResource } from "@/types/schema"; // Assuming these types are correct
 
 interface EventDetailModalProps {
     event: Event | null;
@@ -13,6 +19,71 @@ interface EventDetailModalProps {
 }
 
 export default function EventDetailModal({ event, isOpen, onClose }: EventDetailModalProps) {
+    // const [isRegistering, setIsRegistering] = useState(false); // Handled by AsyncButton
+    const [registrationStatus, setRegistrationStatus] = useState<string | null>(null);
+    const { toast } = useToast(); // Assuming we have a toast hook, or we'll use alert for MVP
+
+    // New state for collaboration opportunities
+    const [roles, setRoles] = useState<EventRole[]>([]);
+    const [resources, setResources] = useState<EventResource[]>([]);
+    const [loadingOpportunities, setLoadingOpportunities] = useState(true);
+
+    // 加載合作機會
+    useEffect(() => {
+        if (isOpen && event?.id) { // Ensure event and event.id exist
+            fetchOpportunities();
+        }
+    }, [isOpen, event?.id]); // Depend on isOpen and event.id
+
+    const fetchOpportunities = async () => {
+        if (!event?.id) return; // Guard against missing event ID
+        try {
+            setLoadingOpportunities(true);
+            // Assuming an API endpoint like /api/events/[eventId]/opportunities
+            const response = await fetch(`/api/events/${event.id}/opportunities`);
+
+            if (response.ok) {
+                const data = await response.json();
+                setRoles(data.roles || []);
+                setResources(data.resources || []);
+            } else {
+                console.error('Failed to fetch opportunities:', response.statusText);
+                setRoles([]);
+                setResources([]);
+            }
+        } catch (error) {
+            console.error('Error fetching opportunities:', error);
+            setRoles([]);
+            setResources([]);
+        } finally {
+            setLoadingOpportunities(false);
+        }
+    };
+
+    const handleRegister = async () => {
+        if (!event) return;
+        // setIsRegistering(true); // Handled by AsyncButton
+
+        try {
+            // Dynamic import to avoid server-only module issues in client component if not handled by Next.js automatically
+            // But standard Server Actions can be imported directly.
+            // We need to ensure this component is Client Component (it is).
+            const { registerForEvent } = await import("@/app/actions/events");
+
+            const result = await registerForEvent(event.id);
+
+            if (result.success) {
+                setRegistrationStatus('confirmed');
+                // alert(result.message); // Simple feedback
+            } else {
+                alert(result.message);
+            }
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred. Please try again.");
+        }
+    };
+
     if (!event) return null;
 
     return (
@@ -86,6 +157,26 @@ export default function EventDetailModal({ event, isOpen, onClose }: EventDetail
                         </DialogDescription>
                     </div>
 
+                    {/* Location Map */}
+                    <div>
+                        <h3 className="text-lg font-bold mb-3">Location</h3>
+                        <MapComponent
+                            latitude={25.0330} // Mock coordinates for Taipei 101
+                            longitude={121.5654}
+                            locationName={event.location}
+                        />
+                    </div>
+
+                    {/* Collaboration Opportunities */}
+                    {event && (
+                        <CollaborationOpportunities
+                            event={{ id: event.id, title: event.title }}
+                            roles={roles} // Use fetched roles
+                            resources={resources} // Use fetched resources
+                            loading={loadingOpportunities} // Pass loading state
+                        />
+                    )}
+
                     {/* Organizer */}
                     <div className="flex items-center justify-between bg-gray-50 p-4 rounded-2xl">
                         <div className="flex items-center gap-3">
@@ -119,9 +210,17 @@ export default function EventDetailModal({ event, isOpen, onClose }: EventDetail
                     <Button variant="outline" size="icon" className="rounded-full w-12 h-12 shrink-0">
                         <Heart className="w-5 h-5" />
                     </Button>
-                    <Button className="flex-1 rounded-full bg-black hover:bg-gray-800 text-white h-12 text-lg font-medium">
-                        Join Event
-                    </Button>
+                    <AsyncButton
+                        className={`flex-1 h-12 text-lg transition-all ${registrationStatus === 'confirmed'
+                            ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
+                            : 'bg-black hover:bg-gray-800 text-white'
+                            }`}
+                        onClick={handleRegister}
+                        disabled={registrationStatus === 'confirmed'}
+                        successText="Registered!"
+                    >
+                        {registrationStatus === 'confirmed' ? "You're Going! 🎉" : "Join Event"}
+                    </AsyncButton>
                 </div>
 
             </DialogContent>

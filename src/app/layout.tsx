@@ -15,6 +15,7 @@ export const metadata: Metadata = {
 };
 
 import { I18nProvider } from "@/lib/i18n";
+import Footer from "@/components/Footer";
 
 export default function RootLayout({
   children,
@@ -28,6 +29,7 @@ export default function RootLayout({
       >
         <I18nProvider>
           {children}
+          <Footer />
         </I18nProvider>
       </body>
     </html>

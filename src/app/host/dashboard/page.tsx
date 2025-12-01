@@ -1,12 +1,15 @@
 "use client";
 
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useLanguage } from "@/lib/i18n";
-import { ArrowUpRight, Users, DollarSign, Eye, Activity, TrendingUp, Filter } from "lucide-react";
+import { ArrowUpRight, Users, DollarSign, Eye, Activity, TrendingUp, Filter, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
+import { createClient } from '@/lib/supabase/client';
+import { Event } from '@/lib/mock-data';
 
-// Mock Data for Charts
+// Mock Data for Charts (Keep these for now as we don't have real analytics data yet)
 const salesData = [
     { name: 'Mon', value: 4000 },
     { name: 'Tue', value: 3000 },
@@ -26,6 +29,77 @@ const funnelData = [
 
 export default function HostDashboard() {
     const { t } = useLanguage();
+    const [events, setEvents] = useState<Event[]>([]);
+    const [loading, setLoading] = useState(true);
+    const supabase = createClient();
+
+    useEffect(() => {
+        const fetchHostEvents = async () => {
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+
+                if (!user) {
+                    setLoading(false);
+                    return;
+                }
+
+                const { data, error } = await supabase
+                    .from('events')
+                    .select('*')
+                    .eq('organizer_id', user.id)
+                    .order('created_at', { ascending: false });
+
+                if (error) throw error;
+
+                if (data) {
+                    const mappedEvents: Event[] = data.map((dbEvent: any) => {
+                        const startDate = new Date(dbEvent.start_time);
+                        const dateStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+                        let priceDisplay = 'Free';
+                        if (dbEvent.ticket_types && dbEvent.ticket_types.length > 0) {
+                            const prices = dbEvent.ticket_types.map((t: any) => Number(t.price));
+                            const minPrice = Math.min(...prices);
+                            priceDisplay = minPrice === 0 ? 'Free' : `$${minPrice}`;
+                        }
+
+                        return {
+                            id: dbEvent.id,
+                            title: dbEvent.title,
+                            type: dbEvent.category || 'event',
+                            format: 'indoor',
+                            attributes: dbEvent.tags || [],
+                            date: dateStr,
+                            fullDate: dbEvent.start_time.split('T')[0],
+                            dayOfWeek: startDate.toLocaleDateString('en-US', { weekday: 'short' }),
+                            time: startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+                            location: dbEvent.venue_name || 'TBD',
+                            distance: 0,
+                            attendees: dbEvent.registered_count || 0,
+                            capacity: dbEvent.capacity_total || 100,
+                            image: dbEvent.cover_image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2940&auto=format&fit=crop',
+                            tags: dbEvent.tags || [],
+                            description: dbEvent.description_short || '',
+                            price: priceDisplay,
+                            organizer: {
+                                id: user.id,
+                                name: 'You', // In a real app, fetch user profile
+                                role: 'member',
+                            },
+                            isPromoted: false
+                        };
+                    });
+                    setEvents(mappedEvents);
+                }
+            } catch (error) {
+                console.error('Error fetching host events:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchHostEvents();
+    }, []);
 
     return (
         <div className="space-y-8 animate-in fade-in duration-500">
@@ -33,14 +107,14 @@ export default function HostDashboard() {
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                 <div>
                     <h1 className="text-3xl font-bold tracking-tight">{t('host.dashboard.title')}</h1>
-                    <p className="text-gray-500 mt-1">Welcome back! Here's what's happening with your events.</p>
+                    <p className="text-gray-500 mt-1">歡迎回來！這是您活動的最新動態。</p>
                 </div>
                 <div className="flex gap-2">
                     <Button variant="outline" className="rounded-full">
-                        <Filter className="w-4 h-4 mr-2" /> Last 7 Days
+                        <Filter className="w-4 h-4 mr-2" /> 最近 7 天
                     </Button>
                     <Button className="rounded-full bg-black text-white hover:bg-gray-800">
-                        <ArrowUpRight className="w-4 h-4 mr-2" /> Export Report
+                        <ArrowUpRight className="w-4 h-4 mr-2" /> 匯出報告
                     </Button>
                 </div>
             </div>
@@ -57,7 +131,7 @@ export default function HostDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">$45,231.89</div>
                         <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +20.1% from last month
+                            <TrendingUp className="w-3 h-3 mr-1" /> 較上月 +20.1%
                         </p>
                     </CardContent>
                 </Card>
@@ -71,7 +145,7 @@ export default function HostDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">+2350</div>
                         <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +180.1% from last month
+                            <TrendingUp className="w-3 h-3 mr-1" /> 較上月 +180.1%
                         </p>
                     </CardContent>
                 </Card>
@@ -85,7 +159,7 @@ export default function HostDashboard() {
                     <CardContent>
                         <div className="text-2xl font-bold">+12,234</div>
                         <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +19% from last month
+                            <TrendingUp className="w-3 h-3 mr-1" /> 較上月 +19%
                         </p>
                     </CardContent>
                 </Card>
@@ -97,9 +171,9 @@ export default function HostDashboard() {
                         <Activity className="h-4 w-4 text-orange-600" />
                     </CardHeader>
                     <CardContent>
-                        <div className="text-2xl font-bold">+573</div>
+                        <div className="text-2xl font-bold">{events.length}</div>
                         <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> +201 since last hour
+                            <TrendingUp className="w-3 h-3 mr-1" /> 共 {events.length} 個活動
                         </p>
                     </CardContent>
                 </Card>
@@ -182,7 +256,7 @@ export default function HostDashboard() {
                                     />
                                     <Bar dataKey="value" barSize={32} radius={[0, 4, 4, 0]}>
                                         {funnelData.map((entry, index) => (
-                                            <Cell key={`cell - ${index} `} fill={entry.fill} />
+                                            <Cell key={`cell-${index}`} fill={entry.fill} />
                                         ))}
                                     </Bar>
                                 </BarChart>
@@ -203,8 +277,8 @@ export default function HostDashboard() {
                         <div className="h-48 flex items-center justify-center border-2 border-dashed border-white/20 rounded-2xl bg-white/5 backdrop-blur-sm">
                             <div className="text-center">
                                 <Activity className="w-10 h-10 mx-auto mb-2 text-emerald-400 animate-pulse" />
-                                <p className="text-sm text-gray-400">Lottie Animation Placeholder</p>
-                                <p className="text-xs text-gray-500 mt-1">Real-time user interactions</p>
+                                <p className="text-sm text-gray-400">動畫佔位符</p>
+                                <p className="text-xs text-gray-500 mt-1">即時用戶互動</p>
                             </div>
                         </div>
                     </CardContent>
@@ -215,18 +289,31 @@ export default function HostDashboard() {
                         <CardTitle>{t('host.dashboard.recentActivity')}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                        <div className="space-y-6">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="flex items-center">
-                                    <div className="w-2 h-2 bg-emerald-500 rounded-full mr-4" />
-                                    <div className="flex-1 space-y-1">
-                                        <p className="text-sm font-medium leading-none">New ticket purchased</p>
-                                        <p className="text-xs text-gray-500">Just now • Alice Chen</p>
+                        {loading ? (
+                            <div className="flex justify-center py-8">
+                                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                            </div>
+                        ) : events.length > 0 ? (
+                            <div className="space-y-6">
+                                {events.slice(0, 5).map((event) => (
+                                    <div key={event.id} className="flex items-center">
+                                        <div
+                                            className="w-10 h-10 rounded-full bg-cover bg-center mr-4 border border-gray-100"
+                                            style={{ backgroundImage: `url(${event.image})` }}
+                                        />
+                                        <div className="flex-1 space-y-1">
+                                            <p className="text-sm font-medium leading-none">{event.title}</p>
+                                            <p className="text-xs text-gray-500">{event.date} • {event.attendees} guests</p>
+                                        </div>
+                                        <div className="font-medium text-sm text-emerald-600">{event.price}</div>
                                     </div>
-                                    <div className="font-medium text-sm">+$1,200</div>
-                                </div>
-                            ))}
-                        </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="text-center py-8 text-gray-500">
+                                <p>尚無活動。立即建立您的第一個活動！</p>
+                            </div>
+                        )}
                     </CardContent>
                 </Card>
             </div>

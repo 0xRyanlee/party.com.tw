@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
-import { MapPin, Navigation, Loader2, X, Search } from 'lucide-react';
-import { setOptions, importLibrary } from '@googlemaps/js-api-loader';
+import { MapPin, Search, Navigation, Loader2, X } from 'lucide-react';
+import { Loader } from '@googlemaps/js-api-loader';
 
 interface LocationPickerProps {
     value?: {
@@ -22,140 +22,144 @@ interface LocationPickerProps {
     }) => void;
 }
 
-export default function LocationPicker({ value, onChange }: LocationPickerProps) {
-    const [showSuggestions, setShowSuggestions] = useState(false);
-    const [isGettingLocation, setIsGettingLocation] = useState(false);
-    const [searchQuery, setSearchQuery] = useState('');
+// 台灣熱門地點預設列表（降級使用）
+const POPULAR_LOCATIONS = [
+    { name: '台北101', address: '台北市信義區信義路五段7號', lat: 25.0339639, lng: 121.5644722 },
+    { name: '西門町', address: '台北市萬華區成都路', lat: 25.042436, lng: 121.506913 },
+    { name: '東區', address: '台北市大安區忠孝東路四段', lat: 25.041583, lng: 121.543611 },
+    { name: '師大夜市', address: '台北市大安區師大路', lat: 25.026039, lng: 121.528139 },
+    { name: '信義商圈', address: '台北市信義區', lat: 25.033611, lng: 121.564444 },
+    { name: '中山站', address: '台北市中山區南京西路', lat: 25.052381, lng: 121.520444 },
+    { name: '士林夜市', address: '台北市士林區基河路', lat: 25.087778, lng: 121.524167 },
+    { name: '台大校園', address: '台北市大安區羅斯福路四段1號', lat: 25.017472, lng: 121.539583 },
+];
 
-    // Google Maps State
-    const [apiKeyError, setApiKeyError] = useState(false);
-    const [autocompleteService, setAutocompleteService] = useState<google.maps.places.AutocompleteService | null>(null);
-    const [placesService, setPlacesService] = useState<google.maps.places.PlacesService | null>(null);
-    const [geocoder, setGeocoder] = useState<google.maps.Geocoder | null>(null);
-    const [predictions, setPredictions] = useState<google.maps.places.AutocompletePrediction[]>([]);
+export default function LocationPicker({ value, onChange }: LocationPickerProps) {
+    const [searchQuery, setSearchQuery] = useState('');
+    const [isSearching, setIsSearching] = useState(false);
+    const [suggestions, setSuggestions] = useState<google.maps.places.AutocompletePrediction[]>([]);
+    const [showSuggestions, setShowSuggestions] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [useGoogleMaps, setUseGoogleMaps] = useState(false);
+    const [showPopularLocations, setShowPopularLocations] = useState(false);
+
+    const autocompleteService = useRef<google.maps.places.AutocompleteService | null>(null);
+    const placesService = useRef<google.maps.places.PlacesService | null>(null);
+    const geocoder = useRef<google.maps.Geocoder | null>(null);
 
     const locationName = value?.name || '';
     const locationAddress = value?.address || '';
 
-    // Load Google Maps API
+    // 初始化 Google Maps API
     useEffect(() => {
         const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+        
         if (!apiKey) {
-            console.warn('Google Maps API Key not found');
-            setApiKeyError(true);
+            console.log('Google Maps API Key not found, using fallback mode');
+            setIsLoading(false);
+            setUseGoogleMaps(false);
             return;
         }
 
-        // Initialize the loader with options
-        // Note: In v2, we use setOptions or just importLibrary directly if we want singleton behavior,
-        // but setOptions is the direct replacement for the Loader constructor options.
-        // However, the error message specifically mentioned setOptions.
-        // Let's try to use the Loader class if it exists in the import but maybe it's named differently?
-        // No, the error said "Loader class is no longer available".
-        // So we must use setOptions.
-
-        // Wait, if I import Loader from '@googlemaps/js-api-loader', and it's not available, that import will fail or be empty?
-        // The error was runtime: "The Loader class is no longer available...".
-        // This means the symbol 'Loader' might still be exported but throws when instantiated, OR I should not import it.
-
-        // Let's use the functional API as requested.
-
-        setOptions({
-            key: apiKey,
-            v: 'weekly',
-            libraries: ['places', 'geometry'],
-            language: 'zh-TW',
-            region: 'TW',
+        const loader = new Loader({
+            apiKey,
+            version: 'weekly',
+            libraries: ['places', 'geocoding'],
         });
 
-        const loadLibraries = async () => {
-            try {
-                const { AutocompleteService, PlacesService } = await importLibrary('places') as google.maps.PlacesLibrary;
-                const { Geocoder } = await importLibrary('geocoding') as google.maps.GeocodingLibrary;
-
-                setAutocompleteService(new AutocompleteService());
-                setGeocoder(new Geocoder());
-                // PlacesService requires a DOM element, even if not displaying a map
-                const dummyDiv = document.createElement('div');
-                setPlacesService(new PlacesService(dummyDiv));
-            } catch (e: unknown) {
-                console.error('Failed to load Google Maps API', e);
-                setApiKeyError(true);
-            }
-        };
-
-        loadLibraries();
+        loader.load().then(() => {
+            autocompleteService.current = new google.maps.places.AutocompleteService();
+            const div = document.createElement('div');
+            placesService.current = new google.maps.places.PlacesService(div);
+            geocoder.current = new google.maps.Geocoder();
+            
+            setUseGoogleMaps(true);
+            setIsLoading(false);
+            console.log('Google Maps API loaded successfully');
+        }).catch((err) => {
+            console.error('Failed to load Google Maps:', err);
+            setUseGoogleMaps(false);
+            setIsLoading(false);
+        });
     }, []);
 
-    // Search Predictions
-    useEffect(() => {
-        if (!autocompleteService || !searchQuery) {
-            setPredictions([]);
+    // Google Maps 搜索
+    const searchWithGoogleMaps = useCallback(async (query: string) => {
+        if (!query || query.length < 2 || !autocompleteService.current) {
+            setSuggestions([]);
             return;
         }
 
-        if (searchQuery.length < 2) return;
-
+        setIsSearching(true);
         const request: google.maps.places.AutocompletionRequest = {
-            input: searchQuery,
+            input: query,
             componentRestrictions: { country: 'tw' },
-            types: ['establishment', 'geocode'],
+            language: 'zh-TW',
         };
 
-        autocompleteService.getPlacePredictions(request, (results, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && results) {
-                setPredictions(results);
+        autocompleteService.current.getPlacePredictions(request, (predictions, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && predictions) {
+                setSuggestions(predictions);
+                setShowSuggestions(true);
             } else {
-                setPredictions([]);
+                setSuggestions([]);
             }
+            setIsSearching(false);
         });
-    }, [searchQuery, autocompleteService]);
+    }, []);
 
-    // Handle Place Selection
-    const handleSelectPlace = (placeId: string, description: string) => {
-        if (!placesService) return;
+    // 選擇 Google Maps 地點
+    const selectGoogleMapsLocation = useCallback((prediction: google.maps.places.AutocompletePrediction) => {
+        if (!placesService.current) return;
 
-        placesService.getDetails({
-            placeId,
-            fields: ['name', 'formatted_address', 'geometry']
-        }, (place, status) => {
-            if (status === google.maps.places.PlacesServiceStatus.OK && place && place.geometry && place.geometry.location) {
+        const request: google.maps.places.PlaceDetailsRequest = {
+            placeId: prediction.place_id,
+            fields: ['name', 'formatted_address', 'geometry'],
+        };
+
+        placesService.current.getDetails(request, (place, status) => {
+            if (status === google.maps.places.PlacesServiceStatus.OK && place) {
                 onChange?.({
-                    name: place.name || description,
-                    address: place.formatted_address || '',
-                    lat: place.geometry.location.lat(),
-                    lng: place.geometry.location.lng(),
+                    name: place.name || prediction.structured_formatting.main_text,
+                    address: place.formatted_address || prediction.description,
+                    lat: place.geometry?.location?.lat(),
+                    lng: place.geometry?.location?.lng(),
                 });
-                setSearchQuery('');
                 setShowSuggestions(false);
+                setSearchQuery('');
             }
         });
-    };
+    }, [onChange]);
 
-    // Use Current Location
-    const useCurrentLocation = () => {
+    // 使用當前位置
+    const useCurrentLocation = useCallback(() => {
         if (!navigator.geolocation) {
             alert('您的瀏覽器不支援地理位置功能');
             return;
         }
 
-        setIsGettingLocation(true);
+        setIsSearching(true);
         navigator.geolocation.getCurrentPosition(
-            (position) => {
+            async (position) => {
                 const { latitude, longitude } = position.coords;
+                
+                // 如果有 Google Maps，使用反向地理編碼
+                if (useGoogleMaps && geocoder.current) {
+                    const request: google.maps.GeocoderRequest = {
+                        location: { lat: latitude, lng: longitude },
+                        language: 'zh-TW',
+                    };
 
-                // If Geocoder is available, get address
-                if (geocoder) {
-                    geocoder.geocode({ location: { lat: latitude, lng: longitude } }, (results, status) => {
-                        if (status === 'OK' && results && results[0]) {
+                    geocoder.current.geocode(request, (results, status) => {
+                        setIsSearching(false);
+                        if (status === google.maps.GeocoderStatus.OK && results && results[0]) {
                             onChange?.({
-                                name: '當前位置', // Or use results[0].formatted_address as name?
+                                name: results[0].address_components[0]?.long_name || '當前位置',
                                 address: results[0].formatted_address,
                                 lat: latitude,
                                 lng: longitude,
                             });
                         } else {
-                            // Fallback if geocoding fails
                             onChange?.({
                                 name: '當前位置',
                                 address: `緯度: ${latitude.toFixed(6)}, 經度: ${longitude.toFixed(6)}`,
@@ -163,97 +167,164 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                                 lng: longitude,
                             });
                         }
-                        setIsGettingLocation(false);
                     });
                 } else {
-                    // Fallback if API not loaded
+                    setIsSearching(false);
                     onChange?.({
                         name: '當前位置',
                         address: `緯度: ${latitude.toFixed(6)}, 經度: ${longitude.toFixed(6)}`,
                         lat: latitude,
                         lng: longitude,
                     });
-                    setIsGettingLocation(false);
                 }
             },
             (error) => {
-                setIsGettingLocation(false);
+                setIsSearching(false);
                 alert('無法獲取當前位置: ' + error.message);
             }
         );
-    };
+    }, [useGoogleMaps, onChange]);
+
+    // 篩選熱門地點
+    const filteredPopularLocations = searchQuery.length > 0
+        ? POPULAR_LOCATIONS.filter(loc => 
+            loc.name.includes(searchQuery) || loc.address.includes(searchQuery)
+          )
+        : POPULAR_LOCATIONS;
+
+    if (isLoading) {
+        return (
+            <div className="flex items-center justify-center py-8">
+                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
+                <span className="ml-2 text-sm text-gray-500">載入地圖服務中...</span>
+            </div>
+        );
+    }
 
     return (
         <div className="space-y-4">
-            {/* Search Input */}
-            <div>
-                <Label className="text-sm font-medium mb-2 block">搜尋地點</Label>
-                <div className="relative">
-                    <div className="relative">
-                        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                        <Input
-                            type="text"
-                            value={searchQuery}
-                            onChange={(e) => {
-                                setSearchQuery(e.target.value);
-                                setShowSuggestions(true);
-                            }}
-                            onFocus={() => setShowSuggestions(true)}
-                            placeholder={apiKeyError ? "API 未連接，請手動輸入" : "搜尋地點名稱或地址..."}
-                            className="pl-10 pr-10"
-                            disabled={apiKeyError}
-                        />
-                        {searchQuery && (
-                            <button
-                                type="button"
-                                onClick={() => {
-                                    setSearchQuery('');
-                                    setShowSuggestions(false);
-                                }}
-                                className="absolute right-3 top-1/2 -translate-y-1/2"
-                            >
-                                <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
-                            </button>
-                        )}
-                    </div>
+            {/* API 狀態提示 */}
+            {!useGoogleMaps && (
+                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
+                    <p className="text-xs text-yellow-800">
+                        💡 目前使用簡化模式（熱門地點）。如需更精確搜索，請配置 Google Maps API Key。
+                    </p>
+                </div>
+            )}
 
-                    {/* Suggestions Dropdown */}
-                    {showSuggestions && predictions.length > 0 && (
-                        <div className="absolute z-50 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
-                            {predictions.map((prediction) => (
+            {/* 搜索框 */}
+            <div className="relative">
+                <Label className="text-sm font-medium mb-2 block">
+                    {useGoogleMaps ? '搜索地點（Google Maps）' : '搜索或選擇地點'}
+                </Label>
+                <div className="relative">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                    <Input
+                        type="text"
+                        value={searchQuery}
+                        onChange={(e) => {
+                            setSearchQuery(e.target.value);
+                            if (useGoogleMaps) {
+                                searchWithGoogleMaps(e.target.value);
+                            } else {
+                                setShowPopularLocations(true);
+                            }
+                        }}
+                        onFocus={() => {
+                            if (useGoogleMaps && suggestions.length > 0) {
+                                setShowSuggestions(true);
+                            } else {
+                                setShowPopularLocations(true);
+                            }
+                        }}
+                        placeholder={useGoogleMaps ? "輸入任何地點名稱或地址..." : "搜索熱門地點..."}
+                        className="pl-10 pr-10"
+                    />
+                    {isSearching ? (
+                        <Loader2 className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 animate-spin" />
+                    ) : searchQuery && (
+                        <button
+                            type="button"
+                            onClick={() => {
+                                setSearchQuery('');
+                                setShowSuggestions(false);
+                                setShowPopularLocations(false);
+                            }}
+                            className="absolute right-3 top-1/2 -translate-y-1/2"
+                        >
+                            <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
+                        </button>
+                    )}
+                </div>
+
+                {/* Google Maps 建議 */}
+                {useGoogleMaps && showSuggestions && suggestions.length > 0 && (
+                    <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        {suggestions.map((suggestion) => (
+                            <button
+                                key={suggestion.place_id}
+                                type="button"
+                                onClick={() => selectGoogleMapsLocation(suggestion)}
+                                className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
+                            >
+                                <div className="flex items-start gap-3">
+                                    <MapPin className="w-5 h-5 text-blue-500 mt-0.5 flex-shrink-0" />
+                                    <div className="flex-1 min-w-0">
+                                        <p className="font-medium text-sm">
+                                            {suggestion.structured_formatting.main_text}
+                                        </p>
+                                        <p className="text-xs text-gray-500 truncate">
+                                            {suggestion.structured_formatting.secondary_text}
+                                        </p>
+                                    </div>
+                                </div>
+                            </button>
+                        ))}
+                    </div>
+                )}
+
+                {/* 熱門地點建議 */}
+                {!useGoogleMaps && showPopularLocations && (
+                    <div className="absolute z-10 w-full mt-2 bg-white border border-gray-200 rounded-xl shadow-lg max-h-60 overflow-y-auto">
+                        {filteredPopularLocations.length > 0 ? (
+                            filteredPopularLocations.map((location, index) => (
                                 <button
-                                    key={prediction.place_id}
+                                    key={index}
                                     type="button"
-                                    onClick={() => handleSelectPlace(prediction.place_id, prediction.description)}
+                                    onClick={() => {
+                                        onChange?.(location);
+                                        setShowPopularLocations(false);
+                                        setSearchQuery('');
+                                    }}
                                     className="w-full text-left px-4 py-3 hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0"
                                 >
                                     <div className="flex items-start gap-3">
                                         <MapPin className="w-5 h-5 text-gray-400 mt-0.5 flex-shrink-0" />
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-medium text-sm text-gray-900">
-                                                {prediction.structured_formatting.main_text}
-                                            </p>
-                                            <p className="text-xs text-gray-500 truncate">
-                                                {prediction.structured_formatting.secondary_text}
-                                            </p>
+                                            <p className="font-medium text-sm">{location.name}</p>
+                                            <p className="text-xs text-gray-500 truncate">{location.address}</p>
                                         </div>
                                     </div>
                                 </button>
-                            ))}
-                        </div>
-                    )}
-                </div>
+                            ))
+                        ) : (
+                            <div className="px-4 py-8 text-center text-gray-500 text-sm">
+                                沒有找到匹配的地點
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
 
-            {/* Current Location Button */}
+            {/* 當前位置 */}
             <Button
                 type="button"
                 variant="outline"
                 onClick={useCurrentLocation}
-                disabled={isGettingLocation}
+                disabled={isSearching}
                 className="w-full gap-2"
             >
-                {isGettingLocation ? (
+                {isSearching ? (
                     <>
                         <Loader2 className="w-4 h-4 animate-spin" />
                         正在獲取位置...
@@ -266,7 +337,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                 )}
             </Button>
 
-            {/* Selected Location Display */}
+            {/* 已選地點 */}
             {locationName && (
                 <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
                     <div className="flex items-start gap-3">
@@ -291,9 +362,9 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                 </div>
             )}
 
-            {/* Manual Input Fallback */}
+            {/* 手動輸入 */}
             <div className="pt-4 border-t border-gray-200">
-                <Label className="text-sm font-medium mb-2 block">手動輸入 (如果找不到地點)</Label>
+                <Label className="text-sm font-medium mb-2 block">或手動輸入</Label>
                 <div className="space-y-3">
                     <div>
                         <Label className="text-xs text-gray-600">地點名稱</Label>
@@ -325,14 +396,6 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                     </div>
                 </div>
             </div>
-
-            {apiKeyError && (
-                <div className="bg-amber-50 border border-amber-200 rounded-lg p-3">
-                    <p className="text-xs text-amber-700">
-                        ⚠️ Google Maps API 未連接，請使用手動輸入模式。
-                    </p>
-                </div>
-            )}
         </div>
     );
 }

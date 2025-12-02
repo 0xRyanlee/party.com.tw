@@ -9,8 +9,11 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Party 聚合平台 - 發現身邊的精彩活動",
-  description: "極簡的派對聚合平台，連接活動組織者和參與者，發現、創建和管理各種社交聚會活動",
+  title: "Party - 探索身邊的精彩活動",
+  description: "發現並參與台灣各地的聚會、工作坊、派對等活動",
+  verification: {
+    google: '58147ZZmtRggK8XRLJkVz7uLOpDJpu0v-Gwd7L2PIs4',
+  },
   keywords: ["活動", "聚會", "meetup", "workshop", "社交", "派對"],
 };
 

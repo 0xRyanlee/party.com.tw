@@ -1,173 +1,146 @@
-import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
-import { EventMVP } from '@/types/event-mvp';
+import { NextRequest, NextResponse } from 'next/server';
 
-/**
- * GET /api/events
- * 獲取活動列表，支援篩選和分頁
- */
-export async function GET(request: NextRequest) {
-    const supabase = await createClient();
-    const { searchParams } = new URL(request.url);
-
-    // 查詢參數
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '20');
-    const status = searchParams.get('status') || 'published';
-    const vibeType = searchParams.get('vibeType');
-    const city = searchParams.get('city');
-    const category = searchParams.get('category');
-
-    try {
-        let query = supabase
-            .from('events')
-            .select('*', { count: 'exact' })
-            .eq('status', status)
-            .order('start_time', { ascending: true });
-
-        // 可選篩選
-        if (vibeType) {
-            query = query.eq('vibe_type', vibeType);
-        }
-        if (city) {
-            query = query.eq('city', city);
-        }
-        if (category) {
-            query = query.eq('category', category);
-        }
-
-        // 分頁
-        const from = (page - 1) * limit;
-        const to = from + limit - 1;
-        query = query.range(from, to);
-
-        const { data, error, count } = await query;
-
-        if (error) {
-            throw error;
-        }
-
-        return NextResponse.json({
-            events: data,
-            pagination: {
-                page,
-                limit,
-                total: count || 0,
-                totalPages: Math.ceil((count || 0) / limit),
-            },
-        });
-    } catch (error: any) {
-        console.error('Error fetching events:', error);
-        return NextResponse.json(
-            { error: error.message || 'Failed to fetch events' },
-            { status: 500 }
-        );
-    }
-}
-
-/**
- * POST /api/events
- * 創建新活動，支援所有 MVP 欄位
- */
 export async function POST(request: NextRequest) {
-    const supabase = await createClient();
-
     try {
-        const body = await request.json();
+        const supabase = await createClient();
 
-        // 獲取當前用戶
-        const {
-            data: { user },
-            error: authError,
-        } = await supabase.auth.getUser();
+        // 驗證用戶登入狀態
+        const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
-            return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+            return NextResponse.json(
+                { error: 'Unauthorized. Please login to create events.' },
+                { status: 401 }
+            );
         }
 
-        // Prepare event data with snake_case for database
+        // 解析請求 body
+        const body = await request.json();
+
+        // 驗證必要欄位
+        const requiredFields = ['title', 'descriptionLong', 'category', 'startTime', 'endTime', 'venueName', 'address'];
+        const missingFields = requiredFields.filter(field => !body[field]);
+
+        if (missingFields.length > 0) {
+            return NextResponse.json(
+                { error: `Missing required fields: ${missingFields.join(', ')}` },
+                { status: 400 }
+            );
+        }
+
+        // 準備活動資料
         const eventData = {
+            organizer_id: user.id,
             title: body.title,
             subtitle: body.subtitle || null,
-            description_short: body.descriptionShort || body.description?.substring(0, 200) || null,
-            description_long: body.descriptionLong || body.description || null,
-            category: body.category || null,
-            status: body.status || 'draft',
-            language: body.language || 'zh',
-
-            // Organizer (auto-populate from auth)
-            organizer_id: user.id,
-            organizer_name: body.organizerName || user.email?.split('@')[0] || 'Organizer',
-
-            // Media
+            description_short: body.descriptionShort || body.descriptionLong.substring(0, 200),
+            description_long: body.descriptionLong,
+            category: body.category,
             cover_image: body.coverImage || null,
 
-            // Time
+            // 時間
             start_time: body.startTime,
-            end_time: body.endTime || body.startTime, // Default to start time if not provided
+            end_time: body.endTime,
             timezone: body.timezone || 'Asia/Taipei',
 
-            // Location
-            venue_name: body.venueName || null,
-            address: body.address || null,
+            // 地點
+            venue_name: body.venueName,
+            address: body.address,
             city: body.city || null,
             country: body.country || 'Taiwan',
             gps_lat: body.gpsLat || null,
             gps_lng: body.gpsLng || null,
 
-            // Tickets
+            // 票務
             ticket_types: body.ticketTypes || [],
-            ticket_sale_start: body.ticketSaleStart || null,
-            ticket_sale_end: body.ticketSaleEnd || null,
-            allow_waitlist: body.allowWaitlist || false,
-
-            // Participant constraints (NEW SCHEMA)
             capacity_total: body.capacityTotal || null,
             capacity_remaining: body.capacityTotal || null,
-            is_adult_only: body.isAdultOnly || false, // NEW: 18+ switch
+            allow_waitlist: body.allowWaitlist || false,
+
+            // 參與設定
+            is_adult_only: body.isAdultOnly || false,
             invitation_only: body.invitationOnly || false,
-            invitation_code: body.invitationCode || null, // NEW: invitation code
-            require_questionnaire: body.requireQuestionnaire || false,
-            questionnaire_fields: body.questionnaireFields || [],
+            invitation_code: body.invitationCode || null,
 
-            // Tags (NEW: unified tag system)
-            tags: body.tags || [], // NEW: replaces vibe_type, theme, mood_tags
+            // 標籤
+            tags: body.tags || [],
 
-            // Social
-            event_rules: body.eventRules || null,
-            allow_comment: body.allowComment !== false,
-            attendee_list_visibility: body.attendeeListVisibility || 'public',
+            // 狀態
+            status: body.status || 'draft',
+            language: body.language || 'zh',
 
-            // Interaction
-            pre_event_chatroom: body.preEventChatroom || false,
-            post_event_chatroom: body.postEventChatroom || false,
-
-            // Rating
-            rating_enabled: body.ratingEnabled !== false,
-
-            // Extra
-            include_meal: body.includeMeal || false,
-
-            // Timestamps
-            created_at: new Date().toISOString(),
-            updated_at: new Date().toISOString(),
+            // 主辦方資訊（從用戶資料獲取）
+            organizer_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Anonymous',
+            organizer_avatar: user.user_metadata?.avatar_url || null,
+            organizer_verified: false,
         };
 
-        const { data, error } = await supabase
+        // 創建活動
+        const { data: event, error: createError } = await supabase
             .from('events')
-            .insert([eventData])
+            .insert(eventData)
             .select()
             .single();
 
-        if (error) {
-            throw error;
+        if (createError) {
+            console.error('Error creating event:', createError);
+            return NextResponse.json(
+                { error: 'Failed to create event', details: createError.message },
+                { status: 500 }
+            );
         }
 
-        return NextResponse.json({ event: data }, { status: 201 });
+        return NextResponse.json({ event }, { status: 201 });
+
     } catch (error: any) {
-        console.error('Error creating event:', error);
+        console.error('Unexpected error in POST /api/events:', error);
         return NextResponse.json(
-            { error: error.message || 'Failed to create event' },
+            { error: 'Internal server error', details: error.message },
+            { status: 500 }
+        );
+    }
+}
+
+export async function GET(request: NextRequest) {
+    try {
+        const supabase = await createClient();
+        const { searchParams } = new URL(request.url);
+
+        // 查詢參數
+        const status = searchParams.get('status') || 'published';
+        const category = searchParams.get('category');
+        const limit = parseInt(searchParams.get('limit') || '20');
+        const offset = parseInt(searchParams.get('offset') || '0');
+
+        // 構建查詢
+        let query = supabase
+            .from('events')
+            .select('*')
+            .eq('status', status)
+            .order('start_time', { ascending: true })
+            .range(offset, offset + limit - 1);
+
+        if (category) {
+            query = query.eq('category', category);
+        }
+
+        const { data: events, error } = await query;
+
+        if (error) {
+            console.error('Error fetching events:', error);
+            return NextResponse.json(
+                { error: 'Failed to fetch events', details: error.message },
+                { status: 500 }
+            );
+        }
+
+        return NextResponse.json({ events }, { status: 200 });
+
+    } catch (error: any) {
+        console.error('Unexpected error in GET /api/events:', error);
+        return NextResponse.json(
+            { error: 'Internal server error', details: error.message },
             { status: 500 }
         );
     }

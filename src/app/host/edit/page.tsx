@@ -155,7 +155,7 @@ export default function HostEdit() {
 
             // 保存角色需求
             if (roles.length > 0) {
-                const rolesResponse = await fetch(`/ api / events / ${event.id}/roles`, {
+                const rolesResponse = await fetch(`/api/events/${event.id}/roles`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roles }),

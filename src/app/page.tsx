@@ -10,13 +10,13 @@ import OnboardingModal from '@/components/OnboardingModal';
 import { mockEvents, tags } from '@/lib/mock-data';
 import WeeklyCalendar from '@/components/WeeklyCalendar';
 import { useLanguage } from '@/lib/i18n';
-import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import PageTransition from '@/components/PageTransition';
 import { motion } from 'framer-motion';
 import HeroCarousel from '@/components/HeroCarousel';
 import MapModal from '@/components/MapModal';
 import QuickActions from '@/components/QuickActions';
 import CategoryFilter from '@/components/CategoryFilter';
+import Navbar from '@/components/Navbar';
 
 export default function Home() {
   const { t } = useLanguage();
@@ -63,23 +63,8 @@ export default function Home() {
           </div>
 
           {/* Navigation */}
-          <nav className="flex items-center gap-2 sm:gap-4 md:gap-6 mb-6 md:mb-8 overflow-x-auto pb-2 scrollbar-hide">
-            <Link href="/" className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-black text-white text-xs sm:text-sm font-medium whitespace-nowrap">
-              {t('nav.home')}
-            </Link>
-            <Link href="/host/dashboard" className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-gray-100 text-xs sm:text-sm font-medium text-gray-600 whitespace-nowrap">
-              {t('nav.host')}
-            </Link>
-            <Link href="/club" className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-gray-100 text-xs sm:text-sm font-medium text-gray-600 whitespace-nowrap">
-              {t('nav.club')}
-            </Link>
-            <Link href="/settings" className="px-3 py-1.5 sm:px-4 sm:py-2 rounded-full hover:bg-gray-100 text-xs sm:text-sm font-medium text-gray-600 whitespace-nowrap">
-              {t('nav.settings')}
-            </Link>
-            <div className="ml-auto flex items-center gap-2">
-              <LanguageSwitcher />
-            </div>
-          </nav>
+          {/* Navigation */}
+          <Navbar />
 
           {/* Search Bar */}
           <div className="flex items-center gap-3 w-full md:w-auto">

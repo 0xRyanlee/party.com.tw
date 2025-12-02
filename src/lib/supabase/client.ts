@@ -12,5 +12,9 @@ export function createClient() {
         );
     }
 
-    return createBrowserClient(supabaseUrl || '', supabaseAnonKey || '');
+    // Provide fallback values for SSR/Build time to prevent @supabase/ssr from throwing
+    return createBrowserClient(
+        supabaseUrl || 'https://placeholder.supabase.co',
+        supabaseAnonKey || 'placeholder'
+    );
 }

@@ -6,10 +6,12 @@ export function createClient() {
 
     // Only validate if we're in a browser environment (not during SSR/build)
     if (typeof window !== 'undefined' && (!supabaseUrl || !supabaseAnonKey)) {
-        throw new Error(
+        console.error(
             'Missing Supabase environment variables. ' +
             'Please ensure NEXT_PUBLIC_SUPABASE_URL and NEXT_PUBLIC_SUPABASE_ANON_KEY are set.'
         );
+        // Return a dummy client to prevent crash, though auth will fail
+        return createBrowserClient('https://placeholder.supabase.co', 'placeholder');
     }
 
     // Provide fallback values for SSR/Build time to prevent @supabase/ssr from throwing

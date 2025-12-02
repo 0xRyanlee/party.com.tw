@@ -141,16 +141,16 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                             使用 Google 登入
                         </Button>
 
-                        {/* Line Login - Placeholder for future implementation */}
+                        {/* Line Login */}
                         <Button
+                            onClick={() => window.location.href = '/api/auth/line/authorize'}
                             variant="outline"
-                            className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50 opacity-50 cursor-not-allowed"
-                            disabled
+                            className="w-full h-12 rounded-xl border-gray-200 hover:bg-gray-50"
                         >
                             <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24" fill="#00C300">
                                 <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.019 9.604.391.084.922.258 1.057.592.121.303.079.778.038 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.992 2.61-4.128 2.61-6.288z" />
                             </svg>
-                            使用 Line 登入（即將推出）
+                            使用 Line 登入
                         </Button>
                     </div>
 

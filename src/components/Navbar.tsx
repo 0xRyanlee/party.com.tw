@@ -14,7 +14,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { User, LogOut, Calendar, Settings, Shield } from 'lucide-react';
+import { User, LogOut, Calendar, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
 
@@ -91,11 +91,7 @@ export default function Navbar() {
                                         <Settings className="mr-2 h-4 w-4" />
                                         <span>設定</span>
                                     </DropdownMenuItem>
-                                    {/* Admin Link (Hidden for normal users in real app, but useful for now) */}
-                                    <DropdownMenuItem onClick={() => router.push('/admin/management')}>
-                                        <Shield className="mr-2 h-4 w-4" />
-                                        <span>管理後台</span>
-                                    </DropdownMenuItem>
+
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem onClick={handleLogout} className="text-red-600">
                                         <LogOut className="mr-2 h-4 w-4" />

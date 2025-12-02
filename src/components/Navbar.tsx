@@ -17,12 +17,15 @@ import {
 import { User, LogOut, Calendar, Settings } from 'lucide-react';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter } from 'next/navigation';
+import AuthModal from '@/components/AuthModal';
+import { useState } from 'react';
 
 export default function Navbar() {
     const { t } = useLanguage();
     const { user, loading } = useUser();
     const router = useRouter();
     const supabase = createClient();
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
@@ -32,7 +35,7 @@ export default function Navbar() {
     const handleHostClick = (e: React.MouseEvent) => {
         if (!user && !loading) {
             e.preventDefault();
-            router.push('/auth');
+            setIsAuthModalOpen(true);
         }
     };
 
@@ -100,15 +103,19 @@ export default function Navbar() {
                                 </DropdownMenuContent>
                             </DropdownMenu>
                         ) : (
-                            <Link href="/auth">
-                                <Button size="sm" className="rounded-full bg-black text-white hover:bg-gray-800">
-                                    登入
-                                </Button>
-                            </Link>
+                            <Button
+                                size="sm"
+                                className="rounded-full bg-black text-white hover:bg-gray-800"
+                                onClick={() => setIsAuthModalOpen(true)}
+                            >
+                                登入
+                            </Button>
                         )}
                     </>
                 )}
             </div>
+
+            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
         </nav>
     );
 }

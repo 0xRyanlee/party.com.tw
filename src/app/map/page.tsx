@@ -1,7 +1,7 @@
 "use client";
 
 import { Map, Marker, Overlay } from "pigeon-maps";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, List, Navigation } from "lucide-react";
@@ -15,6 +15,12 @@ export default function MapPage() {
   const [center, setCenter] = useState<[number, number]>([25.0330, 121.5654]);
   const [zoom, setZoom] = useState(13);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+  const [mapHeight, setMapHeight] = useState(600); // Default height
+
+  useEffect(() => {
+    // Set map height after component mounts
+    setMapHeight(window.innerHeight);
+  }, []);
 
   // Mock coordinates for events (distribute them around Taipei)
   const eventLocations = events.map((event, index) => ({
@@ -45,7 +51,7 @@ export default function MapPage() {
       </div>
 
       <Map
-        height={window.innerHeight}
+        height={mapHeight}
         defaultCenter={center}
         defaultZoom={zoom}
         onBoundsChanged={({ center, zoom }) => {

@@ -1,326 +1,66 @@
-"use client";
-
-export const dynamic = "force-dynamic";
-
-import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { useLanguage } from "@/lib/i18n";
-import { ArrowUpRight, Users, DollarSign, Eye, Activity, TrendingUp, Filter, Loader2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
-import { createClient } from '@/lib/supabase/client';
+import { createClient } from '@/lib/supabase/server';
 import { Event } from '@/lib/mock-data';
+import DashboardClient from './DashboardClient';
+import { redirect } from 'next/navigation';
 
-// Mock Data for Charts (Keep these for now as we don't have real analytics data yet)
-const salesData = [
-    { name: 'Mon', value: 4000 },
-    { name: 'Tue', value: 3000 },
-    { name: 'Wed', value: 2000 },
-    { name: 'Thu', value: 2780 },
-    { name: 'Fri', value: 1890 },
-    { name: 'Sat', value: 2390 },
-    { name: 'Sun', value: 3490 },
-];
+export default async function HostDashboard() {
+    const supabase = await createClient();
 
-const funnelData = [
-    { name: 'Impressions', value: 12000, fill: '#10b981' }, // Emerald 500
-    { name: 'Clicks', value: 8000, fill: '#34d399' },       // Emerald 400
-    { name: 'Signups', value: 4000, fill: '#6ee7b7' },      // Emerald 300
-    { name: 'Paid', value: 2000, fill: '#a7f3d0' },        // Emerald 200
-];
+    const { data: { user } } = await supabase.auth.getUser();
 
-export default function HostDashboard() {
-    const { t } = useLanguage();
-    const [events, setEvents] = useState<Event[]>([]);
-    const [loading, setLoading] = useState(true);
-    const supabase = createClient();
+    if (!user) {
+        redirect('/auth');
+    }
 
-    useEffect(() => {
-        const fetchHostEvents = async () => {
-            try {
-                const { data: { user } } = await supabase.auth.getUser();
+    const { data, error } = await supabase
+        .from('events')
+        .select('*')
+        .eq('organizer_id', user.id)
+        .order('created_at', { ascending: false });
 
-                if (!user) {
-                    setLoading(false);
-                    return;
-                }
+    if (error) {
+        console.error('Error fetching host events:', error);
+    }
 
-                const { data, error } = await supabase
-                    .from('events')
-                    .select('*')
-                    .eq('organizer_id', user.id)
-                    .order('created_at', { ascending: false });
+    const events: Event[] = data ? data.map((dbEvent: any) => {
+        const startDate = new Date(dbEvent.start_time);
+        const dateStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
 
-                if (error) throw error;
+        let priceDisplay = 'Free';
+        if (dbEvent.ticket_types && dbEvent.ticket_types.length > 0) {
+            const prices = dbEvent.ticket_types.map((t: any) => Number(t.price));
+            const minPrice = Math.min(...prices);
+            priceDisplay = minPrice === 0 ? 'Free' : `$${minPrice}`;
+        }
 
-                if (data) {
-                    const mappedEvents: Event[] = data.map((dbEvent: any) => {
-                        const startDate = new Date(dbEvent.start_time);
-                        const dateStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-
-                        let priceDisplay = 'Free';
-                        if (dbEvent.ticket_types && dbEvent.ticket_types.length > 0) {
-                            const prices = dbEvent.ticket_types.map((t: any) => Number(t.price));
-                            const minPrice = Math.min(...prices);
-                            priceDisplay = minPrice === 0 ? 'Free' : `$${minPrice}`;
-                        }
-
-                        return {
-                            id: dbEvent.id,
-                            title: dbEvent.title,
-                            type: dbEvent.category || 'event',
-                            format: 'indoor',
-                            attributes: dbEvent.tags || [],
-                            date: dateStr,
-                            fullDate: dbEvent.start_time.split('T')[0],
-                            dayOfWeek: startDate.toLocaleDateString('en-US', { weekday: 'short' }),
-                            time: startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
-                            location: dbEvent.venue_name || 'TBD',
-                            lat: dbEvent.gps_lat || 25.0330,
-                            lng: dbEvent.gps_lng || 121.5654,
-                            distance: 0,
-                            attendees: dbEvent.registered_count || 0,
-                            capacity: dbEvent.capacity_total || 100,
-                            image: dbEvent.cover_image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2940&auto=format&fit=crop',
-                            tags: dbEvent.tags || [],
-                            description: dbEvent.description_short || '',
-                            price: priceDisplay,
-                            organizer: {
-                                id: user.id,
-                                name: 'You', // In a real app, fetch user profile
-                                role: 'member',
-                            },
-                            isPromoted: false
-                        };
-                    });
-                    setEvents(mappedEvents);
-                }
-            } catch (error) {
-                console.error('Error fetching host events:', error);
-            } finally {
-                setLoading(false);
-            }
+        return {
+            id: dbEvent.id,
+            title: dbEvent.title,
+            type: dbEvent.category || 'event',
+            format: 'indoor',
+            attributes: dbEvent.tags || [],
+            date: dateStr,
+            fullDate: dbEvent.start_time.split('T')[0],
+            dayOfWeek: startDate.toLocaleDateString('en-US', { weekday: 'short' }),
+            time: startDate.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }),
+            location: dbEvent.venue_name || 'TBD',
+            lat: dbEvent.gps_lat || 25.0330,
+            lng: dbEvent.gps_lng || 121.5654,
+            distance: 0,
+            attendees: dbEvent.registered_count || 0,
+            capacity: dbEvent.capacity_total || 100,
+            image: dbEvent.cover_image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?q=80&w=2940&auto=format&fit=crop',
+            tags: dbEvent.tags || [],
+            description: dbEvent.description_short || '',
+            price: priceDisplay,
+            organizer: {
+                id: user.id,
+                name: 'You',
+                role: 'member',
+            },
+            isPromoted: false
         };
+    }) : [];
 
-        fetchHostEvents();
-    }, []);
-
-    return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            {/* Header Section */}
-            <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                <div>
-                    <h1 className="text-3xl font-bold tracking-tight">{t('host.dashboard.title')}</h1>
-                    <p className="text-gray-500 mt-1">歡迎回來！這是您活動的最新動態。</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" className="rounded-full">
-                        <Filter className="w-4 h-4 mr-2" /> 最近 7 天
-                    </Button>
-                    <Button className="rounded-full bg-black text-white hover:bg-gray-800">
-                        <ArrowUpRight className="w-4 h-4 mr-2" /> 匯出報告
-                    </Button>
-                </div>
-            </div>
-
-            {/* Key Metrics Cards */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                <Card className="rounded-[24px] border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">
-                            {t('host.dashboard.totalSales')}
-                        </CardTitle>
-                        <DollarSign className="h-4 w-4 text-emerald-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">$45,231.89</div>
-                        <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> 較上月 +20.1%
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card className="rounded-[24px] border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">
-                            {t('host.dashboard.attendees')}
-                        </CardTitle>
-                        <Users className="h-4 w-4 text-blue-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">+2350</div>
-                        <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> 較上月 +180.1%
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card className="rounded-[24px] border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">
-                            {t('host.dashboard.views')}
-                        </CardTitle>
-                        <Eye className="h-4 w-4 text-purple-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">+12,234</div>
-                        <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> 較上月 +19%
-                        </p>
-                    </CardContent>
-                </Card>
-                <Card className="rounded-[24px] border-gray-100 shadow-sm hover:shadow-md transition-all">
-                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                        <CardTitle className="text-sm font-medium text-gray-500">
-                            {t('host.activeEvents')}
-                        </CardTitle>
-                        <Activity className="h-4 w-4 text-orange-600" />
-                    </CardHeader>
-                    <CardContent>
-                        <div className="text-2xl font-bold">{events.length}</div>
-                        <p className="text-xs text-emerald-600 flex items-center mt-1">
-                            <TrendingUp className="w-3 h-3 mr-1" /> 共 {events.length} 個活動
-                        </p>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Charts Section */}
-            <div className="grid gap-8 md:grid-cols-7">
-
-                {/* Main Line Chart (Revenue) */}
-                <Card className="col-span-4 rounded-[32px] border-gray-100 shadow-sm p-2">
-                    <CardHeader>
-                        <CardTitle>{t('host.revenueOverview')}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="pl-2">
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <AreaChart data={salesData}>
-                                    <defs>
-                                        <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                                            <stop offset="5%" stopColor="#10b981" stopOpacity={0.3} />
-                                            <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
-                                        </linearGradient>
-                                    </defs>
-                                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f3f4f6" />
-                                    <XAxis
-                                        dataKey="name"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                        dy={10}
-                                    />
-                                    <YAxis
-                                        axisLine={false}
-                                        tickLine={false}
-                                        tick={{ fill: '#9ca3af', fontSize: 12 }}
-                                        tickFormatter={(value) => `$${value} `}
-                                    />
-                                    <Tooltip
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    />
-                                    <Area
-                                        type="monotone"
-                                        dataKey="value"
-                                        stroke="#10b981"
-                                        strokeWidth={3}
-                                        fillOpacity={1}
-                                        fill="url(#colorValue)"
-                                    />
-                                </AreaChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                {/* Funnel / Conversion Chart */}
-                <Card className="col-span-3 rounded-[32px] border-gray-100 shadow-sm p-2">
-                    <CardHeader>
-                        <CardTitle>{t('host.conversionFunnel')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="h-[300px] w-full">
-                            <ResponsiveContainer width="100%" height="100%">
-                                <BarChart
-                                    layout="vertical"
-                                    data={funnelData}
-                                    margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
-                                >
-                                    <XAxis type="number" hide />
-                                    <YAxis
-                                        dataKey="name"
-                                        type="category"
-                                        axisLine={false}
-                                        tickLine={false}
-                                        width={80}
-                                        tick={{ fill: '#6b7280', fontSize: 12, fontWeight: 500 }}
-                                    />
-                                    <Tooltip
-                                        cursor={{ fill: 'transparent' }}
-                                        contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
-                                    />
-                                    <Bar dataKey="value" barSize={32} radius={[0, 4, 4, 0]}>
-                                        {funnelData.map((entry, index) => (
-                                            <Cell key={`cell-${index}`} fill={entry.fill} />
-                                        ))}
-                                    </Bar>
-                                </BarChart>
-                            </ResponsiveContainer>
-                        </div>
-                    </CardContent>
-                </Card>
-            </div>
-
-            {/* Lottie Animation Placeholder */}
-            <div className="grid gap-8 md:grid-cols-2">
-                <Card className="rounded-[32px] border-gray-100 shadow-sm bg-gradient-to-br from-black to-gray-900 text-white overflow-hidden relative">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-emerald-500/20 rounded-full blur-3xl -mr-16 -mt-16" />
-                    <CardHeader>
-                        <CardTitle className="text-white">{t('host.liveActivity')}</CardTitle>
-                    </CardHeader>
-                    <CardContent className="relative z-10">
-                        <div className="h-48 flex items-center justify-center border-2 border-dashed border-white/20 rounded-2xl bg-white/5 backdrop-blur-sm">
-                            <div className="text-center">
-                                <Activity className="w-10 h-10 mx-auto mb-2 text-emerald-400 animate-pulse" />
-                                <p className="text-sm text-gray-400">動畫佔位符</p>
-                                <p className="text-xs text-gray-500 mt-1">即時用戶互動</p>
-                            </div>
-                        </div>
-                    </CardContent>
-                </Card>
-
-                <Card className="rounded-[32px] border-gray-100 shadow-sm">
-                    <CardHeader>
-                        <CardTitle>{t('host.dashboard.recentActivity')}</CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                        {loading ? (
-                            <div className="flex justify-center py-8">
-                                <Loader2 className="w-6 h-6 animate-spin text-gray-400" />
-                            </div>
-                        ) : events.length > 0 ? (
-                            <div className="space-y-6">
-                                {events.slice(0, 5).map((event) => (
-                                    <div key={event.id} className="flex items-center">
-                                        <div
-                                            className="w-10 h-10 rounded-full bg-cover bg-center mr-4 border border-gray-100"
-                                            style={{ backgroundImage: `url(${event.image})` }}
-                                        />
-                                        <div className="flex-1 space-y-1">
-                                            <p className="text-sm font-medium leading-none">{event.title}</p>
-                                            <p className="text-xs text-gray-500">{event.date} • {event.attendees} guests</p>
-                                        </div>
-                                        <div className="font-medium text-sm text-emerald-600">{event.price}</div>
-                                    </div>
-                                ))}
-                            </div>
-                        ) : (
-                            <div className="text-center py-8 text-gray-500">
-                                <p>尚無活動。立即建立您的第一個活動！</p>
-                            </div>
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
-        </div>
-    );
+    return <DashboardClient events={events} />;
 }

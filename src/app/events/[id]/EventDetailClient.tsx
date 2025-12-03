@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Event } from '@/lib/mock-data';
@@ -7,6 +8,7 @@ import { Calendar, MapPin, Share2, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/lib/i18n';
+import RegistrationModal from '@/components/RegistrationModal';
 
 interface EventDetailClientProps {
     event: Event;
@@ -14,6 +16,7 @@ interface EventDetailClientProps {
 
 export default function EventDetailClient({ event }: EventDetailClientProps) {
     const { t } = useLanguage();
+    const [showRegistrationModal, setShowRegistrationModal] = useState(false);
 
     return (
         <div className="min-h-screen bg-background pb-24">
@@ -137,7 +140,10 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
                                 <span className="text-gray-500">票價</span>
                                 <span className="text-2xl font-bold text-gray-900">{event.price}</span>
                             </div>
-                            <Button className="w-full rounded-full bg-black text-white hover:bg-gray-800 h-12 text-lg">
+                            <Button
+                                className="w-full rounded-full bg-black text-white hover:bg-gray-800 h-12 text-lg"
+                                onClick={() => setShowRegistrationModal(true)}
+                            >
                                 立即報名
                             </Button>
                             <p className="text-xs text-center text-gray-400 mt-3">
@@ -154,11 +160,22 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
                     <Button variant="outline" size="icon" className="rounded-full w-12 h-12 shrink-0">
                         <Share2 className="w-5 h-5" />
                     </Button>
-                    <Button className="flex-1 rounded-full bg-black text-white hover:bg-gray-800 h-12 text-lg">
+                    <Button
+                        className="flex-1 rounded-full bg-black text-white hover:bg-gray-800 h-12 text-lg"
+                        onClick={() => setShowRegistrationModal(true)}
+                    >
                         立即報名 ({event.price})
                     </Button>
                 </div>
             </div>
+
+            {/* Registration Modal */}
+            <RegistrationModal
+                isOpen={showRegistrationModal}
+                onClose={() => setShowRegistrationModal(false)}
+                eventId={event.id}
+                eventTitle={event.title}
+            />
         </div>
     );
 }

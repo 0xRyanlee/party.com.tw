@@ -6,6 +6,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft, Edit, Share2, XCircle, CheckCircle, Users, UserCheck, Clock, TrendingUp } from 'lucide-react';
 import Link from 'next/link';
+import RegistrationsTab from './RegistrationsTab';
+import CheckInTab from './CheckInTab';
 
 interface Event {
     id: string;
@@ -255,24 +257,14 @@ export default function ManageClient({
                         </div>
                     </TabsContent>
 
-                    {/* Tab 2: Registrations (Placeholder) */}
-                    <TabsContent value="registrations">
-                        <div className="bg-white p-12 rounded-[16px] shadow-sm border border-gray-100 text-center">
-                            <Users className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                            <h3 className="text-xl font-bold mb-2">報名管理</h3>
-                            <p className="text-gray-600 mb-4">此功能將在 Phase 12 實施</p>
-                            <p className="text-sm text-gray-500">包含報名列表、候補管理、CSV 導出等功能</p>
-                        </div>
+                    {/* Tab 2: Registrations Management */}
+                    <TabsContent value="registrations" className="space-y-6">
+                        <RegistrationsTab eventId={event.id} />
                     </TabsContent>
 
-                    {/* Tab 3: Check-in (Placeholder) */}
-                    <TabsContent value="checkin">
-                        <div className="bg-white p-12 rounded-[16px] shadow-sm border border-gray-100 text-center">
-                            <UserCheck className="w-16 h-16 mx-auto mb-4 text-gray-400" />
-                            <h3 className="text-xl font-bold mb-2">簽到管理</h3>
-                            <p className="text-gray-600 mb-4">此功能將在 Phase 12 實施</p>
-                            <p className="text-sm text-gray-500">包含簽到列表、QR Code 掃描、手動簽到等功能</p>
-                        </div>
+                    {/* Tab 3: Check-in */}
+                    <TabsContent value="checkin" className="space-y-6">
+                        <CheckInTab eventId={event.id} />
                     </TabsContent>
 
                     {/* Tab 4: Share & Promotion */}

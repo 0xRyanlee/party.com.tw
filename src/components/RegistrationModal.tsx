@@ -1,0 +1,221 @@
+'use client';
+
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogFooter,
+} from '@/components/ui/dialog';
+import { Loader2, CheckCircle, AlertCircle } from 'lucide-react';
+
+interface RegistrationModalProps {
+    isOpen: boolean;
+    onClose: () => void;
+    eventId: string;
+    eventTitle: string;
+    ticketTypes?: Array<{ name: string; price: number; quantity?: number }>;
+}
+
+export default function RegistrationModal({
+    isOpen,
+    onClose,
+    eventId,
+    eventTitle,
+    ticketTypes = [],
+}: RegistrationModalProps) {
+    const router = useRouter();
+    const [loading, setLoading] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [error, setError] = useState('');
+
+    const [formData, setFormData] = useState({
+        attendee_name: '',
+        attendee_email: '',
+        attendee_phone: '',
+        ticket_type_id: ticketTypes[0]?.name || '',
+    });
+
+    const handleSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch(`/api/events/${eventId}/registrations`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Registration failed');
+            }
+
+            setSuccess(true);
+
+            // Close modal and refresh after 2 seconds
+            setTimeout(() => {
+                router.refresh();
+                onClose();
+                setSuccess(false);
+                setFormData({
+                    attendee_name: '',
+                    attendee_email: '',
+                    attendee_phone: '',
+                    ticket_type_id: ticketTypes[0]?.name || '',
+                });
+            }, 2000);
+
+        } catch (err: any) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+        setFormData(prev => ({
+            ...prev,
+            [e.target.name]: e.target.value,
+        }));
+    };
+
+    return (
+        <Dialog open={isOpen} onOpenChange={onClose}>
+            <DialogContent className="sm:max-w-md rounded-[24px]">
+                <DialogHeader>
+                    <DialogTitle className="text-2xl font-bold">報名參加</DialogTitle>
+                    <DialogDescription>
+                        {eventTitle}
+                    </DialogDescription>
+                </DialogHeader>
+
+                {success ? (
+                    <div className="py-8 text-center">
+                        <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-600" />
+                        <h3 className="text-xl font-bold mb-2">報名成功！</h3>
+                        <p className="text-gray-600">
+                            確認郵件已發送到您的信箱
+                        </p>
+                    </div>
+                ) : (
+                    <form onSubmit={handleSubmit} className="space-y-4 py-4">
+                        <div className="space-y-2">
+                            <Label htmlFor="attendee_name">
+                                姓名 <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="attendee_name"
+                                name="attendee_name"
+                                type="text"
+                                required
+                                value={formData.attendee_name}
+                                onChange={handleChange}
+                                placeholder="請輸入您的姓名"
+                                className="rounded-xl"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="attendee_email">
+                                Email <span className="text-red-500">*</span>
+                            </Label>
+                            <Input
+                                id="attendee_email"
+                                name="attendee_email"
+                                type="email"
+                                required
+                                value={formData.attendee_email}
+                                onChange={handleChange}
+                                placeholder="your@email.com"
+                                className="rounded-xl"
+                            />
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label htmlFor="attendee_phone">
+                                電話（選填）
+                            </Label>
+                            <Input
+                                id="attendee_phone"
+                                name="attendee_phone"
+                                type="tel"
+                                value={formData.attendee_phone}
+                                onChange={handleChange}
+                                placeholder="0912-345-678"
+                                className="rounded-xl"
+                            />
+                        </div>
+
+                        {ticketTypes.length > 0 && (
+                            <div className="space-y-2">
+                                <Label htmlFor="ticket_type_id">
+                                    票種 <span className="text-red-500">*</span>
+                                </Label>
+                                <select
+                                    id="ticket_type_id"
+                                    name="ticket_type_id"
+                                    required
+                                    value={formData.ticket_type_id}
+                                    onChange={handleChange}
+                                    className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-600"
+                                >
+                                    {ticketTypes.map((ticket, idx) => (
+                                        <option key={idx} value={ticket.name}>
+                                            {ticket.name} - ${ticket.price}
+                                            {ticket.quantity && ` (剩餘 ${ticket.quantity})`}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm">
+                                <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                <span>{error}</span>
+                            </div>
+                        )}
+
+                        <DialogFooter className="gap-2 sm:gap-0">
+                            <Button
+                                type="button"
+                                variant="outline"
+                                onClick={onClose}
+                                className="rounded-xl"
+                            >
+                                取消
+                            </Button>
+                            <Button
+                                type="submit"
+                                disabled={loading}
+                                className="rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                            >
+                                {loading ? (
+                                    <>
+                                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        報名中...
+                                    </>
+                                ) : (
+                                    '確認報名'
+                                )}
+                            </Button>
+                        </DialogFooter>
+                    </form>
+                )}
+            </DialogContent>
+        </Dialog>
+    );
+}

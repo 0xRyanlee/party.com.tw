@@ -12,7 +12,7 @@ interface Registration {
     status: string;
     checked_in: boolean;
     created_at: string;
-    events: {
+    event: {
         id: string;
         title: string;
         description_short: string;
@@ -92,7 +92,7 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
     };
 
     const activeRegistrations = registrations.filter(r => r.status !== 'cancelled');
-    const pastRegistrations = registrations.filter(r => r.status === 'cancelled' || new Date(r.events.end_time) < new Date());
+    const pastRegistrations = registrations.filter(r => r.status === 'cancelled' || new Date(r.event.end_time) < new Date());
 
     return (
         <>
@@ -137,7 +137,7 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
                                             {/* Event Image */}
                                             <div
                                                 className="h-48 md:h-auto md:w-64 bg-cover bg-center"
-                                                style={{ backgroundImage: `url(${reg.events.cover_image})` }}
+                                                style={{ backgroundImage: `url(${reg.event.cover_image})` }}
                                             />
 
                                             {/* Event Details */}
@@ -145,13 +145,13 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
                                                 <div className="flex items-start justify-between mb-3">
                                                     <div className="flex-1">
                                                         <Link
-                                                            href={`/events/${reg.events.id}`}
+                                                            href={`/events/${reg.event.id}`}
                                                             className="text-xl font-bold hover:text-purple-600 transition-colors"
                                                         >
-                                                            {reg.events.title}
+                                                            {reg.event.title}
                                                         </Link>
                                                         <p className="text-gray-600 mt-2 line-clamp-2">
-                                                            {reg.events.description_short}
+                                                            {reg.event.description_short}
                                                         </p>
                                                     </div>
                                                     {getStatusBadge(reg.status, reg.checked_in)}
@@ -160,7 +160,7 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
                                                 <div className="space-y-2 mb-4">
                                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                                         <Calendar className="w-4 h-4" />
-                                                        {new Date(reg.events.start_time).toLocaleString('zh-TW', {
+                                                        {new Date(reg.event.start_time).toLocaleString('zh-TW', {
                                                             year: 'numeric',
                                                             month: 'long',
                                                             day: 'numeric',
@@ -170,16 +170,16 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
                                                     </div>
                                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                                         <MapPin className="w-4 h-4" />
-                                                        {reg.events.venue_name || reg.events.address}
+                                                        {reg.event.venue_name || reg.event.address}
                                                     </div>
                                                     <div className="flex items-center gap-2 text-sm text-gray-600">
                                                         <Users className="w-4 h-4" />
-                                                        {reg.events.registered_count} / {reg.events.capacity_total} 人已報名
+                                                        {reg.event.registered_count} / {reg.event.capacity_total} 人已報名
                                                     </div>
                                                 </div>
 
                                                 <div className="flex gap-2">
-                                                    <Link href={`/events/${reg.events.id}`}>
+                                                    <Link href={`/events/${reg.event.id}`}>
                                                         <Button variant="outline" className="rounded-full">
                                                             查看詳情
                                                         </Button>
@@ -187,7 +187,7 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
                                                     {reg.status === 'confirmed' && !reg.checked_in && (
                                                         <Button
                                                             variant="outline"
-                                                            onClick={() => handleCancelRegistration(reg.id, reg.events.id)}
+                                                            onClick={() => handleCancelRegistration(reg.id, reg.event.id)}
                                                             disabled={cancellingId === reg.id}
                                                             className="rounded-full text-red-600 hover:text-red-700 hover:bg-red-50"
                                                         >
@@ -216,14 +216,14 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
                                         <div className="md:flex">
                                             <div
                                                 className="h-32 md:h-auto md:w-48 bg-cover bg-center"
-                                                style={{ backgroundImage: `url(${reg.events.cover_image})` }}
+                                                style={{ backgroundImage: `url(${reg.event.cover_image})` }}
                                             />
                                             <div className="flex-1 p-4">
                                                 <div className="flex items-start justify-between">
                                                     <div>
-                                                        <h3 className="font-bold text-gray-700">{reg.events.title}</h3>
+                                                        <h3 className="font-bold text-gray-700">{reg.event.title}</h3>
                                                         <p className="text-sm text-gray-500 mt-1">
-                                                            {new Date(reg.events.start_time).toLocaleDateString('zh-TW')}
+                                                            {new Date(reg.event.start_time).toLocaleDateString('zh-TW')}
                                                         </p>
                                                     </div>
                                                     {getStatusBadge(reg.status, reg.checked_in)}

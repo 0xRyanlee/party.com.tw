@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 // DELETE /api/events/[eventId]/registrations/[registrationId] - Cancel a registration
 export async function DELETE(
     request: NextRequest,
-    { params }: { params: { eventId: string; registrationId: string } }
+    props: { params: Promise<{ eventId: string; registrationId: string }> }
 ) {
+    const params = await props.params;
     try {
         const supabase = await createClient();
 
@@ -76,8 +77,9 @@ export async function DELETE(
 // PATCH /api/events/[eventId]/registrations/[registrationId] - Update registration (check-in, approve, etc.)
 export async function PATCH(
     request: NextRequest,
-    { params }: { params: { eventId: string; registrationId: string } }
+    props: { params: Promise<{ eventId: string; registrationId: string }> }
 ) {
+    const params = await props.params;
     try {
         const supabase = await createClient();
 

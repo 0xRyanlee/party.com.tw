@@ -13,14 +13,14 @@ export default async function MyEventsPage() {
     }
 
     // Fetch user's registrations with event details
-    const { data: registrations, error } = await supabase
+    const { data: rawRegistrations, error } = await supabase
         .from('registrations')
         .select(`
             id,
             status,
             checked_in,
             created_at,
-            events (
+            event:events!inner (
                 id,
                 title,
                 description_short,
@@ -44,5 +44,11 @@ export default async function MyEventsPage() {
         console.error('Error fetching registrations:', error);
     }
 
-    return <MyEventsClient registrations={registrations || []} />;
+    // Transform the data: Supabase returns event as an array, we need it as a single object
+    const registrations = rawRegistrations?.map((reg: any) => ({
+        ...reg,
+        event: Array.isArray(reg.event) ? reg.event[0] : reg.event,
+    })) || [];
+
+    return <MyEventsClient registrations={registrations} />;
 }

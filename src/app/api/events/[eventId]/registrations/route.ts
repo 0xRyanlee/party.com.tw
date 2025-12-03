@@ -4,8 +4,9 @@ import { NextRequest, NextResponse } from 'next/server';
 // POST /api/events/[eventId]/registrations - Create a new registration
 export async function POST(
     request: NextRequest,
-    { params }: { params: { eventId: string } }
+    props: { params: Promise<{ eventId: string }> }
 ) {
+    const params = await props.params;
     try {
         const supabase = await createClient();
 
@@ -135,8 +136,9 @@ export async function POST(
 // GET /api/events/[eventId]/registrations - Get all registrations for an event
 export async function GET(
     request: NextRequest,
-    { params }: { params: { eventId: string } }
+    props: { params: Promise<{ eventId: string }> }
 ) {
+    const params = await props.params;
     try {
         const supabase = await createClient();
 

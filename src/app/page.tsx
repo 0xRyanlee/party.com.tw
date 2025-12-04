@@ -53,22 +53,19 @@ export default function Home() {
       </div>
 
       <PageTransition className="container mx-auto px-4 py-6 md:py-8 max-w-7xl flex-1">
-        {/* Top Header Area: Logo, Tagline, Nav, Search */}
-        <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-6 mb-12">
-          <div className="flex flex-col gap-1">
+        {/* Top Header Area: Logo, Nav, Search */}
+        <header className="flex items-center justify-between gap-4 mb-12">
+          {/* Logo */}
+          <div className="flex items-center">
             <Logo />
-            <p className="text-[10px] text-gray-400 font-medium tracking-widest uppercase pl-1">
-              {t('home.tagline')}
-            </p>
           </div>
 
           {/* Navigation */}
-          {/* Navigation */}
           <Navbar />
 
-          {/* Search Bar */}
-          <div className="flex items-center gap-3 w-full md:w-auto">
-            <div className="relative flex-1 md:w-64 group">
+          {/* Right Side: Search Bar + Create Event Button */}
+          <div className="flex items-center gap-3">
+            <div className="relative w-64 group hidden md:block">
               <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors">
                 <Search className="w-4 h-4" />
               </div>
@@ -80,12 +77,14 @@ export default function Home() {
                 className="w-full h-10 pl-10 pr-4 bg-white shadow-sm border border-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
               />
             </div>
-            <Button
-              className="rounded-full w-10 h-10 bg-black text-white hover:bg-gray-800 shrink-0 shadow-lg hover:shadow-xl transition-all"
-              onClick={() => { }}
-            >
-              <Plus className="w-5 h-5" />
-            </Button>
+            <Link href="/host/edit">
+              <Button
+                className="rounded-full h-10 px-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shrink-0 shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
+              >
+                <Plus className="w-5 h-5" />
+                <span className="hidden sm:inline font-semibold">發起活動</span>
+              </Button>
+            </Link>
           </div>
         </header>
 

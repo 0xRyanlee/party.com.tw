@@ -6,7 +6,7 @@ import { NextRequest, NextResponse } from 'next/server';
  */
 export async function GET(request: NextRequest) {
     const lineChannelId = process.env.LINE_CHANNEL_ID;
-    const callbackUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/auth/line/callback`;
+    const callbackUrl = `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/line/callback`;
 
     if (!lineChannelId) {
         return NextResponse.json(

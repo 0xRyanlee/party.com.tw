@@ -12,11 +12,11 @@ export async function GET(request: NextRequest) {
     const error = searchParams.get('error');
 
     if (error) {
-        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}?error=line_auth_failed`);
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}?error=line_auth_failed`);
     }
 
     if (!code) {
-        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}?error=missing_code`);
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}?error=missing_code`);
     }
 
     try {
@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
             body: new URLSearchParams({
                 grant_type: 'authorization_code',
                 code,
-                redirect_uri: `${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/auth/line/callback`,
+                redirect_uri: `${process.env.NEXT_PUBLIC_SITE_URL}/api/auth/line/callback`,
                 client_id: process.env.LINE_CHANNEL_ID!,
                 client_secret: process.env.LINE_CHANNEL_SECRET!,
             }),
@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
             // 3. Or use Supabase's signInWithIdToken if available
 
             // For now, redirect to home with success
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}?line_login=success`);
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}?line_login=success`);
         } else {
             // Create new user
             const { data: newUser, error: createError } = await supabase
@@ -92,11 +92,11 @@ export async function GET(request: NextRequest) {
                 throw createError;
             }
 
-            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}?line_login=success&new_user=true`);
+            return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}?line_login=success&new_user=true`);
         }
 
     } catch (error: any) {
         console.error('Line OAuth error:', error);
-        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}?error=line_auth_error`);
+        return NextResponse.redirect(`${process.env.NEXT_PUBLIC_SITE_URL}?error=line_auth_error`);
     }
 }

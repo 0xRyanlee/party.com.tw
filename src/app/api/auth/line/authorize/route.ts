@@ -15,19 +15,13 @@ export async function GET(request: NextRequest) {
         );
     }
 
-    // Line OAuth authorization URL with app-to-app support
+    // Line OAuth authorization URL
     const authUrl = new URL('https://access.line.me/oauth2/v2.1/authorize');
     authUrl.searchParams.set('response_type', 'code');
     authUrl.searchParams.set('client_id', lineChannelId);
     authUrl.searchParams.set('redirect_uri', callbackUrl);
     authUrl.searchParams.set('state', generateRandomState());
-    authUrl.searchParams.set('scope', 'profile openid email');
-
-    // Try to trigger LINE app if installed
-    authUrl.searchParams.set('bot_prompt', 'aggressive');
-
-    // Optimize login experience for mobile
-    authUrl.searchParams.set('initial_amr_display', 'lineqr');
+    authUrl.searchParams.set('scope', 'profile openid'); // 移除 email 避免驗證碼
 
     return NextResponse.redirect(authUrl.toString());
 }

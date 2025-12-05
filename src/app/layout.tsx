@@ -18,6 +18,7 @@ export const metadata: Metadata = {
 };
 
 import { I18nProvider } from "@/lib/i18n";
+import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
@@ -28,11 +29,12 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="zh-TW">
       <body
         className={`antialiased`}
       >
         <I18nProvider>
+          <Header />
           {children}
           <Footer />
           <Analytics />

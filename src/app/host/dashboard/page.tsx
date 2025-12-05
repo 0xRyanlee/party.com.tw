@@ -9,7 +9,7 @@ export default async function HostDashboard() {
     const { data: { user } } = await supabase.auth.getUser();
 
     if (!user) {
-        redirect('/auth');
+        redirect('/?login=true');
     }
 
     const { data, error } = await supabase

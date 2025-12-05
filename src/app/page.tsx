@@ -1,12 +1,13 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
-import { Logo } from '@/components/ui/logo';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Search, MapPin, Calendar, ChevronRight, Bell, User, Plus, History, Map as MapIcon, Briefcase, Users } from 'lucide-react';
+import { MapPin, Calendar, ChevronRight, History, Map as MapIcon } from 'lucide-react';
 import OnboardingModal from '@/components/OnboardingModal';
+import AuthModal from '@/components/AuthModal';
 import { mockEvents, tags } from '@/lib/mock-data';
 import WeeklyCalendar from '@/components/WeeklyCalendar';
 import { useLanguage } from '@/lib/i18n';
@@ -16,14 +17,22 @@ import HeroCarousel from '@/components/HeroCarousel';
 import MapModal from '@/components/MapModal';
 import QuickActions from '@/components/QuickActions';
 import CategoryFilter from '@/components/CategoryFilter';
-import Navbar from '@/components/Navbar';
 
 export default function Home() {
   const { t } = useLanguage();
+  const searchParams = useSearchParams();
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [activeTag, setActiveTag] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [isMapOpen, setIsMapOpen] = useState(false);
+
+  // 處理登入參數
+  useEffect(() => {
+    if (searchParams.get('login') === 'true') {
+      setIsAuthModalOpen(true);
+    }
+  }, [searchParams]);
 
   // Filter and Sort Logic
   const filteredEvents = useMemo(() => {
@@ -53,40 +62,7 @@ export default function Home() {
       </div>
 
       <PageTransition className="container mx-auto px-4 py-6 md:py-8 max-w-7xl flex-1">
-        {/* Top Header Area: Logo, Nav, Search */}
-        <header className="flex items-center justify-between gap-4 mb-12">
-          {/* Logo */}
-          <div className="flex items-center">
-            <Logo />
-          </div>
-
-          {/* Navigation */}
-          <Navbar />
-
-          {/* Right Side: Search Bar + Create Event Button */}
-          <div className="flex items-center gap-3">
-            <div className="relative w-64 group hidden md:block">
-              <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 group-focus-within:text-black transition-colors">
-                <Search className="w-4 h-4" />
-              </div>
-              <input
-                type="text"
-                placeholder={t('home.searchPlaceholder')}
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full h-10 pl-10 pr-4 bg-white shadow-sm border border-gray-100 rounded-full text-sm focus:outline-none focus:ring-2 focus:ring-black/5 transition-all"
-              />
-            </div>
-            <Link href="/host/edit">
-              <Button
-                className="rounded-full h-10 px-6 bg-gradient-to-r from-purple-600 to-pink-600 text-white hover:from-purple-700 hover:to-pink-700 shrink-0 shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
-              >
-                <Plus className="w-5 h-5" />
-                <span className="hidden sm:inline font-semibold">發起活動</span>
-              </Button>
-            </Link>
-          </div>
-        </header>
+        {/* 移除本地 header，使用全局 Header */}
 
         {/* Hero Carousel */}
         <HeroCarousel />
@@ -277,48 +253,6 @@ export default function Home() {
         </div>
       </PageTransition>
 
-      {/* Footer */}
-      <footer className="mt-20 border-t border-gray-200 bg-white">
-        <div className="container mx-auto px-4 py-12">
-          <div className="grid md:grid-cols-4 gap-8 mb-12">
-            <div className="col-span-2">
-              <Logo />
-              <p className="mt-4 text-gray-500 max-w-xs">
-                {t('footer.tagline')} <br />
-                {t('footer.madeIn')}
-              </p>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">{t('footer.discover')}</h4>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-black">{t('footer.featured')}</a></li>
-                <li><a href="#" className="hover:text-black">{t('footer.trending')}</a></li>
-                <li><a href="#" className="hover:text-black">{t('footer.newArrivals')}</a></li>
-              </ul>
-            </div>
-            <div>
-              <h4 className="font-bold mb-4">{t('footer.community')}</h4>
-              <ul className="space-y-2 text-sm text-gray-500">
-                <li><a href="#" className="hover:text-black">{t('footer.guidelines')}</a></li>
-                <li><a href="#" className="hover:text-black">{t('footer.support')}</a></li>
-                <li><a href="#" className="hover:text-black">{t('footer.partner')}</a></li>
-              </ul>
-            </div>
-          </div>
-          <div className="flex flex-col md:flex-row items-center justify-between pt-8 border-t border-gray-100 text-xs text-gray-400">
-            <div className="text-center md:text-left">
-              <p>{t('footer.copyright')}</p>
-              <p className="mt-1 text-gray-300">{t('footer.techSupport')}</p>
-            </div>
-            <div className="flex gap-4 mt-4 md:mt-0">
-              <a href="#" className="hover:text-black">{t('footer.privacy')}</a>
-              <a href="#" className="hover:text-black">{t('footer.terms')}</a>
-              <a href="#" className="hover:text-black">{t('footer.cookies')}</a>
-            </div>
-          </div>
-        </div>
-      </footer>
-
       {showOnboarding && (
         <div onClick={() => setShowOnboarding(false)}>
           <OnboardingModal open={showOnboarding} onOpenChange={setShowOnboarding} />
@@ -331,6 +265,9 @@ export default function Home() {
         onClose={() => setIsMapOpen(false)}
         events={filteredEvents}
       />
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </main>
   );
 }

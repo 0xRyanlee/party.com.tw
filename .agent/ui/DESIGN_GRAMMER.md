@@ -14,7 +14,20 @@ LLM 只要遵守此語法，就能生成一致、可控的 UI。
 
 ⸻
 
-1. Grid System / 網格系統
+1. Style Philosophy: Swiss International & Vibe Coding
+
+EN (Rule):
+ • **Swiss International Style**: Strict grid, high contrast, heavy typography, clear hierarchy.
+ • **World App Vibe**: High-end monochrome, large rounded corners (soft tech), glassmorphism.
+ • **Low Hallucination**: Predictable, calm interfaces. No decorative noise.
+
+CN（註釋）:
+ 設計哲學整合了「瑞士國際主義」（嚴謹網格、大字體）與「World App」（極致黑白、超大圓角）。
+ 強調「低幻覺」，介面要冷靜、可預測。
+
+⸻
+
+2. Grid System / 網格系統
 
 EN (Rule):
  • Use a 12-column grid on desktop.
@@ -44,6 +57,23 @@ Use a modular scale spacing system:
 CN（註釋）:
 間距採模組化尺度（4–64px）。
 不允許出現不符合尺度的任意間距，保持設計節奏統一。
+
+⸻
+
+3. Spacing System / 間距語法
+
+EN (Rule):
+
+Use a modular scale spacing system:
+4, 8, 12, 16, 24, 32, 48, 64 px.
+ • Small components (tags, badges): 4–8px
+ • Lists / cards internal padding: 16–24px (Comfortable)
+ • Section spacing: 48–64px (Breathable)
+ • No spacing outside this scale is allowed unless explicitly required.
+
+CN（註釋）:
+ 間距採模組化尺度（4–64px）。
+ 強調「透氣感」，不要塞得太擠。
 
 ⸻
 
@@ -214,21 +244,19 @@ EN (Rule):
  • Allowed motions: fade, slide, opacity.
  • Forbidden motions: bounce, elastic, playful dynamics.
 
-Border Radius Rules:
- • Buttons: rounded-full (pill shape) for all interactive buttons
- • Input fields: rounded-full (pill shape) for search bars and text inputs
- • Tags / Badges: rounded-full (pill shape)
- • Dialogs / Modals: rounded-xl or rounded-2xl (large but not pill)
- • Cards: rounded-lg or rounded-xl (medium radius, NOT rounded-full)
- • Card internal elements follow card styling
+Border Radius Rules (Swiss/World Vibe):
+ • **Standard Radius**: `rounded-3xl` (24px) for Cards, Modals, and Main Containers. (Use `rounded-[32px]` if needed for larger surfaces).
+ • **Nested Elements**: `rounded-2xl` (16px) for inner items.
+ • **Interactive**: `rounded-full` (Pill shape) for Buttons, Inputs, key actions.
+ • **Sharp**: Only use sharp corners (`rounded-none` or `rounded-sm`) for internal grid dividers or specific brutalist accents (rarely).
 
  • Hover states: minimal elevation or subtle border-darken.
 
 CN（註釋）:
-互動＝極簡功能性。
-動效速度固定，不允許彈跳。
-按鈕、輸入框、標籤使用膠囊形狀 (rounded-full)。
-卡片使用中等圓角 (rounded-lg/xl)，不使用膠囊形狀。
+ 圓角規則更新（Swiss/World 風格）：
+ 標準卡片與容器改用 **`rounded-3xl` (24px)**，創造親和的 Soft Tech 感。
+ 內部元素用 `rounded-2xl`。
+ 按鈕與輸入框維持 `rounded-full` (膠囊狀)。
 
 ⸻
 
@@ -301,3 +329,35 @@ Every LLM-generated UI must reinforce this separation.
 CN（註釋）:
 平台是基礎設施，不是敘事者；活動才是主角。
 所有 UI 都要遵守這個層級關係。
+
+⸻
+
+11. Implementation Guide & Tailwind Tokens (Vibe Coding)
+
+EN (Rule):
+
+To achieve the "Vibe", use these specific patterns:
+
+**Colors (Monochrome Dominance)**
+
+* **Background**: `bg-background` (White/Black), `bg-zinc-50` / `bg-zinc-950`.
+* **Text**: `text-foreground` (Black/White), `text-muted-foreground` (Gray).
+* **Accents**: Use color SPACIOUSLY. Only for primary actions or status.
+
+**Typography (Inter / System)**
+
+* **Headings**: `font-bold tracking-tight` (e.g., `-tracking-[0.03em]`).
+* **Body**: `font-medium text-zinc-600 dark:text-zinc-400`.
+
+**Components Examples**
+
+* **Card**: `bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl p-6 shadow-sm`
+* **Primary Button**: `rounded-full bg-black text-white px-8 py-3 font-semibold hover:bg-zinc-800`
+* **Input**: `rounded-full bg-zinc-100 dark:bg-zinc-900 px-6 py-3 border-transparent focus:ring-2 focus:ring-black`
+
+CN（註釋）:
+ 實作指南：
+
+* **顏色**：嚴格黑白灰，減少彩色使用。
+* **排版**：標題稍微縮緊字距 (`tracking-tight`) 增加現代感。
+* **組件**：卡片標配 `rounded-3xl`，按鈕標配 `rounded-full`。

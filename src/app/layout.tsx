@@ -31,7 +31,7 @@ export default function RootLayout({
   return (
     <html lang="zh-TW">
       <body
-        className={`antialiased`}
+        className={`${inter.variable} antialiased`}
       >
         <I18nProvider>
           <Header />

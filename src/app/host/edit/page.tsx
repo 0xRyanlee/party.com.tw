@@ -210,7 +210,7 @@ export default function HostEdit() {
                     {/* Basic Info Card */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-6">
                         <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                            <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600">
                                 <Info className="w-4 h-4" />
                             </div>
                             <h2 className="text-lg font-bold">{t('host.edit.basicInfo')}</h2>
@@ -255,7 +255,7 @@ export default function HostEdit() {
                     {/* Media Card */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-6">
                         <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600">
+                            <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600">
                                 <Tag className="w-4 h-4" />
                             </div>
                             <h2 className="text-lg font-bold">{t('host.edit.media')}</h2>
@@ -299,7 +299,7 @@ export default function HostEdit() {
                     {/* Collaboration Card */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-6">
                         <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                            <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600">
                                 <Briefcase className="w-4 h-4" />
                             </div>
                             <h2 className="text-lg font-bold">合作招募</h2>
@@ -334,14 +334,14 @@ export default function HostEdit() {
                             </div>
                             <div className="space-y-1">
                                 <Label className="text-xs text-gray-500">活動時長</Label>
-                                <div className="flex gap-2">
+                                <div className="flex flex-wrap gap-2">
                                     {[1, 2, 3, 4, 6, 8].map((hours) => (
                                         <button
                                             key={hours}
                                             type="button"
                                             onClick={() => setDuration(hours)}
-                                            className={`flex-1 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${duration === hours
-                                                ? 'border-purple-600 bg-purple-50 text-purple-700'
+                                            className={`w-14 px-3 py-2 rounded-full border text-sm font-medium transition-all ${duration === hours
+                                                ? 'border-gray-900 bg-gray-100 text-gray-900'
                                                 : 'border-gray-200 hover:border-gray-300'
                                                 }`}
                                         >

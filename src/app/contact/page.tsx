@@ -42,7 +42,7 @@ export default function ContactPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-16">
+            <div className="bg-gray-900 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">聯絡我們</h1>
@@ -138,7 +138,7 @@ export default function ContactPage() {
                             <Button
                                 type="submit"
                                 disabled={isSubmitting}
-                                className="w-full rounded-xl bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
+                                className="w-full rounded-full bg-gray-900 hover:bg-gray-800"
                             >
                                 {isSubmitting ? '發送中...' : (
                                     <>
@@ -156,12 +156,12 @@ export default function ContactPage() {
                         <div className="space-y-6">
                             {/* Email */}
                             <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center flex-shrink-0">
-                                    <Mail className="w-6 h-6 text-purple-600" />
+                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                    <Mail className="w-6 h-6 text-gray-600" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold mb-1">Email</h3>
-                                    <a href="mailto:support@party.com.tw" className="text-purple-600 hover:underline">
+                                    <a href="mailto:support@party.com.tw" className="text-gray-900 hover:underline">
                                         support@party.com.tw
                                     </a>
                                     <p className="text-sm text-gray-600 mt-1">
@@ -172,8 +172,8 @@ export default function ContactPage() {
 
                             {/* Office Hours */}
                             <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center flex-shrink-0">
-                                    <Clock className="w-6 h-6 text-pink-600" />
+                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                    <Clock className="w-6 h-6 text-gray-600" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold mb-1">服務時間</h3>
@@ -184,8 +184,8 @@ export default function ContactPage() {
 
                             {/* Location */}
                             <div className="flex items-start gap-4">
-                                <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
-                                    <MapPin className="w-6 h-6 text-blue-600" />
+                                <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+                                    <MapPin className="w-6 h-6 text-gray-600" />
                                 </div>
                                 <div>
                                     <h3 className="font-bold mb-1">地點</h3>
@@ -224,7 +224,7 @@ export default function ContactPage() {
                                     rel="noopener noreferrer"
                                     className="w-10 h-10 rounded-full bg-gray-100 hover:bg-green-100 flex items-center justify-center transition-colors"
                                 >
-                                    <svg className="w-5 h-5" fill="#00C300" viewBox="0 0 24 24">
+                                    <svg className="w-5 h-5" fill="#4B5563" viewBox="0 0 24 24">
                                         <path d="M24 10.304c0-5.369-5.383-9.738-12-9.738-6.616 0-12 4.369-12 9.738 0 4.814 4.269 8.846 10.019 9.604.391.084.922.258 1.057.592.121.303.079.778.038 1.085l-.171 1.027c-.053.303-.242 1.186 1.039.647 1.281-.54 6.911-4.069 9.428-6.967 1.739-1.992 2.61-4.128 2.61-6.288z" />
                                     </svg>
                                 </a>

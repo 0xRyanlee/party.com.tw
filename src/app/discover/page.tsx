@@ -1,7 +1,6 @@
 'use client';
 
 import { useState } from 'react';
-import HomeHeader from '@/components/HomeHeader';
 import EventCard from '@/components/EventCard';
 import { Button } from '@/components/ui/button';
 import { Search, SlidersHorizontal } from 'lucide-react';
@@ -11,19 +10,17 @@ export default function DiscoverPage() {
   const [activeFilter, setActiveFilter] = useState('全部');
 
   return (
-    <main className="min-h-screen bg-black text-white pb-24">
-      <HomeHeader />
-
-      <div className="pt-24 px-6 container mx-auto max-w-4xl">
+    <main className="min-h-screen bg-white text-gray-900 pb-24">
+      <div className="pt-8 px-6 container mx-auto max-w-4xl">
         {/* Header Section */}
         <div className="mb-8 space-y-4">
-          <h1 className="text-4xl font-bold">探索活動</h1>
+          <h1 className="text-3xl font-bold">探索活動</h1>
           <div className="relative">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 w-5 h-5" />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               placeholder="搜尋活動、地點..."
-              className="w-full h-12 bg-[#1C1C1E] rounded-full pl-12 pr-4 text-white placeholder:text-gray-500 focus:outline-none focus:ring-2 focus:ring-[#06C755]"
+              className="w-full h-12 bg-gray-50 border border-gray-200 rounded-md pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
             />
           </div>
         </div>
@@ -33,7 +30,7 @@ export default function DiscoverPage() {
           <Button
             variant="outline"
             size="icon"
-            className="rounded-full w-10 h-10 shrink-0 border-white/20 bg-transparent hover:bg-white/10"
+            className="rounded-md w-10 h-10 shrink-0 border-gray-200 bg-white hover:bg-gray-50"
           >
             <SlidersHorizontal className="w-4 h-4" />
           </Button>
@@ -42,10 +39,10 @@ export default function DiscoverPage() {
               key={filter}
               onClick={() => setActiveFilter(filter)}
               className={`
-                px-5 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all
+                px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all
                 ${activeFilter === filter
-                  ? 'bg-[#06C755] text-white'
-                  : 'bg-[#1C1C1E] text-gray-400 hover:text-white hover:bg-[#2C2C2E]'
+                  ? 'bg-gray-900 text-white'
+                  : 'bg-gray-50 text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-gray-200'
                 }
               `}
             >
@@ -55,7 +52,7 @@ export default function DiscoverPage() {
         </div>
 
         {/* Events Grid */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {mockEvents.map((event) => (
             <EventCard key={event.id} event={event} />
           ))}
@@ -64,3 +61,4 @@ export default function DiscoverPage() {
     </main>
   );
 }
+

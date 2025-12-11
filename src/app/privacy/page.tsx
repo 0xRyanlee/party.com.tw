@@ -4,7 +4,7 @@ export default function PrivacyPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-16">
+            <div className="bg-gray-900 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
                         <Shield className="w-16 h-16 mx-auto mb-4" />
@@ -17,7 +17,7 @@ export default function PrivacyPage() {
             </div>
 
             <div className="container mx-auto px-4 py-16">
-                <div className="max-w-4xl mx-auto bg-white rounded-[24px] p-8 md:p-12 shadow-sm">
+                <div className="max-w-4xl mx-auto bg-white rounded-xl p-8 md:p-12 shadow-sm">
                     {/* Introduction */}
                     <section className="mb-12">
                         <p className="text-lg text-gray-700 leading-relaxed">
@@ -29,7 +29,7 @@ export default function PrivacyPage() {
                     {/* Section 1 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Database className="w-6 h-6 text-purple-600" />
+                            <Database className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">1. 資料收集範圍</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -46,7 +46,7 @@ export default function PrivacyPage() {
                     {/* Section 2 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Eye className="w-6 h-6 text-purple-600" />
+                            <Eye className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">2. 資料使用方式</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -67,7 +67,7 @@ export default function PrivacyPage() {
                     {/* Section 3 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Lock className="w-6 h-6 text-purple-600" />
+                            <Lock className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">3. Cookie 政策</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -86,7 +86,7 @@ export default function PrivacyPage() {
                     {/* Section 4 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <UserCheck className="w-6 h-6 text-purple-600" />
+                            <UserCheck className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">4. 第三方服務</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -106,7 +106,7 @@ export default function PrivacyPage() {
                     {/* Section 5 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Shield className="w-6 h-6 text-purple-600" />
+                            <Shield className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">5. 資料安全</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -126,7 +126,7 @@ export default function PrivacyPage() {
                     {/* Section 6 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Mail className="w-6 h-6 text-purple-600" />
+                            <Mail className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">6. 您的權利</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -139,7 +139,7 @@ export default function PrivacyPage() {
                                 <li><strong>撤回同意</strong>：隨時撤回對資料處理的同意</li>
                             </ul>
                             <p className="mt-4">
-                                如需行使這些權利，請透過 <a href="mailto:privacy@party.com.tw" className="text-purple-600 hover:underline">privacy@party.com.tw</a> 聯絡我們。
+                                如需行使這些權利，請透過 <a href="mailto:support@party.com.tw" className="text-gray-900 hover:underline">support@party.com.tw</a> 聯絡我們。
                             </p>
                         </div>
                     </section>
@@ -170,7 +170,7 @@ export default function PrivacyPage() {
                         <h2 className="text-2xl font-bold mb-4">聯絡我們</h2>
                         <div className="space-y-2 text-gray-700">
                             <p>如對本隱私權政策有任何疑問，請聯絡：</p>
-                            <p><strong>Email</strong>: <a href="mailto:privacy@party.com.tw" className="text-purple-600 hover:underline">privacy@party.com.tw</a></p>
+                            <p><strong>Email</strong>: <a href="mailto:support@party.com.tw" className="text-gray-900 hover:underline">support@party.com.tw</a></p>
                             <p><strong>地址</strong>: 台北市, 台灣</p>
                         </div>
                     </section>

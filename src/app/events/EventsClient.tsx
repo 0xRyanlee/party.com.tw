@@ -113,7 +113,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                                         variant={activeFilter === filter ? 'default' : 'outline'}
                                         size="sm"
                                         onClick={() => setActiveFilter(filter)}
-                                        className={`rounded-full capitalize whitespace-nowrap ${activeFilter === filter ? 'bg-black text-white hover:bg-gray-800' : 'bg-white'}`}
+                                        className={`rounded-md capitalize whitespace-nowrap ${activeFilter === filter ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-white'}`}
                                     >
                                         {filter === '全部' ? '全部' : filter}
                                     </Button>
@@ -133,7 +133,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                                             variant={dateFilter === filter ? 'default' : 'outline'}
                                             size="sm"
                                             onClick={() => setDateFilter(filter)}
-                                            className={`rounded-full whitespace-nowrap ${dateFilter === filter ? 'bg-purple-600 text-white hover:bg-purple-700' : 'bg-white'}`}
+                                            className={`rounded-md whitespace-nowrap ${dateFilter === filter ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-white'}`}
                                         >
                                             {filter}
                                         </Button>
@@ -151,7 +151,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                                             variant={priceFilter === filter ? 'default' : 'outline'}
                                             size="sm"
                                             onClick={() => setPriceFilter(filter)}
-                                            className={`rounded-full whitespace-nowrap ${priceFilter === filter ? 'bg-green-600 text-white hover:bg-green-700' : 'bg-white'}`}
+                                            className={`rounded-md whitespace-nowrap ${priceFilter === filter ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-white'}`}
                                         >
                                             {filter}
                                         </Button>
@@ -170,7 +170,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                         </div>
                     ) : (
                         <div className="text-center py-20">
-                            <div className="text-6xl mb-4">🔍</div>
+                            <Search className="w-12 h-12 text-gray-400 mb-4 mx-auto" />
                             <h3 className="text-xl font-bold text-gray-900 mb-2">找不到符合條件的活動</h3>
                             <p className="text-gray-500 mb-6">
                                 {searchQuery
@@ -186,7 +186,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                                         setDateFilter('全部');
                                         setPriceFilter('全部');
                                     }}
-                                    className="rounded-full"
+                                    className="rounded-md"
                                 >
                                     清除所有篩選
                                 </Button>

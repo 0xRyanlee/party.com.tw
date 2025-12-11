@@ -5,7 +5,7 @@ export default function TermsPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-16">
+            <div className="bg-gray-900 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
                         <FileText className="w-16 h-16 mx-auto mb-4" />
@@ -18,7 +18,7 @@ export default function TermsPage() {
             </div>
 
             <div className="container mx-auto px-4 py-16">
-                <div className="max-w-4xl mx-auto bg-white rounded-[24px] p-8 md:p-12 shadow-sm">
+                <div className="max-w-4xl mx-auto bg-white rounded-xl p-8 md:p-12 shadow-sm">
                     {/* Introduction */}
                     <section className="mb-12">
                         <p className="text-lg text-gray-700 leading-relaxed">
@@ -30,7 +30,7 @@ export default function TermsPage() {
                     {/* Section 1 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Users className="w-6 h-6 text-purple-600" />
+                            <Users className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">1. 服務說明</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -50,7 +50,7 @@ export default function TermsPage() {
                     {/* Section 2 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Scale className="w-6 h-6 text-purple-600" />
+                            <Scale className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">2. 用戶責任</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -68,7 +68,7 @@ export default function TermsPage() {
                     {/* Section 3 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <FileText className="w-6 h-6 text-purple-600" />
+                            <FileText className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">3. 活動發起規範</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -89,7 +89,7 @@ export default function TermsPage() {
                     {/* Section 4 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Ban className="w-6 h-6 text-purple-600" />
+                            <Ban className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">4. 禁止行為</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -112,7 +112,7 @@ export default function TermsPage() {
                     {/* Section 5 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <Shield className="w-6 h-6 text-purple-600" />
+                            <Shield className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">5. 智慧財產權</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -129,7 +129,7 @@ export default function TermsPage() {
                     {/* Section 6 */}
                     <section className="mb-12">
                         <div className="flex items-center gap-3 mb-4">
-                            <AlertTriangle className="w-6 h-6 text-purple-600" />
+                            <AlertTriangle className="w-6 h-6 text-gray-600" />
                             <h2 className="text-2xl font-bold">6. 免責聲明</h2>
                         </div>
                         <div className="space-y-4 text-gray-700">
@@ -163,7 +163,7 @@ export default function TermsPage() {
                         <div className="space-y-4 text-gray-700">
                             <p>
                                 我們重視您的隱私。請參閱我們的{' '}
-                                <Link href="/legal/privacy" className="text-purple-600 hover:underline">
+                                <Link href="/privacy" className="text-gray-900 hover:underline">
                                     隱私權政策
                                 </Link>
                                 {' '}了解我們如何收集、使用和保護您的個人資料。
@@ -197,7 +197,7 @@ export default function TermsPage() {
                         <h2 className="text-2xl font-bold mb-4">聯絡我們</h2>
                         <div className="space-y-2 text-gray-700">
                             <p>如對本服務條款有任何疑問，請聯絡：</p>
-                            <p><strong>Email</strong>: <a href="mailto:legal@party.com.tw" className="text-purple-600 hover:underline">legal@party.com.tw</a></p>
+                            <p><strong>Email</strong>: <a href="mailto:support@party.com.tw" className="text-gray-900 hover:underline">support@party.com.tw</a></p>
                             <p><strong>地址</strong>: 台北市, 台灣</p>
                         </div>
                     </section>

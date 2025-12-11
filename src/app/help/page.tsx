@@ -104,7 +104,7 @@ function FAQItem({ question, answer }: { question: string; answer: string }) {
         <div className="border-b border-gray-200 last:border-0">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full py-4 flex items-center justify-between text-left hover:text-purple-600 transition-colors"
+                className="w-full py-4 flex items-center justify-between text-left hover:text-gray-600 transition-colors"
             >
                 <span className="font-medium pr-4">{question}</span>
                 <ChevronDown className={`w-5 h-5 flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
@@ -122,7 +122,7 @@ export default function HelpPage() {
     return (
         <div className="min-h-screen bg-gray-50">
             {/* Header */}
-            <div className="bg-gradient-to-r from-purple-600 to-pink-600 text-white py-16">
+            <div className="bg-gray-900 text-white py-16">
                 <div className="container mx-auto px-4">
                     <div className="max-w-3xl mx-auto text-center">
                         <h1 className="text-4xl md:text-5xl font-bold mb-4">幫助中心</h1>
@@ -136,18 +136,18 @@ export default function HelpPage() {
             {/* Quick Links */}
             <div className="container mx-auto px-4 -mt-8">
                 <div className="max-w-4xl mx-auto grid md:grid-cols-3 gap-4">
-                    <Link href="/contact" className="bg-white p-6 rounded-[16px] shadow-sm hover:shadow-md transition-shadow">
-                        <Mail className="w-8 h-8 text-purple-600 mb-3" />
+                    <Link href="/contact" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <Mail className="w-8 h-8 text-gray-600 mb-3" />
                         <h3 className="font-bold mb-1">聯絡我們</h3>
                         <p className="text-sm text-gray-600">發送訊息給我們</p>
                     </Link>
-                    <Link href="/host" className="bg-white p-6 rounded-[16px] shadow-sm hover:shadow-md transition-shadow">
-                        <Book className="w-8 h-8 text-purple-600 mb-3" />
+                    <Link href="/host" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <Book className="w-8 h-8 text-gray-600 mb-3" />
                         <h3 className="font-bold mb-1">主辦方指南</h3>
                         <p className="text-sm text-gray-600">學習如何發起活動</p>
                     </Link>
-                    <a href="mailto:support@party.com.tw" className="bg-white p-6 rounded-[16px] shadow-sm hover:shadow-md transition-shadow">
-                        <MessageCircle className="w-8 h-8 text-purple-600 mb-3" />
+                    <a href="mailto:support@party.com.tw" className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-shadow">
+                        <MessageCircle className="w-8 h-8 text-gray-600 mb-3" />
                         <h3 className="font-bold mb-1">Email 支援</h3>
                         <p className="text-sm text-gray-600">support@party.com.tw</p>
                     </a>
@@ -160,8 +160,8 @@ export default function HelpPage() {
                     <h2 className="text-3xl font-bold mb-8 text-center">常見問題</h2>
                     <div className="space-y-8">
                         {faqs.map((category, idx) => (
-                            <div key={idx} className="bg-white rounded-[16px] p-6 shadow-sm">
-                                <h3 className="text-xl font-bold mb-4 text-purple-600">
+                            <div key={idx} className="bg-white rounded-xl p-6 shadow-sm">
+                                <h3 className="text-xl font-bold mb-4 text-gray-900">
                                     {category.category}
                                 </h3>
                                 <div>
@@ -181,7 +181,7 @@ export default function HelpPage() {
 
             {/* Contact CTA */}
             <div className="container mx-auto px-4 pb-16">
-                <div className="max-w-4xl mx-auto bg-gradient-to-r from-purple-600 to-pink-600 rounded-[24px] p-12 text-center text-white">
+                <div className="max-w-4xl mx-auto bg-gray-900 rounded-xl p-12 text-center text-white">
                     <h2 className="text-2xl md:text-3xl font-bold mb-4">
                         找不到答案？
                     </h2>
@@ -189,7 +189,7 @@ export default function HelpPage() {
                         我們的團隊隨時準備協助您
                     </p>
                     <Link href="/contact">
-                        <Button size="lg" className="rounded-full bg-white text-purple-600 hover:bg-gray-100">
+                        <Button size="lg" className="rounded-full bg-white text-gray-900 hover:bg-gray-100">
                             聯絡我們
                         </Button>
                     </Link>
@@ -198,3 +198,4 @@ export default function HelpPage() {
         </div>
     );
 }
+

@@ -102,7 +102,7 @@ export default function Home() {
                   {otherEvents.map((event) => (
                     <div
                       key={event.id}
-                      className="min-w-[280px] sm:min-w-[320px] lg:min-w-[22%] snap-start shrink-0 bg-white rounded-2xl sm:rounded-[20px] overflow-hidden border border-gray-100 hover:shadow-lg transition-all cursor-pointer group/card flex flex-col"
+                      className="min-w-[280px] sm:min-w-[320px] lg:min-w-[22%] snap-start shrink-0 bg-white rounded-lg overflow-hidden border border-gray-100 hover:shadow-lg transition-all cursor-pointer group/card flex flex-col"
                     >
                       <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden">
                         <div
@@ -114,7 +114,7 @@ export default function Home() {
                         </div>
                       </div>
                       <div className="p-3 flex-1 flex flex-col">
-                        <h4 className="font-bold text-sm truncate mb-1 group-hover/card:text-emerald-600 transition-colors">{event.title}</h4>
+                        <h4 className="font-bold text-sm truncate mb-1 group-hover/card:text-gray-600 transition-colors">{event.title}</h4>
 
                         {/* Organizer & Vendors */}
                         <div className="flex items-center gap-2 mb-2">
@@ -181,7 +181,7 @@ export default function Home() {
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.3 }}
-              className="bg-white rounded-[32px] p-4 sm:p-6 border border-gray-100 shadow-sm"
+              className="bg-white rounded-lg p-4 sm:p-6 border border-gray-100 shadow-sm"
             >
               <div className="flex items-center gap-2 mb-4 text-gray-400">
                 <History className="w-4 h-4" />
@@ -192,7 +192,7 @@ export default function Home() {
                   <div key={i} className="flex gap-2 sm:gap-3 group cursor-pointer">
                     <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gray-100 bg-cover bg-center shrink-0" style={{ backgroundImage: `url(${mockEvents[i].image})` }} />
                     <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-xs sm:text-sm truncate group-hover:text-emerald-600 transition-colors">{mockEvents[i].title}</h4>
+                      <h4 className="font-bold text-xs sm:text-sm truncate group-hover:text-gray-600 transition-colors">{mockEvents[i].title}</h4>
                       <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1">{mockEvents[i].date}</p>
                     </div>
                   </div>
@@ -217,10 +217,10 @@ export default function Home() {
               viewport={{ once: true }}
               transition={{ delay: 0.4 }}
               onClick={() => setIsMapOpen(true)}
-              className="bg-white rounded-[24px] sm:rounded-[32px] p-2 border border-gray-100 shadow-sm h-[250px] sm:h-[300px] relative overflow-hidden group cursor-pointer"
+              className="bg-white rounded-lg p-2 border border-gray-100 shadow-sm h-[250px] sm:h-[300px] relative overflow-hidden group cursor-pointer"
             >
-              <div className="absolute inset-2 rounded-[16px] sm:rounded-[24px] overflow-hidden">
-                <div className="absolute inset-0 bg-[url('https://docs.mapbox.com/mapbox-gl-js/assets/streets-v11.png')] bg-cover bg-center transition-transform duration-700 group-hover:scale-110 opacity-80" />
+              <div className="absolute inset-2 rounded-lg overflow-hidden">
+                <div className="absolute inset-0 bg-[url('https://docs.mapbox.com/mapbox-gl-js/assets/streets-v11.png')] bg-cover bg-center transition-transform duration-200 group-hover:scale-105 opacity-80" />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4 sm:p-6">
                   <div className="flex items-center justify-between">
@@ -239,12 +239,12 @@ export default function Home() {
             </motion.div>
 
             {/* Quick Stats */}
-            <div className="bg-black text-white rounded-[24px] sm:rounded-[32px] p-6 sm:p-8">
+            <div className="bg-gray-900 text-white rounded-lg p-6 sm:p-8">
               <h3 className="text-lg sm:text-xl font-bold mb-2">{t('home.sidebar.yourVibe')}</h3>
               <p className="text-gray-400 text-xs sm:text-sm mb-4 sm:mb-6">You've joined 3 events this month.</p>
               <div className="space-y-2 sm:space-y-3">
                 <div className="flex justify-between items-center p-2 sm:p-3 bg-white/10 rounded-xl text-xs sm:text-sm">
-                  <span>🔥 Hot Tags</span>
+                  <span>Hot Tags</span>
                   <span className="font-bold">Tech, Party</span>
                 </div>
               </div>

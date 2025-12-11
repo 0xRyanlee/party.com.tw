@@ -62,8 +62,8 @@ export default function BusinessPage() {
                         <Mail className="w-4 h-4" /> Direct Contact
                     </h4>
                     <p className="text-gray-500 text-sm mb-4">For urgent inquiries, please email us directly.</p>
-                    <a href="mailto:business@party-aggregator.tw" className="text-emerald-600 font-medium hover:underline">
-                        business@party-aggregator.tw
+                    <a href="mailto:business@party.com.tw" className="text-emerald-600 font-medium hover:underline">
+                        business@party.com.tw
                     </a>
                 </div>
             </div>

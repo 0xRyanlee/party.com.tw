@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import Script from "next/script";
 import "./globals.css";
 
 const inter = Inter({
@@ -22,6 +23,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
+import GoogleOneTap from "@/components/GoogleOneTap";
 
 export default function RootLayout({
   children,
@@ -30,6 +32,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="zh-TW">
+      <head>
+        {/* Google Identity Services */}
+        <Script
+          src="https://accounts.google.com/gsi/client"
+          strategy="afterInteractive"
+        />
+      </head>
       <body
         className={`antialiased`}
       >
@@ -39,6 +48,7 @@ export default function RootLayout({
           <Footer />
           <Analytics />
           <GoogleAnalytics />
+          <GoogleOneTap />
         </I18nProvider>
       </body>
     </html>

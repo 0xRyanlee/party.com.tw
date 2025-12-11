@@ -83,12 +83,12 @@ export default function SettingsPage() {
                 <section>
                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">{t('settings.info')}</h2>
                     <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm divide-y divide-gray-50">
-                        <Link href="/legal/terms" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                        <Link href="/terms" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
                             <div className="flex items-center gap-3">
-                                <FileText className="w-5 h-5 text-gray-400" />
-                                <span className="font-medium">{t('settings.terms')}</span>
+                                <FileText className="w-5 h-5 text-gray-600" />
+                                <span>服務條款</span>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                            <ChevronRight className="w-5 h-5 text-gray-400" />
                         </Link>
                         <Link href="#" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
                             <div className="flex items-center gap-3">

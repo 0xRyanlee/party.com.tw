@@ -4,15 +4,15 @@ import { ArrowRight, Sparkles, Users, Calendar, TrendingUp } from 'lucide-react'
 
 export default function ForHostsPage() {
     return (
-        <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white">
+        <div className="min-h-screen bg-white">
             {/* Hero Section */}
             <section className="container mx-auto px-4 py-20 md:py-32">
                 <div className="max-w-4xl mx-auto text-center">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-100 text-purple-700 text-sm font-medium mb-6">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 text-gray-700 text-sm font-medium mb-6">
                         <Sparkles className="w-4 h-4" />
                         為主辦方打造
                     </div>
-                    <h1 className="text-4xl md:text-6xl font-bold mb-6 bg-gradient-to-r from-purple-600 to-pink-600 bg-clip-text text-transparent">
+                    <h1 className="text-4xl md:text-6xl font-bold mb-6 text-gray-900">
                         輕鬆發起活動<br />連結更多人
                     </h1>
                     <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
@@ -20,7 +20,7 @@ export default function ForHostsPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                         <Link href="/host/edit">
-                            <Button size="lg" className="rounded-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white px-8">
+                            <Button size="lg" className="rounded-full bg-gray-900 hover:bg-gray-800 text-white px-8">
                                 開始發起活動
                                 <ArrowRight className="ml-2 w-5 h-5" />
                             </Button>
@@ -40,9 +40,9 @@ export default function ForHostsPage() {
                     <h2 className="text-3xl font-bold text-center mb-12">為什麼選擇 Party？</h2>
                     <div className="grid md:grid-cols-3 gap-8">
                         {/* Feature 1 */}
-                        <div className="bg-white p-8 rounded-[24px] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                            <div className="w-12 h-12 rounded-full bg-purple-100 flex items-center justify-center mb-4">
-                                <Calendar className="w-6 h-6 text-purple-600" />
+                        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                <Calendar className="w-6 h-6 text-gray-600" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">快速創建</h3>
                             <p className="text-gray-600">
@@ -51,9 +51,9 @@ export default function ForHostsPage() {
                         </div>
 
                         {/* Feature 2 */}
-                        <div className="bg-white p-8 rounded-[24px] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                            <div className="w-12 h-12 rounded-full bg-pink-100 flex items-center justify-center mb-4">
-                                <Users className="w-6 h-6 text-pink-600" />
+                        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                <Users className="w-6 h-6 text-gray-600" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">報名管理</h3>
                             <p className="text-gray-600">
@@ -62,9 +62,9 @@ export default function ForHostsPage() {
                         </div>
 
                         {/* Feature 3 */}
-                        <div className="bg-white p-8 rounded-[24px] shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-                            <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
-                                <TrendingUp className="w-6 h-6 text-blue-600" />
+                        <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+                            <div className="w-12 h-12 rounded-full bg-gray-100 flex items-center justify-center mb-4">
+                                <TrendingUp className="w-6 h-6 text-gray-600" />
                             </div>
                             <h3 className="text-xl font-bold mb-3">數據分析</h3>
                             <p className="text-gray-600">
@@ -82,7 +82,7 @@ export default function ForHostsPage() {
                     <div className="space-y-8">
                         {/* Step 1 */}
                         <div className="flex gap-6 items-start">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold">
                                 1
                             </div>
                             <div>
@@ -95,7 +95,7 @@ export default function ForHostsPage() {
 
                         {/* Step 2 */}
                         <div className="flex gap-6 items-start">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold">
                                 2
                             </div>
                             <div>
@@ -108,7 +108,7 @@ export default function ForHostsPage() {
 
                         {/* Step 3 */}
                         <div className="flex gap-6 items-start">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold">
                                 3
                             </div>
                             <div>
@@ -121,7 +121,7 @@ export default function ForHostsPage() {
 
                         {/* Step 4 */}
                         <div className="flex gap-6 items-start">
-                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-purple-600 text-white flex items-center justify-center font-bold">
+                            <div className="flex-shrink-0 w-10 h-10 rounded-full bg-gray-900 text-white flex items-center justify-center font-bold">
                                 4
                             </div>
                             <div>
@@ -137,7 +137,7 @@ export default function ForHostsPage() {
 
             {/* CTA Section */}
             <section className="container mx-auto px-4 py-20">
-                <div className="max-w-4xl mx-auto text-center bg-gradient-to-r from-purple-600 to-pink-600 rounded-[32px] p-12 text-white">
+                <div className="max-w-4xl mx-auto text-center bg-gray-900 rounded-xl p-12 text-white">
                     <h2 className="text-3xl md:text-4xl font-bold mb-4">
                         準備好發起您的第一個活動了嗎？
                     </h2>
@@ -145,7 +145,7 @@ export default function ForHostsPage() {
                         加入數千位主辦方，開始連結更多志同道合的人。
                     </p>
                     <Link href="/host/edit">
-                        <Button size="lg" className="rounded-full bg-white text-purple-600 hover:bg-gray-100 px-8">
+                        <Button size="lg" className="rounded-full bg-white text-gray-900 hover:bg-gray-100 px-8">
                             免費開始
                             <ArrowRight className="ml-2 w-5 h-5" />
                         </Button>
@@ -155,3 +155,4 @@ export default function ForHostsPage() {
         </div>
     );
 }
+

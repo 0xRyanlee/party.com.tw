@@ -18,7 +18,9 @@ import MapModal from '@/components/MapModal';
 import QuickActions from '@/components/QuickActions';
 import CategoryFilter from '@/components/CategoryFilter';
 
-export default function Home() {
+import { Suspense } from 'react';
+
+function HomeContent() {
   const { t } = useLanguage();
   const searchParams = useSearchParams();
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -269,5 +271,20 @@ export default function Home() {
       {/* Auth Modal */}
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </main>
+  );
+}
+
+export default function Home() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-8 h-8 rounded-full border-4 border-neutral-200 border-t-neutral-900 animate-spin" />
+          <p className="text-neutral-500 font-medium animate-pulse">Loading experience...</p>
+        </div>
+      </div>
+    }>
+      <HomeContent />
+    </Suspense>
   );
 }

@@ -98,7 +98,7 @@ export async function GET(request: NextRequest) {
                 console.error('❌ Sign up error:', signUpError);
                 throw signUpError;
             }
-            authData = signUpData;
+            authData = signUpData as any;
             console.log('✅ New user created');
         } else if (signInError) {
             console.error('❌ Sign in error:', signInError);

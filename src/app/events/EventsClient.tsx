@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import Navigation from '@/components/Navigation';
+
 import FloatingActionButton from '@/components/FloatingActionButton';
 import EventCard from '@/components/EventCard';
 import { Button } from '@/components/ui/button';
@@ -72,7 +72,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
 
     return (
         <>
-            <Navigation />
+
             <FloatingActionButton />
 
             <div className="min-h-screen bg-background pt-24 pb-20">

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import Navigation from '@/components/Navigation';
+
 import { Button } from '@/components/ui/button';
 import { Event } from '@/lib/mock-data';
 import { Calendar, MapPin, Share2, ArrowLeft, Clock, CheckCircle2 } from 'lucide-react';
@@ -21,7 +21,7 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
     // Swiss Vibe: Large radii, monochrome palette, high contrast
     return (
         <div className="min-h-screen bg-white pb-24 font-sans">
-            <Navigation />
+
 
             {/* Hero Section */}
             <div className="relative h-[50vh] w-full overflow-hidden">

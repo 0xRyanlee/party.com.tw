@@ -2,7 +2,6 @@
 
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
-import Navigation from '@/components/Navigation';
 import { Button } from '@/components/ui/button';
 import { Calendar, MapPin, Users, XCircle, CheckCircle, Clock } from 'lucide-react';
 import Link from 'next/link';
@@ -96,7 +95,7 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
 
     return (
         <>
-            <Navigation />
+
             <div className="min-h-screen bg-background pt-24 pb-20">
                 <div className="container mx-auto px-4 md:px-6">
                     {/* Header */}

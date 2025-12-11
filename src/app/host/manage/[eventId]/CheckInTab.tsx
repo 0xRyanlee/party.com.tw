@@ -108,42 +108,43 @@ export default function CheckInTab({ eventId }: { eventId: string }) {
     return (
         <div className="space-y-6">
             {/* Stats Cards */}
+            {/* Stats Cards */}
             <div className="grid md:grid-cols-4 gap-4">
-                <div className="bg-white p-6 rounded-[16px] border border-gray-100">
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-gray-600">總報名數</span>
-                        <Users className="w-5 h-5 text-gray-400" />
+                        <span className="text-sm text-neutral-500 font-medium">總報名數</span>
+                        <Users className="w-5 h-5 text-neutral-400" />
                     </div>
-                    <div className="text-3xl font-bold">{stats.total}</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">{stats.total}</div>
                 </div>
 
-                <div className="bg-gradient-to-br from-green-50 to-emerald-50 p-6 rounded-[16px] border border-green-100">
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-green-700 font-medium">已簽到</span>
-                        <CheckCircle className="w-5 h-5 text-green-600" />
+                        <span className="text-sm text-neutral-500 font-medium">已簽到</span>
+                        <CheckCircle className="w-5 h-5 text-neutral-900" />
                     </div>
-                    <div className="text-3xl font-bold text-green-900">{stats.checkedIn}</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">{stats.checkedIn}</div>
                 </div>
 
-                <div className="bg-gradient-to-br from-orange-50 to-amber-50 p-6 rounded-[16px] border border-orange-100">
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-orange-700 font-medium">待簽到</span>
-                        <Clock className="w-5 h-5 text-orange-600" />
+                        <span className="text-sm text-neutral-500 font-medium">待簽到</span>
+                        <Clock className="w-5 h-5 text-neutral-400" />
                     </div>
-                    <div className="text-3xl font-bold text-orange-900">{stats.pending}</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">{stats.pending}</div>
                 </div>
 
-                <div className="bg-gradient-to-br from-blue-50 to-cyan-50 p-6 rounded-[16px] border border-blue-100">
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
                     <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm text-blue-700 font-medium">簽到率</span>
-                        <UserCheck className="w-5 h-5 text-blue-600" />
+                        <span className="text-sm text-neutral-500 font-medium">簽到率</span>
+                        <UserCheck className="w-5 h-5 text-neutral-400" />
                     </div>
-                    <div className="text-3xl font-bold text-blue-900">{stats.checkInRate}%</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">{stats.checkInRate}%</div>
                 </div>
             </div>
 
             {/* Search Bar */}
-            <div className="bg-white p-4 rounded-[16px] border border-gray-100">
+            <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
@@ -156,7 +157,7 @@ export default function CheckInTab({ eventId }: { eventId: string }) {
             </div>
 
             {/* Check-in List */}
-            <div className="bg-white rounded-[16px] border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-[32px] border border-neutral-100 overflow-hidden shadow-sm">
                 {loading ? (
                     <div className="p-12 text-center">
                         <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-gray-400" />
@@ -184,12 +185,12 @@ export default function CheckInTab({ eventId }: { eventId: string }) {
                             {filteredRegistrations.map((reg) => (
                                 <TableRow
                                     key={reg.id}
-                                    className={reg.checked_in ? 'bg-green-50/50' : ''}
+                                    className={reg.checked_in ? 'bg-neutral-50/50' : ''}
                                 >
                                     <TableCell className="font-medium">
                                         <div className="flex items-center gap-2">
                                             {reg.checked_in ? (
-                                                <CheckCircle className="w-5 h-5 text-green-600" />
+                                                <CheckCircle className="w-5 h-5 text-neutral-900" />
                                             ) : (
                                                 <XCircle className="w-5 h-5 text-gray-300" />
                                             )}
@@ -218,7 +219,7 @@ export default function CheckInTab({ eventId }: { eventId: string }) {
                                     </TableCell>
                                     <TableCell className="text-sm">
                                         {reg.checked_in && reg.checked_in_at ? (
-                                            <div className="text-green-700 font-medium">
+                                            <div className="text-neutral-900 font-medium">
                                                 {new Date(reg.checked_in_at).toLocaleTimeString('zh-TW', {
                                                     hour: '2-digit',
                                                     minute: '2-digit',
@@ -234,7 +235,7 @@ export default function CheckInTab({ eventId }: { eventId: string }) {
                                                 size="sm"
                                                 onClick={() => handleCheckIn(reg.id)}
                                                 disabled={checkingIn === reg.id}
-                                                className="rounded-lg bg-green-600 hover:bg-green-700"
+                                                className="rounded-full bg-neutral-900 hover:bg-neutral-800"
                                             >
                                                 {checkingIn === reg.id ? (
                                                     <>
@@ -250,7 +251,7 @@ export default function CheckInTab({ eventId }: { eventId: string }) {
                                             </Button>
                                         )}
                                         {reg.checked_in && (
-                                            <span className="text-sm text-green-600 font-medium">
+                                            <span className="text-sm text-neutral-500 font-medium">
                                                 ✓ 已簽到
                                             </span>
                                         )}

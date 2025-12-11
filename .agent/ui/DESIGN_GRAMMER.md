@@ -17,9 +17,10 @@ LLM 只要遵守此語法，就能生成一致、可控的 UI。
 1. Style Philosophy: Swiss International & Vibe Coding
 
 EN (Rule):
- • **Swiss International Style**: Strict grid, high contrast, heavy typography, clear hierarchy.
- • **World App Vibe**: High-end monochrome, large rounded corners (soft tech), glassmorphism.
- • **Low Hallucination**: Predictable, calm interfaces. No decorative noise.
+
+1. **Strict Grid & Layout**: Adherence to the 12-column grid is non-negotiable.
+2. **Monochrome Dominance**: 90% of the UI should be strict monochrome.
+3. **Low Hallucination**: No decorative elements without functional purpose. No decorative noise.
 
 CN（註釋）:
  設計哲學整合了「瑞士國際主義」（嚴謹網格、大字體）與「World App」（極致黑白、超大圓角）。
@@ -245,11 +246,11 @@ EN (Rule):
  • Forbidden motions: bounce, elastic, playful dynamics.
 
 Border Radius Rules (Swiss/World Vibe):
- • **Standard Radius**: `rounded-3xl` (24px) for Cards, Modals, and Main Containers. (Use `rounded-[32px]` if needed for larger surfaces).
- • **Nested Elements**: `rounded-2xl` (16px) for inner items.
- • **Interactive**: `rounded-full` (Pill shape) for Buttons, Inputs, key actions.
- • **Sharp**: Only use sharp corners (`rounded-none` or `rounded-sm`) for internal grid dividers or specific brutalist accents (rarely).
 
+### Do
+
+- Use strict 8pt grid.
+- Use `rounded-3xl` for cards.
  • Hover states: minimal elevation or subtle border-darken.
 
 CN（註釋）:
@@ -340,24 +341,25 @@ To achieve the "Vibe", use these specific patterns:
 
 **Colors (Monochrome Dominance)**
 
-* **Background**: `bg-background` (White/Black), `bg-zinc-50` / `bg-zinc-950`.
-* **Text**: `text-foreground` (Black/White), `text-muted-foreground` (Gray).
-* **Accents**: Use color SPACIOUSLY. Only for primary actions or status.
+- **Background**: `bg-background` (White/Black), `bg-zinc-50` / `bg-zinc-950`.
+- **Text**: `text-foreground` (Black/White), `text-muted-foreground` (Gray).
+- **Accents**: Use color SPACIOUSLY. Only for primary actions or status.
 
-**Typography (Inter / System)**
+### Typography Vibe
 
-* **Headings**: `font-bold tracking-tight` (e.g., `-tracking-[0.03em]`).
-* **Body**: `font-medium text-zinc-600 dark:text-zinc-400`.
+- **Inter** is the only font.
+- Headings must use `tracking-tight`. (e.g., `-tracking-[0.03em]`).
+- **Body**: `font-medium text-zinc-600 dark:text-zinc-400`.
 
 **Components Examples**
 
-* **Card**: `bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl p-6 shadow-sm`
-* **Primary Button**: `rounded-full bg-black text-white px-8 py-3 font-semibold hover:bg-zinc-800`
-* **Input**: `rounded-full bg-zinc-100 dark:bg-zinc-900 px-6 py-3 border-transparent focus:ring-2 focus:ring-black`
+- **Card**: `bg-white dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl p-6 shadow-sm`
+- **Primary Button**: `rounded-full bg-black text-white px-8 py-3 font-semibold hover:bg-zinc-800`
+- **Input**: `rounded-full bg-zinc-100 dark:bg-zinc-900 px-6 py-3 border-transparent focus:ring-2 focus:ring-black`
 
 CN（註釋）:
  實作指南：
 
-* **顏色**：嚴格黑白灰，減少彩色使用。
-* **排版**：標題稍微縮緊字距 (`tracking-tight`) 增加現代感。
-* **組件**：卡片標配 `rounded-3xl`，按鈕標配 `rounded-full`。
+- **顏色**：嚴格黑白灰，減少彩色使用。
+- **排版**：標題稍微縮緊字距 (`tracking-tight`) 增加現代感。
+- **組件**：卡片標配 `rounded-3xl`，按鈕標配 `rounded-full`。

@@ -156,17 +156,17 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'confirmed':
-                return 'bg-green-100 text-green-800';
+                return 'bg-neutral-900 text-white';
             case 'pending':
-                return 'bg-yellow-100 text-yellow-800';
+                return 'bg-neutral-100 text-neutral-600 border border-neutral-200';
             case 'waitlist':
-                return 'bg-orange-100 text-orange-800';
+                return 'bg-neutral-100 text-neutral-500';
             case 'rejected':
-                return 'bg-red-100 text-red-800';
+                return 'bg-red-50 text-red-600';
             case 'cancelled':
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-neutral-50 text-neutral-400';
             default:
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-neutral-50 text-neutral-600';
         }
     };
 
@@ -191,32 +191,32 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
         <div className="space-y-6">
             {/* Header with Stats */}
             <div className="grid md:grid-cols-4 gap-4">
-                <div className="bg-white p-4 rounded-[16px] border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">總報名數</div>
-                    <div className="text-2xl font-bold">{total}</div>
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
+                    <div className="text-sm text-neutral-500 font-medium mb-1">總報名數</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">{total}</div>
                 </div>
-                <div className="bg-white p-4 rounded-[16px] border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">已確認</div>
-                    <div className="text-2xl font-bold text-green-600">
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
+                    <div className="text-sm text-neutral-500 font-medium mb-1">已確認</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">
                         {registrations.filter(r => r.status === 'confirmed').length}
                     </div>
                 </div>
-                <div className="bg-white p-4 rounded-[16px] border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">候補名單</div>
-                    <div className="text-2xl font-bold text-orange-600">
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
+                    <div className="text-sm text-neutral-500 font-medium mb-1">候補名單</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">
                         {registrations.filter(r => r.status === 'waitlist').length}
                     </div>
                 </div>
-                <div className="bg-white p-4 rounded-[16px] border border-gray-100">
-                    <div className="text-sm text-gray-600 mb-1">已簽到</div>
-                    <div className="text-2xl font-bold text-blue-600">
+                <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
+                    <div className="text-sm text-neutral-500 font-medium mb-1">已簽到</div>
+                    <div className="text-3xl font-extrabold tracking-tight text-neutral-900">
                         {registrations.filter(r => r.checked_in).length}
                     </div>
                 </div>
             </div>
 
             {/* Filters and Actions */}
-            <div className="bg-white p-4 rounded-[16px] border border-gray-100">
+            <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="flex-1 flex gap-2">
                         <div className="relative flex-1">
@@ -261,7 +261,7 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
             </div>
 
             {/* Registrations Table */}
-            <div className="bg-white rounded-[16px] border border-gray-100 overflow-hidden">
+            <div className="bg-white rounded-[32px] border border-neutral-100 overflow-hidden shadow-sm">
                 {loading ? (
                     <div className="p-12 text-center">
                         <Loader2 className="w-8 h-8 mx-auto mb-4 animate-spin text-gray-400" />
@@ -316,12 +316,12 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
                                     </TableCell>
                                     <TableCell>
                                         {reg.checked_in ? (
-                                            <CheckCircle className="w-5 h-5 text-green-600" />
+                                            <CheckCircle className="w-5 h-5 text-neutral-900" />
                                         ) : (
                                             <XCircle className="w-5 h-5 text-gray-300" />
                                         )}
                                     </TableCell>
-                                    <TableCell className="text-sm text-gray-600">
+                                    <TableCell className="text-sm text-neutral-500">
                                         <div className="flex items-center gap-1">
                                             <Calendar className="w-3 h-3" />
                                             {new Date(reg.created_at).toLocaleDateString('zh-TW')}
@@ -345,7 +345,7 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
                                                         size="sm"
                                                         variant="outline"
                                                         onClick={() => handleApprove(reg.id)}
-                                                        className="rounded-lg text-green-600 hover:text-green-700"
+                                                        className="rounded-full text-neutral-900 hover:bg-neutral-100"
                                                     >
                                                         批准
                                                     </Button>
@@ -353,7 +353,7 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
                                                         size="sm"
                                                         variant="outline"
                                                         onClick={() => handleReject(reg.id)}
-                                                        className="rounded-lg text-red-600 hover:text-red-700"
+                                                        className="rounded-full text-red-600 hover:bg-red-50 hover:text-red-700"
                                                     >
                                                         拒絕
                                                     </Button>

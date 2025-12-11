@@ -40,13 +40,13 @@ export default function ManageClient({
     const getStatusColor = (status: string) => {
         switch (status) {
             case 'published':
-                return 'bg-green-100 text-green-800';
+                return 'bg-neutral-900 text-white';
             case 'draft':
-                return 'bg-gray-100 text-gray-800';
+                return 'bg-neutral-100 text-neutral-600';
             case 'closed':
-                return 'bg-blue-100 text-blue-800';
+                return 'bg-neutral-200 text-neutral-700';
             case 'canceled':
-                return 'bg-red-100 text-red-800';
+                return 'bg-red-50 text-red-600';
             default:
                 return 'bg-gray-100 text-gray-800';
         }
@@ -84,7 +84,7 @@ export default function ManageClient({
                             <div>
                                 <h1 className="text-2xl font-bold">{event.title}</h1>
                                 <div className="flex items-center gap-2 mt-1">
-                                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
+                                    <span className={`px-3 py-1 rounded-full text-xs font-medium ${getStatusColor(event.status)}`}>
                                         {getStatusText(event.status)}
                                     </span>
                                     <span className="text-sm text-gray-600">
@@ -114,7 +114,7 @@ export default function ManageClient({
             {/* Tabs */}
             <div className="container mx-auto px-4 py-6">
                 <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-                    <TabsList className="grid w-full grid-cols-5 mb-6">
+                    <TabsList className="grid w-full grid-cols-5 mb-8 p-1 bg-neutral-100/50 rounded-full">
                         <TabsTrigger value="overview">概覽</TabsTrigger>
                         <TabsTrigger value="registrations">報名管理</TabsTrigger>
                         <TabsTrigger value="checkin">簽到管理</TabsTrigger>
@@ -126,21 +126,21 @@ export default function ManageClient({
                     <TabsContent value="overview" className="space-y-6">
                         {/* Stats Cards */}
                         <div className="grid md:grid-cols-4 gap-4">
-                            <div className="bg-white p-6 rounded-[16px] shadow-sm border border-gray-100">
+                            <div className="bg-white p-6 rounded-[32px] shadow-sm border border-neutral-100">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-gray-600">報名人數</span>
-                                    <Users className="w-5 h-5 text-purple-600" />
+                                    <span className="text-sm text-neutral-500 font-medium">報名人數</span>
+                                    <Users className="w-5 h-5 text-neutral-400" />
                                 </div>
-                                <div className="text-3xl font-bold">
+                                <div className="text-3xl font-extrabold tracking-tight text-neutral-900">
                                     {stats.registered}
-                                    <span className="text-lg text-gray-400 ml-1">
+                                    <span className="text-lg text-neutral-400 ml-1 font-medium">
                                         / {stats.capacity || '∞'}
                                     </span>
                                 </div>
                                 {stats.capacity > 0 && (
-                                    <div className="mt-2 w-full bg-gray-200 rounded-full h-2">
+                                    <div className="mt-4 w-full bg-neutral-100 rounded-full h-2">
                                         <div
-                                            className="bg-purple-600 h-2 rounded-full"
+                                            className="bg-neutral-900 h-2 rounded-full"
                                             style={{
                                                 width: `${Math.min((stats.registered / stats.capacity) * 100, 100)}%`,
                                             }}
@@ -149,42 +149,42 @@ export default function ManageClient({
                                 )}
                             </div>
 
-                            <div className="bg-white p-6 rounded-[16px] shadow-sm border border-gray-100">
+                            <div className="bg-white p-6 rounded-[32px] shadow-sm border border-neutral-100">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-gray-600">已簽到</span>
-                                    <UserCheck className="w-5 h-5 text-green-600" />
+                                    <span className="text-sm text-neutral-500 font-medium">已簽到</span>
+                                    <UserCheck className="w-5 h-5 text-neutral-400" />
                                 </div>
-                                <div className="text-3xl font-bold">
+                                <div className="text-3xl font-extrabold tracking-tight text-neutral-900">
                                     {stats.checkedIn}
-                                    <span className="text-lg text-gray-400 ml-1">
+                                    <span className="text-lg text-neutral-400 ml-1 font-medium">
                                         / {stats.registered}
                                     </span>
                                 </div>
                                 {stats.registered > 0 && (
-                                    <div className="mt-2 text-sm text-gray-600">
+                                    <div className="mt-4 text-sm text-neutral-500">
                                         簽到率 {Math.round((stats.checkedIn / stats.registered) * 100)}%
                                     </div>
                                 )}
                             </div>
 
-                            <div className="bg-white p-6 rounded-[16px] shadow-sm border border-gray-100">
+                            <div className="bg-white p-6 rounded-[32px] shadow-sm border border-neutral-100">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-gray-600">候補名單</span>
-                                    <Clock className="w-5 h-5 text-orange-600" />
+                                    <span className="text-sm text-neutral-500 font-medium">候補名單</span>
+                                    <Clock className="w-5 h-5 text-neutral-400" />
                                 </div>
-                                <div className="text-3xl font-bold">{stats.waitlist}</div>
-                                <div className="mt-2 text-sm text-gray-600">等待中</div>
+                                <div className="text-3xl font-extrabold tracking-tight text-neutral-900">{stats.waitlist}</div>
+                                <div className="mt-4 text-sm text-neutral-500">等待中</div>
                             </div>
 
-                            <div className="bg-white p-6 rounded-[16px] shadow-sm border border-gray-100">
+                            <div className="bg-white p-6 rounded-[32px] shadow-sm border border-neutral-100">
                                 <div className="flex items-center justify-between mb-2">
-                                    <span className="text-sm text-gray-600">活動狀態</span>
-                                    <TrendingUp className="w-5 h-5 text-blue-600" />
+                                    <span className="text-sm text-neutral-500 font-medium">活動狀態</span>
+                                    <TrendingUp className="w-5 h-5 text-neutral-400" />
                                 </div>
-                                <div className="text-lg font-bold mt-1">
+                                <div className="text-lg font-bold mt-1 text-neutral-900">
                                     {getStatusText(event.status)}
                                 </div>
-                                <div className="mt-2 text-sm text-gray-600">
+                                <div className="mt-4 text-sm text-neutral-500">
                                     {new Date(event.start_time).toLocaleDateString('zh-TW', {
                                         month: 'long',
                                         day: 'numeric',

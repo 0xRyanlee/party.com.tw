@@ -18,7 +18,7 @@ import { useUser } from '@/hooks/useUser';
 import AuthModal from '@/components/AuthModal';
 import { useLanguage } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/client';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 export default function Header() {
     const { user, loading } = useUser();
@@ -26,11 +26,27 @@ export default function Header() {
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const router = useRouter();
+    const pathname = usePathname();
     const supabase = createClient();
 
     const handleLogout = async () => {
         await supabase.auth.signOut();
         router.refresh();
+    };
+
+    // Navigation items with active state logic
+    const navItems = [
+        { href: '/', label: '首頁', matchExact: true },
+        { href: '/events', label: '活動', matchExact: false },
+        { href: '/club', label: '社團', matchExact: false },
+        { href: '/settings', label: '設定', matchExact: true },
+    ];
+
+    const isActive = (item: typeof navItems[0]) => {
+        if (item.matchExact) {
+            return pathname === item.href;
+        }
+        return pathname.startsWith(item.href);
     };
 
     return (
@@ -53,30 +69,21 @@ export default function Header() {
 
                         {/* Navigation Links */}
                         <nav className="hidden md:flex items-center gap-1">
-                            <Link
-                                href="/"
-                                className="px-4 py-2 rounded-full bg-black text-white text-sm font-medium hover:bg-gray-800 transition-colors"
-                            >
-                                首頁
-                            </Link>
-                            <Link
-                                href="/host/dashboard"
-                                className="px-4 py-2 rounded-full hover:bg-gray-50 text-sm font-medium text-gray-600 transition-colors"
-                            >
-                                主辦方
-                            </Link>
-                            <Link
-                                href="/club"
-                                className="px-4 py-2 rounded-full hover:bg-gray-50 text-sm font-medium text-gray-600 transition-colors"
-                            >
-                                社團
-                            </Link>
-                            <Link
-                                href="/settings"
-                                className="px-4 py-2 rounded-full hover:bg-gray-50 text-sm font-medium text-gray-600 transition-colors"
-                            >
-                                設定
-                            </Link>
+                            {navItems.map((item) => (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`
+                                        px-4 py-2 rounded-full text-sm font-medium transition-colors
+                                        ${isActive(item)
+                                            ? 'bg-black text-white hover:bg-gray-800'
+                                            : 'text-gray-600 hover:bg-gray-50'
+                                        }
+                                    `}
+                                >
+                                    {item.label}
+                                </Link>
+                            ))}
                         </nav>
 
                         {/* Spacer */}

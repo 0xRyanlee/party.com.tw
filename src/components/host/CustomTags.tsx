@@ -89,7 +89,7 @@ export default function CustomTags({
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-2">
-                <Tag className="w-5 h-5 text-purple-600" />
+                <Tag className="w-5 h-5 text-gray-700" />
                 <div>
                     <Label className="text-base font-semibold">活動標籤</Label>
                     <p className="text-sm text-gray-500">選擇或新增標籤，幫助參與者了解活動特色</p>
@@ -108,7 +108,7 @@ export default function CustomTags({
                             return (
                                 <div
                                     key={tag}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-white border-2 border-purple-200 rounded-full text-sm font-medium"
+                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white rounded-full text-sm font-medium"
                                 >
                                     <span>{tagInfo?.label || tag}</span>
                                     <button
@@ -133,8 +133,8 @@ export default function CustomTags({
                         type="button"
                         onClick={() => setActiveCategory(category)}
                         className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${activeCategory === category
-                                ? 'bg-purple-600 text-white'
-                                : 'bg-gray-100 hover:bg-gray-200'
+                            ? 'bg-black text-white'
+                            : 'bg-gray-100 hover:bg-gray-200'
                             }`}
                     >
                         {category}
@@ -151,12 +151,12 @@ export default function CustomTags({
                             key={tag.value}
                             type="button"
                             onClick={() => toggleTag(tag.value)}
-                            className={`flex items-center gap-2 px-4 py-3 rounded-xl border-2 transition-all text-left ${allTags.includes(tag.value)
-                                    ? 'border-purple-600 bg-purple-50'
-                                    : 'border-gray-200 hover:border-gray-300'
+                            className={`flex items-center gap-2 px-4 py-3 rounded-full border-2 transition-all text-left ${allTags.includes(tag.value)
+                                ? 'border-black bg-black text-white'
+                                : 'border-gray-200 hover:border-gray-300'
                                 }`}
                         >
-                            <Icon className={`w-4 h-4 ${allTags.includes(tag.value) ? 'text-purple-600 fill-purple-600' : 'text-gray-400'}`} />
+                            <Icon className={`w-4 h-4 ${allTags.includes(tag.value) ? 'text-white fill-white' : 'text-gray-400'}`} />
                             <span className="font-medium text-sm">{tag.label}</span>
                         </button>
                     );
@@ -180,7 +180,7 @@ export default function CustomTags({
                         type="button"
                         onClick={addCustomTag}
                         disabled={!customInput.trim()}
-                        className="px-4 py-2 bg-purple-600 text-white rounded-xl hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         新增
                     </button>

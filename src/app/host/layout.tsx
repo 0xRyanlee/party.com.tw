@@ -5,7 +5,6 @@ import { Button } from "@/components/ui/button";
 import { LayoutDashboard, Edit, Users, ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 
 export default function HostLayout({
     children,
@@ -35,11 +34,6 @@ export default function HostLayout({
                             <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center font-bold">H</div>
                             <span className="font-bold text-lg hidden sm:inline">Host Center</span>
                         </div>
-                    </div>
-
-                    <div className="flex items-center gap-2">
-                        <LanguageSwitcher />
-                        <div className="w-8 h-8 bg-gray-200 rounded-full" />
                     </div>
                 </div>
 

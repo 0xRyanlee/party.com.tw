@@ -217,9 +217,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
 
             {/* 搜索框 */}
             <div className="relative">
-                <Label className="text-sm font-medium mb-2 block">
-                    {useGoogleMaps ? '搜索地點（Google Maps）' : '搜索或選擇地點'}
-                </Label>
+                <Label className="text-sm font-medium mb-2 block">搜索地點</Label>
                 <div className="relative">
                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                     <Input
@@ -363,42 +361,6 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
                         </button>
                     </div>
                 </div>
-            )}
-
-            {/* 手動輸入 */}
-            <div className="pt-4 border-t border-gray-200">
-                <Label className="text-sm font-medium mb-2 block">或手動輸入</Label>
-                <div className="space-y-3">
-                    <div>
-                        <Label className="text-xs text-gray-600">地點名稱</Label>
-                        <Input
-                            type="text"
-                            value={locationName}
-                            onChange={(e) => onChange?.({
-                                name: e.target.value,
-                                address: locationAddress,
-                                lat: value?.lat,
-                                lng: value?.lng,
-                            })}
-                            placeholder="例如：某咖啡廳、某酒吧"
-                        />
-                    </div>
-                    <div>
-                        <Label className="text-xs text-gray-600">詳細地址</Label>
-                        <Input
-                            type="text"
-                            value={locationAddress}
-                            onChange={(e) => onChange?.({
-                                name: locationName,
-                                address: e.target.value,
-                                lat: value?.lat,
-                                lng: value?.lng,
-                            })}
-                            placeholder="例如：台北市大安區..."
-                        />
-                    </div>
-                </div>
-            </div>
-        </div>
+            )}        </div>
     );
 }

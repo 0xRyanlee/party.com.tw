@@ -19,7 +19,7 @@ export default function ForHostsPage() {
                         無論是小型聚會、工作坊還是大型派對，Party 提供您所需的所有工具，讓活動管理變得簡單高效。
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                        <Link href="/host/edit">
+                        <Link href="/events/host/edit">
                             <Button size="lg" className="rounded-full bg-gray-900 hover:bg-gray-800 text-white px-8">
                                 開始發起活動
                                 <ArrowRight className="ml-2 w-5 h-5" />
@@ -144,7 +144,7 @@ export default function ForHostsPage() {
                     <p className="text-xl mb-8 opacity-90">
                         加入數千位主辦方，開始連結更多志同道合的人。
                     </p>
-                    <Link href="/host/edit">
+                    <Link href="/events/host/edit">
                         <Button size="lg" className="rounded-full bg-white text-gray-900 hover:bg-gray-100 px-8">
                             免費開始
                             <ArrowRight className="ml-2 w-5 h-5" />

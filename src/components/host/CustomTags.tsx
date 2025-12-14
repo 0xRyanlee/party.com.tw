@@ -1,79 +1,57 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
-import { X, Tag, Circle } from 'lucide-react';
+import { X, Tag, Sparkles } from 'lucide-react';
+import {
+    DEFAULT_TAGS,
+    SYSTEM_TAGS,
+    useSmartTags,
+    getTagLabel,
+    type TagInfo
+} from '@/lib/smartTags';
 
 interface CustomTagsProps {
     selectedTags?: string[];
-    customTags?: string[];
     onTagsChange?: (tags: string[]) => void;
+    showSmartSuggestions?: boolean;
 }
-
-// 預設標籤分類（移除 emoji）
-const DEFAULT_TAGS = {
-    活動類型: [
-        { value: 'sport', label: '運動健身', icon: Circle },
-        { value: 'bar', label: '酒吧夜店', icon: Circle },
-        { value: 'coffee', label: '咖啡聚會', icon: Circle },
-        { value: 'meetup', label: '聚會交流', icon: Circle },
-        { value: 'workshop', label: '工作坊', icon: Circle },
-        { value: 'conference', label: '研討會', icon: Circle },
-        { value: 'networking', label: '商務社交', icon: Circle },
-        { value: 'music', label: '音樂演出', icon: Circle },
-    ],
-    興趣主題: [
-        { value: 'tech', label: '科技', icon: Circle },
-        { value: 'art', label: '藝術', icon: Circle },
-        { value: 'food', label: '美食', icon: Circle },
-        { value: 'travel', label: '旅遊', icon: Circle },
-        { value: 'photography', label: '攝影', icon: Circle },
-        { value: 'gaming', label: '遊戲', icon: Circle },
-        { value: 'reading', label: '閱讀', icon: Circle },
-        { value: 'movie', label: '電影', icon: Circle },
-    ],
-    氛圍: [
-        { value: 'casual', label: '輕鬆休閒', icon: Circle },
-        { value: 'formal', label: '正式專業', icon: Circle },
-        { value: 'party', label: '派對狂歡', icon: Circle },
-        { value: 'chill', label: '放鬆療癒', icon: Circle },
-        { value: 'active', label: '活力充沛', icon: Circle },
-        { value: 'creative', label: '創意發想', icon: Circle },
-    ],
-    特色: [
-        { value: 'outdoor', label: '戶外活動', icon: Circle },
-        { value: 'indoor', label: '室內活動', icon: Circle },
-        { value: 'free', label: '免費參加', icon: Circle },
-        { value: 'beginner', label: '新手友善', icon: Circle },
-        { value: 'pet-friendly', label: '攜帶寵物', icon: Circle },
-        { value: 'kids-friendly', label: '親子友善', icon: Circle },
-        { value: 'lgbtq', label: 'LGBTQ+', icon: Circle },
-        { value: 'eco', label: '環保永續', icon: Circle },
-    ],
-};
 
 export default function CustomTags({
     selectedTags = [],
-    customTags = [],
     onTagsChange,
+    showSmartSuggestions = true,
 }: CustomTagsProps) {
     const [customInput, setCustomInput] = useState('');
-    const [activeCategory, setActiveCategory] = useState<string>('活動類型');
 
-    const allTags = [...selectedTags, ...customTags];
+    // 使用智能標籤 Hook
+    const {
+        selectedTags: internalSelectedTags,
+        impliedTags,
+        allTags,
+        loading,
+        toggleTag,
+        addCustomTag,
+        removeTag,
+        setSelectedTags,
+    } = useSmartTags(selectedTags);
 
-    const toggleTag = (tagValue: string) => {
-        const newTags = allTags.includes(tagValue)
-            ? allTags.filter((t) => t !== tagValue)
-            : [...allTags, tagValue];
-        onTagsChange?.(newTags);
-    };
+    // 同步外部 selectedTags
+    useEffect(() => {
+        if (selectedTags.length > 0 && JSON.stringify(selectedTags) !== JSON.stringify(internalSelectedTags)) {
+            setSelectedTags(selectedTags);
+        }
+    }, [selectedTags, internalSelectedTags, setSelectedTags]);
 
-    const addCustomTag = () => {
-        if (customInput.trim() && !allTags.includes(customInput.trim())) {
-            const newTags = [...allTags, customInput.trim()];
-            onTagsChange?.(newTags);
+    // 當標籤變化時通知父組件
+    useEffect(() => {
+        onTagsChange?.(allTags);
+    }, [allTags, onTagsChange]);
+
+    const handleAddCustomTag = () => {
+        if (customInput.trim()) {
+            addCustomTag(customInput.trim());
             setCustomInput('');
         }
     };
@@ -81,91 +59,123 @@ export default function CustomTags({
     const handleKeyPress = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter') {
             e.preventDefault();
-            addCustomTag();
+            handleAddCustomTag();
         }
     };
+
+    // 判斷標籤是否為系統自動添加
+    const isImpliedTag = (tag: string) => impliedTags.includes(tag);
 
     return (
         <div className="space-y-6">
             {/* Header */}
             <div className="flex items-center gap-2">
-                <Tag className="w-5 h-5 text-gray-700" />
+                <Tag className="w-5 h-5 text-zinc-700" />
                 <div>
-                    <Label className="text-base font-semibold">活動標籤</Label>
-                    <p className="text-sm text-gray-500">選擇或新增標籤，幫助參與者了解活動特色</p>
+                    <Label className="text-base font-semibold">Event Tags</Label>
+                    <p className="text-sm text-zinc-500">Select or add tags to help attendees understand your event</p>
                 </div>
             </div>
 
             {/* 已選標籤 */}
             {allTags.length > 0 && (
-                <div className="bg-gray-50 rounded-xl p-4">
-                    <p className="text-xs text-gray-600 mb-2">已選標籤 ({allTags.length})</p>
-                    <div className="flex flex-wrap gap-2">
-                        {allTags.map((tag) => {
-                            const tagInfo = Object.values(DEFAULT_TAGS)
-                                .flat()
-                                .find((t) => t.value === tag);
-                            return (
-                                <div
-                                    key={tag}
-                                    className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white rounded-full text-sm font-medium"
-                                >
-                                    <span>{tagInfo?.label || tag}</span>
-                                    <button
-                                        type="button"
-                                        onClick={() => toggleTag(tag)}
-                                        className="ml-1 hover:text-red-600"
-                                    >
-                                        <X className="w-3 h-3" />
-                                    </button>
-                                </div>
-                            );
-                        })}
+                <div className="bg-zinc-50 rounded-3xl p-4 space-y-3">
+                    <div className="flex items-center justify-between">
+                        <p className="text-xs text-zinc-600 font-medium">
+                            已選標籤 ({internalSelectedTags.length})
+                            {impliedTags.length > 0 && (
+                                <span className="text-zinc-400 ml-2">
+                                    + {impliedTags.length} 自動添加
+                                </span>
+                            )}
+                        </p>
+                        {allTags.length > 0 && (
+                            <button
+                                type="button"
+                                onClick={() => setSelectedTags([])}
+                                className="text-xs text-zinc-400 hover:text-zinc-600"
+                            >
+                                清除全部
+                            </button>
+                        )}
                     </div>
+
+                    <div className="flex flex-wrap gap-2">
+                        {/* 用戶選擇的標籤 */}
+                        {internalSelectedTags.map((tag) => (
+                            <div
+                                key={tag}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-black text-white rounded-full text-sm font-medium"
+                            >
+                                <span>{getTagLabel(tag)}</span>
+                                <button
+                                    type="button"
+                                    onClick={() => removeTag(tag)}
+                                    className="ml-1 hover:text-red-300 transition-colors"
+                                >
+                                    <X className="w-3 h-3" />
+                                </button>
+                            </div>
+                        ))}
+
+                        {/* 系統自動添加的標籤 */}
+                        {impliedTags.map((tag) => (
+                            <div
+                                key={tag}
+                                className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-zinc-200 text-zinc-600 rounded-full text-sm"
+                                title="系統自動添加"
+                            >
+                                <Sparkles className="w-3 h-3" />
+                                <span>{getTagLabel(tag)}</span>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* 智能標籤提示 */}
+                    {showSmartSuggestions && impliedTags.length > 0 && (
+                        <p className="text-xs text-zinc-400">
+                            💡 系統根據您的選擇自動添加了相關標籤
+                        </p>
+                    )}
                 </div>
             )}
 
-            {/* 類別切換 */}
-            <div className="flex gap-2 overflow-x-auto pb-2">
-                {Object.keys(DEFAULT_TAGS).map((category) => (
-                    <button
-                        key={category}
-                        type="button"
-                        onClick={() => setActiveCategory(category)}
-                        className={`px-4 py-2 rounded-full whitespace-nowrap transition-all ${activeCategory === category
-                            ? 'bg-black text-white'
-                            : 'bg-gray-100 hover:bg-gray-200'
-                            }`}
-                    >
-                        {category}
-                    </button>
-                ))}
-            </div>
+            {/* 常用標籤 */}
+            <div className="space-y-3">
+                <p className="text-sm font-medium text-zinc-700">常用標籤</p>
+                <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                    {DEFAULT_TAGS.map((tag) => {
+                        const isSelected = internalSelectedTags.includes(tag.value);
+                        const isImplied = isImpliedTag(tag.value);
 
-            {/* 預設標籤選擇 */}
-            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
-                {DEFAULT_TAGS[activeCategory as keyof typeof DEFAULT_TAGS]?.map((tag) => {
-                    const Icon = tag.icon;
-                    return (
-                        <button
-                            key={tag.value}
-                            type="button"
-                            onClick={() => toggleTag(tag.value)}
-                            className={`flex items-center gap-2 px-4 py-3 rounded-full border-2 transition-all text-left ${allTags.includes(tag.value)
-                                ? 'border-black bg-black text-white'
-                                : 'border-gray-200 hover:border-gray-300'
-                                }`}
-                        >
-                            <Icon className={`w-4 h-4 ${allTags.includes(tag.value) ? 'text-white fill-white' : 'text-gray-400'}`} />
-                            <span className="font-medium text-sm">{tag.label}</span>
-                        </button>
-                    );
-                })}
+                        return (
+                            <button
+                                key={tag.value}
+                                type="button"
+                                onClick={() => toggleTag(tag.value)}
+                                disabled={isImplied}
+                                className={`
+                                    flex items-center justify-center gap-2 px-3 py-2.5 rounded-full 
+                                    border-2 transition-all text-sm font-medium
+                                    ${isSelected
+                                        ? 'border-black bg-black text-white'
+                                        : isImplied
+                                            ? 'border-zinc-200 bg-zinc-100 text-zinc-400 cursor-not-allowed'
+                                            : 'border-zinc-200 hover:border-zinc-400'
+                                    }
+                                `}
+                            >
+                                {isImplied && <Sparkles className="w-3 h-3" />}
+                                {tag.label}
+                            </button>
+                        );
+                    })}
+                </div>
             </div>
 
             {/* 自定義標籤輸入 */}
-            <div className="border-2 border-dashed border-gray-300 rounded-xl p-4">
-                <Label className="text-sm font-medium mb-2 block">新增自定義標籤</Label>
+            <div className="border-2 border-dashed border-zinc-200 rounded-3xl p-4 space-y-3">
+                <Label className="text-sm font-medium">新增自定義標籤</Label>
                 <div className="flex gap-2">
                     <Input
                         type="text"
@@ -173,22 +183,30 @@ export default function CustomTags({
                         onChange={(e) => setCustomInput(e.target.value)}
                         onKeyPress={handleKeyPress}
                         placeholder="例如：Startup、Web3、區塊鏈..."
-                        className="flex-1"
+                        className="flex-1 rounded-full"
                         maxLength={20}
                     />
                     <button
                         type="button"
-                        onClick={addCustomTag}
+                        onClick={handleAddCustomTag}
                         disabled={!customInput.trim()}
-                        className="px-4 py-2 bg-black text-white rounded-full hover:bg-gray-800 disabled:opacity-50 disabled:cursor-not-allowed"
+                        className="px-5 py-2 bg-black text-white rounded-full hover:bg-zinc-800 disabled:opacity-50 disabled:cursor-not-allowed font-medium transition-all"
                     >
                         新增
                     </button>
                 </div>
-                <p className="text-xs text-gray-500 mt-2">
-                    提示：按 Enter 鍵快速新增標籤
+                <p className="text-xs text-zinc-400">
+                    💡 提示：輸入活動特色，系統會自動匹配相關標籤。按 Enter 快速新增。
                 </p>
             </div>
+
+            {/* Loading 狀態 */}
+            {loading && (
+                <div className="text-center py-4">
+                    <div className="inline-block w-4 h-4 border-2 border-zinc-300 border-t-black rounded-full animate-spin" />
+                    <p className="text-xs text-zinc-400 mt-2">載入標籤規則中...</p>
+                </div>
+            )}
         </div>
     );
 }

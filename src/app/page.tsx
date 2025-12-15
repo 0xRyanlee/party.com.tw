@@ -19,6 +19,7 @@ import QuickActions from '@/components/QuickActions';
 import CategoryFilter from '@/components/CategoryFilter';
 
 import { Suspense } from 'react';
+import AttendedEventsWidget from '@/components/AttendedEventsWidget';
 
 function HomeContent() {
   const { t } = useLanguage();
@@ -177,30 +178,8 @@ function HomeContent() {
           {/* Right Column - Sidebar */}
           <div className="lg:col-span-4 space-y-6 lg:space-y-8 px-4 sm:px-0">
 
-            {/* Recently Viewed Widget */}
-            <motion.div
-              initial={{ opacity: 0, x: 20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.3 }}
-              className="bg-white rounded-lg p-4 sm:p-6 border border-gray-100 shadow-sm"
-            >
-              <div className="flex items-center gap-2 mb-4 text-gray-400">
-                <History className="w-4 h-4" />
-                <h3 className="text-xs font-bold tracking-wider uppercase">{t('home.sidebar.recentlyViewed')}</h3>
-              </div>
-              <div className="space-y-3 sm:space-y-4">
-                {[1, 2].map((i) => (
-                  <div key={i} className="flex gap-2 sm:gap-3 group cursor-pointer">
-                    <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-gray-100 bg-cover bg-center shrink-0" style={{ backgroundImage: `url(${mockEvents[i].image})` }} />
-                    <div className="flex-1 min-w-0">
-                      <h4 className="font-bold text-xs sm:text-sm truncate group-hover:text-gray-600 transition-colors">{mockEvents[i].title}</h4>
-                      <p className="text-[10px] sm:text-xs text-gray-400 mt-0.5 sm:mt-1">{mockEvents[i].date}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </motion.div>
+            {/* Attended Events Widget (P0 - UX Roadmap) */}
+            <AttendedEventsWidget limit={3} />
 
             {/* Actions Card */}
             <motion.div

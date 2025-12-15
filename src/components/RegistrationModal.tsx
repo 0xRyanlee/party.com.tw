@@ -49,18 +49,16 @@ export default function RegistrationModal({
         setError('');
 
         try {
-            const response = await fetch(`/api/events/${eventId}/registrations`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(formData),
+            const { registerWithDetails } = await import('@/app/actions/events');
+            const result = await registerWithDetails(eventId, {
+                attendee_name: formData.attendee_name,
+                attendee_email: formData.attendee_email,
+                attendee_phone: formData.attendee_phone || undefined,
+                ticket_type_id: formData.ticket_type_id || undefined,
             });
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.error || 'Registration failed');
+            if (!result.success) {
+                throw new Error(result.message);
             }
 
             setSuccess(true);

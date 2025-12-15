@@ -100,3 +100,65 @@ export async function checkRegistrationStatus(eventId: string) {
 
     return data?.status || null;
 }
+
+// Extended registration with attendee details
+export type RegistrationFormData = {
+    attendee_name: string;
+    attendee_email: string;
+    attendee_phone?: string;
+    ticket_type_id?: string;
+};
+
+export async function registerWithDetails(
+    eventId: string,
+    formData: RegistrationFormData
+): Promise<RegistrationResult> {
+    const supabase = await createClient();
+
+    // 1. Check Auth
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+        return { success: false, message: "請先登入才能報名" };
+    }
+
+    // 2. Check if already registered
+    const { data: existing } = await supabase
+        .from('registrations')
+        .select('status')
+        .eq('event_id', eventId)
+        .eq('user_id', user.id)
+        .single();
+
+    if (existing) {
+        return { success: false, message: "您已經報名過此活動", status: existing.status };
+    }
+
+    // 3. Validate required fields
+    if (!formData.attendee_name || !formData.attendee_email) {
+        return { success: false, message: "請填寫姓名和 Email" };
+    }
+
+    // 4. Create Registration with attendee details
+    const { error } = await supabase
+        .from('registrations')
+        .insert({
+            event_id: eventId,
+            user_id: user.id,
+            status: 'confirmed',
+            attendee_name: formData.attendee_name,
+            attendee_email: formData.attendee_email,
+            attendee_phone: formData.attendee_phone || null,
+            ticket_type_id: formData.ticket_type_id || null,
+            registration_source: 'web',
+        });
+
+    if (error) {
+        console.error("Registration error:", error);
+        return { success: false, message: "報名失敗，請稍後再試" };
+    }
+
+    revalidatePath(`/events/${eventId}`);
+    revalidatePath('/user/my-events');
+
+    return { success: true, message: "報名成功！", status: 'confirmed' };
+}

@@ -4,13 +4,15 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, Di
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, MapPin, Clock, Users, X, Share2, Heart } from "lucide-react";
-import { Event } from "@/lib/mock-data"; // This import might need to be updated if Event type is moved
+import { Event } from "@/lib/mock-data";
 import MapComponent from "@/components/MapComponent";
-import { useState, useEffect } from "react"; // Added useEffect
-import { useToast } from "@/components/ui/use-toast"; // Assuming this exists or we mock it
-import AsyncButton from "@/components/ui/AsyncButton";
+import { useState, useEffect } from "react";
+import { useToast } from "@/components/ui/use-toast";
 import CollaborationOpportunities from "@/components/CollaborationOpportunities";
-import { EventRole, EventResource } from "@/types/schema"; // Assuming these types are correct
+import { EventRole, EventResource } from "@/types/schema";
+import QuickRegisterButton from "@/components/QuickRegisterButton";
+import AuthModal from "@/components/AuthModal";
+import { createClient } from "@/lib/supabase/client";
 
 interface EventDetailModalProps {
     event: Event | null;
@@ -19,21 +21,42 @@ interface EventDetailModalProps {
 }
 
 export default function EventDetailModal({ event, isOpen, onClose }: EventDetailModalProps) {
-    // const [isRegistering, setIsRegistering] = useState(false); // Handled by AsyncButton
-    const [registrationStatus, setRegistrationStatus] = useState<string | null>(null);
-    const { toast } = useToast(); // Assuming we have a toast hook, or we'll use alert for MVP
+    const { toast } = useToast();
 
-    // New state for collaboration opportunities
+    // Auth state
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isRegistered, setIsRegistered] = useState(false);
+
+    // Collaboration opportunities state
     const [roles, setRoles] = useState<EventRole[]>([]);
     const [resources, setResources] = useState<EventResource[]>([]);
     const [loadingOpportunities, setLoadingOpportunities] = useState(true);
 
-    // 加載合作機會
+    // Check auth state and registration status
     useEffect(() => {
-        if (isOpen && event?.id) { // Ensure event and event.id exist
+        const checkAuthAndRegistration = async () => {
+            if (!event?.id) return;
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            setIsLoggedIn(!!user);
+
+            if (user) {
+                const { data: registration } = await supabase
+                    .from('registrations')
+                    .select('status')
+                    .eq('event_id', event.id)
+                    .eq('user_id', user.id)
+                    .single();
+                setIsRegistered(!!registration && ['confirmed', 'pending'].includes(registration.status));
+            }
+        };
+
+        if (isOpen && event?.id) {
+            checkAuthAndRegistration();
             fetchOpportunities();
         }
-    }, [isOpen, event?.id]); // Depend on isOpen and event.id
+    }, [isOpen, event?.id]);
 
     const fetchOpportunities = async () => {
         if (!event?.id) return; // Guard against missing event ID
@@ -57,30 +80,6 @@ export default function EventDetailModal({ event, isOpen, onClose }: EventDetail
             setResources([]);
         } finally {
             setLoadingOpportunities(false);
-        }
-    };
-
-    const handleRegister = async () => {
-        if (!event) return;
-        // setIsRegistering(true); // Handled by AsyncButton
-
-        try {
-            // Dynamic import to avoid server-only module issues in client component if not handled by Next.js automatically
-            // But standard Server Actions can be imported directly.
-            // We need to ensure this component is Client Component (it is).
-            const { registerForEvent } = await import("@/app/actions/events");
-
-            const result = await registerForEvent(event.id);
-
-            if (result.success) {
-                setRegistrationStatus('confirmed');
-                // alert(result.message); // Simple feedback
-            } else {
-                alert(result.message);
-            }
-        } catch (error) {
-            console.error(error);
-            alert("An error occurred. Please try again.");
         }
     };
 
@@ -202,7 +201,6 @@ export default function EventDetailModal({ event, isOpen, onClose }: EventDetail
                     </div>
                 </div>
 
-                {/* Footer Actions */}
                 <div className="p-6 border-t border-gray-100 bg-white flex gap-4 sticky bottom-0 z-10">
                     <Button variant="outline" size="icon" className="rounded-full w-12 h-12 shrink-0">
                         <Share2 className="w-5 h-5" />
@@ -210,18 +208,23 @@ export default function EventDetailModal({ event, isOpen, onClose }: EventDetail
                     <Button variant="outline" size="icon" className="rounded-full w-12 h-12 shrink-0">
                         <Heart className="w-5 h-5" />
                     </Button>
-                    <AsyncButton
-                        className={`flex-1 h-12 text-lg transition-all ${registrationStatus === 'confirmed'
-                            ? 'bg-emerald-500 hover:bg-emerald-600 text-white'
-                            : 'bg-black hover:bg-gray-800 text-white'
-                            }`}
-                        onClick={handleRegister}
-                        disabled={registrationStatus === 'confirmed'}
-                        successText="Registered!"
-                    >
-                        {registrationStatus === 'confirmed' ? "You're Going! 🎉" : "Join Event"}
-                    </AsyncButton>
+                    <QuickRegisterButton
+                        eventId={event.id}
+                        eventTitle={event.title}
+                        isLoggedIn={isLoggedIn}
+                        isAlreadyRegistered={isRegistered}
+                        onLoginRequired={() => setIsAuthModalOpen(true)}
+                        onSuccess={() => setIsRegistered(true)}
+                        size="lg"
+                        className="flex-1 h-12 text-lg"
+                    />
                 </div>
+
+                {/* Auth Modal */}
+                <AuthModal
+                    isOpen={isAuthModalOpen}
+                    onClose={() => setIsAuthModalOpen(false)}
+                />
 
             </DialogContent>
         </Dialog>

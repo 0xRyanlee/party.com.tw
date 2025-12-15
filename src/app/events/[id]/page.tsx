@@ -11,6 +11,9 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     const { id } = await params;
     const supabase = await createClient();
 
+    // Get current user
+    const { data: { user } } = await supabase.auth.getUser();
+
     const { data: dbEvent, error } = await supabase
         .from('events')
         .select('*')
@@ -19,6 +22,18 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
     if (error || !dbEvent) {
         notFound();
+    }
+
+    // Check if user is already registered
+    let isRegistered = false;
+    if (user) {
+        const { data: registration } = await supabase
+            .from('registrations')
+            .select('status')
+            .eq('event_id', id)
+            .eq('user_id', user.id)
+            .single();
+        isRegistered = !!registration && ['confirmed', 'pending'].includes(registration.status);
     }
 
     const startDate = new Date(dbEvent.start_time);
@@ -63,5 +78,11 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         isPromoted: false,
     };
 
-    return <EventDetailClient event={event} />;
+    return (
+        <EventDetailClient
+            event={event}
+            isLoggedIn={!!user}
+            initialIsRegistered={isRegistered}
+        />
+    );
 }

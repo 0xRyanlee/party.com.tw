@@ -9,14 +9,20 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/lib/i18n';
 import RegistrationModal from '@/components/RegistrationModal';
+import QuickRegisterButton from '@/components/QuickRegisterButton';
+import AuthModal from '@/components/AuthModal';
 
 interface EventDetailClientProps {
     event: Event;
+    isLoggedIn: boolean;
+    initialIsRegistered: boolean;
 }
 
-export default function EventDetailClient({ event }: EventDetailClientProps) {
+export default function EventDetailClient({ event, isLoggedIn, initialIsRegistered }: EventDetailClientProps) {
     const { t } = useLanguage();
     const [showRegistrationModal, setShowRegistrationModal] = useState(false);
+    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const [isRegistered, setIsRegistered] = useState(initialIsRegistered);
 
     // Swiss Vibe: Large radii, monochrome palette, high contrast
     return (
@@ -161,12 +167,16 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
                                 <span className="text-3xl font-bold tracking-tight text-white">{event.price}</span>
                             </div>
                             <div className="space-y-4">
-                                <Button
-                                    className="w-full rounded-full bg-white text-black hover:bg-neutral-200 h-14 text-lg font-bold shadow-lg shadow-white/10 transition-transform active:scale-95"
-                                    onClick={() => setShowRegistrationModal(true)}
-                                >
-                                    立即報名
-                                </Button>
+                                <QuickRegisterButton
+                                    eventId={event.id}
+                                    eventTitle={event.title}
+                                    isLoggedIn={isLoggedIn}
+                                    isAlreadyRegistered={isRegistered}
+                                    onLoginRequired={() => setIsAuthModalOpen(true)}
+                                    onSuccess={() => setIsRegistered(true)}
+                                    size="lg"
+                                    className="w-full h-14 text-lg"
+                                />
                                 <p className="text-xs text-center text-neutral-500 font-medium">
                                     剩餘名額: {event.capacity - (event.attendees || 0)}
                                 </p>
@@ -182,12 +192,16 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
                     <Button variant="outline" size="icon" className="rounded-full w-14 h-14 shrink-0 border-neutral-200 bg-white">
                         <Share2 className="w-5 h-5 text-neutral-900" />
                     </Button>
-                    <Button
-                        className="flex-1 rounded-full bg-neutral-900 text-white hover:bg-black h-14 text-lg font-bold shadow-lg"
-                        onClick={() => setShowRegistrationModal(true)}
-                    >
-                        立即報名
-                    </Button>
+                    <QuickRegisterButton
+                        eventId={event.id}
+                        eventTitle={event.title}
+                        isLoggedIn={isLoggedIn}
+                        isAlreadyRegistered={isRegistered}
+                        onLoginRequired={() => setIsAuthModalOpen(true)}
+                        onSuccess={() => setIsRegistered(true)}
+                        size="lg"
+                        className="flex-1 h-14 text-lg"
+                    />
                 </div>
             </div>
 
@@ -197,6 +211,12 @@ export default function EventDetailClient({ event }: EventDetailClientProps) {
                 onClose={() => setShowRegistrationModal(false)}
                 eventId={event.id}
                 eventTitle={event.title}
+            />
+
+            {/* Auth Modal */}
+            <AuthModal
+                isOpen={isAuthModalOpen}
+                onClose={() => setIsAuthModalOpen(false)}
             />
         </div>
     );

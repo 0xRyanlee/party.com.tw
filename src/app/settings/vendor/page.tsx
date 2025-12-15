@@ -6,22 +6,28 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe } from 'lucide-react';
-
-// Service categories will use i18n in component
+import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe, Instagram, Linkedin, ChevronLeft, ChevronRight, Image } from 'lucide-react';
 
 export default function VendorProfilePage() {
     const { t } = useLanguage();
+    const [activeImageIndex, setActiveImageIndex] = useState(0);
     const [profile, setProfile] = useState({
         displayName: '',
         bio: '',
         categories: [] as string[],
+        coverImages: [] as string[], // 3-5 張輪播圖片
         portfolio: [] as { title: string; description: string; image?: string }[],
         contact: {
             email: '',
             phone: '',
             website: '',
         },
+        socialLinks: {
+            instagram: '',
+            linkedin: '',
+            threads: '',
+        },
+        services: [] as { name: string; description: string; price?: string }[], // 服務項目
         pricing: {
             min: '',
             max: '',

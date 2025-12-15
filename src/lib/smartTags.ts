@@ -75,59 +75,75 @@ export const SYSTEM_TAGS: TagInfo[] = [
 
 /**
  * 從資料庫獲取所有活躍的標籤規則
+ * 如果表不存在或發生錯誤，返回空陣列（優雅降級）
  */
 export async function fetchTagRules(): Promise<TagRule[]> {
-    const supabase = createClient();
+    try {
+        const supabase = createClient();
 
-    const { data, error } = await supabase
-        .from('tag_inference_rules')
-        .select('*')
-        .eq('is_active', true)
-        .order('priority', { ascending: false });
+        const { data, error } = await supabase
+            .from('tag_inference_rules')
+            .select('*')
+            .eq('is_active', true)
+            .order('priority', { ascending: false });
 
-    if (error) {
-        console.error('Error fetching tag rules:', error);
+        // 靜默處理錯誤（表可能不存在）
+        if (error) {
+            // 只在開發環境 debug 時輸出
+            if (process.env.NODE_ENV === 'development' && process.env.DEBUG_TAGS === 'true') {
+                console.warn('Tag rules not available:', error.message);
+            }
+            return [];
+        }
+
+        return data || [];
+    } catch {
+        // 網路錯誤或其他異常
         return [];
     }
-
-    return data || [];
 }
 
 /**
  * 獲取熱門標籤（用於推薦）
  */
 export async function fetchPopularTags(limit = 20): Promise<TagStats[]> {
-    const supabase = createClient();
+    try {
+        const supabase = createClient();
 
-    const { data, error } = await supabase
-        .from('tag_usage_stats')
-        .select('*')
-        .order('usage_count', { ascending: false })
-        .limit(limit);
+        const { data, error } = await supabase
+            .from('tag_usage_stats')
+            .select('*')
+            .order('usage_count', { ascending: false })
+            .limit(limit);
 
-    if (error) {
-        console.error('Error fetching popular tags:', error);
+        if (error) {
+            return [];
+        }
+
+        return data || [];
+    } catch {
         return [];
     }
-
-    return data || [];
 }
 
 /**
  * 使用資料庫函數獲取隱含標籤
  */
 export async function getImpliedTagsFromDB(tags: string[]): Promise<string[]> {
-    const supabase = createClient();
+    try {
+        const supabase = createClient();
 
-    const { data, error } = await supabase
-        .rpc('get_implied_tags', { input_tags: tags });
+        const { data, error } = await supabase
+            .rpc('get_implied_tags', { input_tags: tags });
 
-    if (error) {
-        console.error('Error getting implied tags:', error);
+        if (error) {
+            return tags;
+        }
+
+        return data || tags;
+    } catch {
         return tags;
     }
-
-    return data || tags;
 }
 
 // ============================================

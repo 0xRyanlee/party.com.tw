@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { X, Tag, Sparkles } from 'lucide-react';
@@ -24,6 +24,8 @@ export default function CustomTags({
     showSmartSuggestions = true,
 }: CustomTagsProps) {
     const [customInput, setCustomInput] = useState('');
+    const isInitializedRef = useRef(false);
+    const prevAllTagsRef = useRef<string[]>([]);
 
     // 使用智能標籤 Hook
     const {
@@ -37,16 +39,21 @@ export default function CustomTags({
         setSelectedTags,
     } = useSmartTags(selectedTags);
 
-    // 同步外部 selectedTags
+    // 初始化時同步外部 selectedTags（只執行一次）
     useEffect(() => {
-        if (selectedTags.length > 0 && JSON.stringify(selectedTags) !== JSON.stringify(internalSelectedTags)) {
+        if (!isInitializedRef.current && selectedTags.length > 0) {
             setSelectedTags(selectedTags);
+            isInitializedRef.current = true;
         }
-    }, [selectedTags, internalSelectedTags, setSelectedTags]);
+    }, [selectedTags, setSelectedTags]);
 
-    // 當標籤變化時通知父組件
+    // 當標籤變化時通知父組件（避免無限循環）
     useEffect(() => {
-        onTagsChange?.(allTags);
+        const tagsChanged = JSON.stringify(allTags) !== JSON.stringify(prevAllTagsRef.current);
+        if (tagsChanged && onTagsChange) {
+            prevAllTagsRef.current = allTags;
+            onTagsChange(allTags);
+        }
     }, [allTags, onTagsChange]);
 
     const handleAddCustomTag = () => {

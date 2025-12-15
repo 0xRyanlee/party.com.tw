@@ -10,8 +10,11 @@ export default function Footer() {
                     <div className="space-y-4">
                         <Logo />
                         <p className="text-gray-500 text-sm leading-relaxed">
-                            探索台灣最精彩的活動<br />
-                            連結、慶祝、創造回憶
+                            城市活動行事曆<br />
+                            連接、慶祝、創造難忘回憶
+                        </p>
+                        <p className="text-xs text-gray-400 italic">
+                            Meetup, Anytime, Anywhere
                         </p>
                     </div>
 

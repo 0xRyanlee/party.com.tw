@@ -63,7 +63,7 @@ export default function Header() {
                                 </span>
                             </div>
                             <p className="text-[10px] text-gray-400 font-medium tracking-wider pl-1">
-                                派對聚會平台
+                                城市活動行事曆
                             </p>
                         </div>
 

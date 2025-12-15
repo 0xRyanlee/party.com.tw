@@ -5,12 +5,22 @@ import { useRef } from "react";
 
 interface CategoryFilterProps {
     tags: string[];
-    activeTag: string;
-    onSelectTag: (tag: string) => void;
+    activeTags: string[];
+    onToggleTag: (tag: string) => void;
 }
 
-export default function CategoryFilter({ tags, activeTag, onSelectTag }: CategoryFilterProps) {
+export default function CategoryFilter({ tags, activeTags, onToggleTag }: CategoryFilterProps) {
     const scrollContainerRef = useRef<HTMLDivElement>(null);
+
+    const isAllSelected = activeTags.length === 0;
+
+    const handleAllClick = () => {
+        // Clear all selections (empty array = show all)
+        if (!isAllSelected) {
+            // Reset to empty array which means "All"
+            activeTags.forEach(tag => onToggleTag(tag));
+        }
+    };
 
     return (
         <div className="relative group">
@@ -23,10 +33,10 @@ export default function CategoryFilter({ tags, activeTag, onSelectTag }: Categor
                 className="flex items-center gap-2 overflow-x-auto pb-4 pt-1 px-4 sm:px-0 scrollbar-hide -mx-4 sm:mx-0"
             >
                 <button
-                    onClick={() => onSelectTag('All')}
+                    onClick={handleAllClick}
                     className={cn(
                         "px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all active:scale-95",
-                        activeTag === 'All'
+                        isAllSelected
                             ? "bg-black text-white shadow-md"
                             : "bg-white text-zinc-600 border border-gray-200 hover:bg-gray-50"
                     )}
@@ -34,20 +44,23 @@ export default function CategoryFilter({ tags, activeTag, onSelectTag }: Categor
                     全部
                 </button>
 
-                {tags.map((tag) => (
-                    <button
-                        key={tag}
-                        onClick={() => onSelectTag(tag)}
-                        className={cn(
-                            "px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all active:scale-95",
-                            activeTag === tag
-                                ? "bg-black text-white shadow-md"
-                                : "bg-white text-zinc-600 border border-gray-200 hover:bg-gray-50"
-                        )}
-                    >
-                        #{tag}
-                    </button>
-                ))}
+                {tags.filter(t => t !== 'All').map((tag) => {
+                    const isActive = activeTags.includes(tag);
+                    return (
+                        <button
+                            key={tag}
+                            onClick={() => onToggleTag(tag)}
+                            className={cn(
+                                "px-5 py-2.5 rounded-full text-sm font-medium whitespace-nowrap transition-all active:scale-95",
+                                isActive
+                                    ? "bg-black text-white shadow-md"
+                                    : "bg-white text-zinc-600 border border-gray-200 hover:bg-gray-50"
+                            )}
+                        >
+                            {tag}
+                        </button>
+                    );
+                })}
             </div>
 
             {/* Right Fade */}

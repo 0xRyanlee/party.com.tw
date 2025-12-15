@@ -10,12 +10,16 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Party - 探索身邊的精彩活動",
-  description: "發現並參與台灣各地的聚會、工作坊、派對等活動",
+  title: "Party - 城市活動行事曆 | Events Today in Town",
+  description: "隨時隨地，精彩相聚。連接、慶祝、創造難忘回憶。發現並參與台灣各地的聚會、工作坊、活動。",
   verification: {
     google: '58147ZZmtRggK8XRLJkVz7uLOpDJpu0v-Gwd7L2PIs4',
   },
-  keywords: ["活動", "聚會", "meetup", "workshop", "社交", "派對"],
+  keywords: ["活動", "聚會", "meetup", "workshop", "社交", "城市活動", "events"],
+  icons: {
+    icon: "/1202-Party-Logo-v1.png",
+    apple: "/1202-Party-Logo-v1.png",
+  },
 };
 
 import { I18nProvider } from "@/lib/i18n";

@@ -26,9 +26,17 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [activeTag, setActiveTag] = useState('All');
+  const [activeTags, setActiveTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMapOpen, setIsMapOpen] = useState(false);
+
+  const handleToggleTag = (tag: string) => {
+    setActiveTags(prev =>
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
 
   // 處理登入參數
   useEffect(() => {
@@ -41,7 +49,10 @@ function HomeContent() {
   const filteredEvents = useMemo(() => {
     return mockEvents
       .filter((event) => {
-        const matchesTag = activeTag === 'All' || event.tags.includes(activeTag) || event.type === activeTag.toLowerCase();
+        // 空陣列 = 顯示全部
+        const matchesTag = activeTags.length === 0 ||
+          event.tags.some(tag => activeTags.includes(tag)) ||
+          activeTags.includes(event.type);
         const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
           event.location.toLowerCase().includes(searchQuery.toLowerCase());
         return matchesTag && matchesSearch;
@@ -50,7 +61,7 @@ function HomeContent() {
         if (a.distance !== b.distance) return a.distance - b.distance;
         return 0;
       });
-  }, [activeTag, searchQuery]);
+  }, [activeTags, searchQuery]);
 
   const nearestEvent = filteredEvents[0];
   const otherEvents = filteredEvents.slice(1);
@@ -78,8 +89,8 @@ function HomeContent() {
             {/* Category Filter */}
             <CategoryFilter
               tags={tags}
-              activeTag={activeTag}
-              onSelectTag={setActiveTag}
+              activeTags={activeTags}
+              onToggleTag={handleToggleTag}
             />
 
             {/* Upcoming Events Section */}
@@ -91,7 +102,7 @@ function HomeContent() {
               className="relative"
             >
               <div className="flex items-center justify-between mb-4 px-1">
-                <h2 className="text-sm font-bold text-gray-500 tracking-wider">{t('home.upcoming')}</h2>
+                <h2 className="text-sm font-bold text-gray-500 tracking-wider">UPCOMING</h2>
               </div>
 
               {/* Foolproof Carousel Container */}
@@ -151,9 +162,14 @@ function HomeContent() {
                           )}
                         </div>
 
-                        <div className="mt-auto flex items-center gap-1 text-xs text-gray-400">
-                          <MapPin className="w-3 h-3" />
-                          <span className="truncate">{event.location.split(',')[0]}</span>
+                        <div className="mt-auto flex items-center justify-between text-xs text-gray-400">
+                          <div className="flex items-center gap-1">
+                            <MapPin className="w-3 h-3" />
+                            <span className="truncate max-w-[100px]">{event.location.split(',')[0]}</span>
+                          </div>
+                          <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-[10px] font-medium shrink-0">
+                            {event.distance < 1 ? `${Math.round(event.distance * 1000)} m` : `${event.distance.toFixed(1)} km`}
+                          </span>
                         </div>
                       </div>
                     </div>

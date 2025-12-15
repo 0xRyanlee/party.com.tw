@@ -108,7 +108,7 @@ export async function GET(request: NextRequest) {
         const { searchParams } = new URL(request.url);
 
         // 查詢參數
-        const status = searchParams.get('status') || 'published';
+        const status = searchParams.get('status') || 'active';
         const category = searchParams.get('category');
         const limit = parseInt(searchParams.get('limit') || '20');
         const offset = parseInt(searchParams.get('offset') || '0');

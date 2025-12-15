@@ -28,6 +28,7 @@ import Footer from "@/components/Footer";
 import { Analytics } from "@vercel/analytics/react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import GoogleOneTap from "@/components/GoogleOneTap";
+import PWAInstallPrompt from "@/components/PWAInstallPrompt";
 
 export default function RootLayout({
   children,
@@ -53,6 +54,7 @@ export default function RootLayout({
           <Analytics />
           <GoogleAnalytics />
           <GoogleOneTap />
+          <PWAInstallPrompt />
         </I18nProvider>
       </body>
     </html>

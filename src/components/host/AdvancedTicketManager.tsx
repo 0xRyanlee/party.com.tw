@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Switch } from '@/components/ui/switch';
+import { Textarea } from '@/components/ui/textarea';
 import { Ticket, Plus, X, DollarSign, Utensils } from 'lucide-react';
 
 interface TicketTypeData {
@@ -13,6 +14,7 @@ interface TicketTypeData {
     price: number;
     quantity: number;
     includeMeal: boolean;
+    description?: string;
 }
 
 interface AdvancedTicketManagerProps {
@@ -41,6 +43,7 @@ export default function AdvancedTicketManager({
             price: 0,
             quantity: 50,
             includeMeal: false,
+            description: '',
         };
         const updated = [...ticketList, newTicket];
         setTicketList(updated);
@@ -130,7 +133,7 @@ export default function AdvancedTicketManager({
 
                             <div className="grid grid-cols-2 gap-4">
                                 {/* Ticket Name */}
-                                <div>
+                                <div className="col-span-2">
                                     <Label className="text-sm">票種名稱</Label>
                                     <Input
                                         value={ticket.name}
@@ -184,6 +187,17 @@ export default function AdvancedTicketManager({
                                         {ticket.includeMeal ? '包含餐點' : '不含餐'}
                                     </button>
                                 </div>
+                            </div>
+
+                            {/* Description */}
+                            <div className="mt-4">
+                                <Label className="text-sm">票種描述 / 限制</Label>
+                                <Textarea
+                                    value={ticket.description || ''}
+                                    onChange={(e) => updateTicket(ticket.id, 'description', e.target.value)}
+                                    placeholder="例如：包含一杯飲料、限 18 歲以上、入場注意事項..."
+                                    className="mt-1 h-20 resize-none rounded-xl"
+                                />
                             </div>
 
                             {/* Quick Presets for Free Ticket */}

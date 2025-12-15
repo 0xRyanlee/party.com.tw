@@ -98,6 +98,18 @@ export default function SettingsPage() {
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
                         </Link>
+                        <Link href="/settings/report" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                                    <MessageSquare className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="font-bold block">申訴與回報</span>
+                                    <span className="text-xs text-gray-400">檢舉違規、功能建議或合作洽談</span>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                        </Link>
                         <Link href="/settings/vendor" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
                             <div className="flex items-center gap-3">
                                 <Briefcase className="w-5 h-5 text-gray-400" />
@@ -105,6 +117,31 @@ export default function SettingsPage() {
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
                         </Link>
+                    </div>
+                </section>
+
+                {/* PWA Install Section - Mobile Only */}
+                <section className="md:hidden">
+                    <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">快速存取</h2>
+                    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                        <button
+                            onClick={() => {
+                                localStorage.removeItem('pwa-prompt-dismissed');
+                                alert('請在 3 秒後查看底部彈窗');
+                            }}
+                            className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
+                        >
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                                    <span className="text-white text-sm">📱</span>
+                                </div>
+                                <div className="text-left">
+                                    <span className="font-bold block">加入主畫面</span>
+                                    <span className="text-xs text-gray-400">像 App 一樣使用 Party</span>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                        </button>
                     </div>
                 </section>
 

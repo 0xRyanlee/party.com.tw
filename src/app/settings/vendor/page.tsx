@@ -6,7 +6,8 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe, Instagram, Linkedin, ChevronLeft, ChevronRight, Image } from 'lucide-react';
+import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe, Instagram, Linkedin, ChevronLeft, ChevronRight, Image, MapPin } from 'lucide-react';
+import LocationPicker from "@/components/host/LocationPicker";
 
 export default function VendorProfilePage() {
     const { t } = useLanguage();
@@ -14,6 +15,7 @@ export default function VendorProfilePage() {
     const [profile, setProfile] = useState({
         displayName: '',
         bio: '',
+        location: { name: '', address: '', lat: 0, lng: 0 }, // Add location field
         categories: [] as string[],
         coverImages: [] as string[], // 3-5 張輪播圖片
         portfolio: [] as { title: string; description: string; image?: string }[],
@@ -148,6 +150,239 @@ export default function VendorProfilePage() {
                                     {profile.bio.length} / 500 {t('vendor.profile.bioCount')}
                                 </p>
                             </div>
+
+                            {/* Google Place Location */}
+                            <div className="space-y-2">
+                                <Label className="flex items-center gap-2">
+                                    <MapPin className="w-4 h-4" /> 服務據點 / 工作室位置（Google Place）
+                                </Label>
+                                <LocationPicker
+                                    value={profile.location}
+                                    onChange={(loc) => setProfile({ ...profile, location: { ...profile.location, ...loc } })}
+                                />
+                                <p className="text-xs text-gray-500">
+                                    設定您的據點位置，方便在地圖上顯示您的服務範圍
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Cover Images Carousel */}
+                    <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-bold flex items-center gap-2">
+                                    <Image className="w-5 h-5" /> 封面圖片
+                                </h2>
+                                <p className="text-sm text-gray-500 mt-1">上傳 3-5 張展示您服務的圖片</p>
+                            </div>
+                        </div>
+
+                        {profile.coverImages.length > 0 ? (
+                            <div className="relative">
+                                <div className="aspect-[3/2] bg-gray-100 rounded-xl overflow-hidden">
+                                    <div className="w-full h-full flex items-center justify-center text-gray-400">
+                                        圖片 {activeImageIndex + 1} / {profile.coverImages.length}
+                                    </div>
+                                </div>
+                                {profile.coverImages.length > 1 && (
+                                    <div className="absolute inset-0 flex items-center justify-between px-2">
+                                        <button
+                                            onClick={() => setActiveImageIndex(i => i > 0 ? i - 1 : profile.coverImages.length - 1)}
+                                            className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center"
+                                        >
+                                            <ChevronLeft className="w-5 h-5" />
+                                        </button>
+                                        <button
+                                            onClick={() => setActiveImageIndex(i => i < profile.coverImages.length - 1 ? i + 1 : 0)}
+                                            className="w-8 h-8 rounded-full bg-white/80 flex items-center justify-center"
+                                        >
+                                            <ChevronRight className="w-5 h-5" />
+                                        </button>
+                                    </div>
+                                )}
+                            </div>
+                        ) : (
+                            <div
+                                onClick={() => setProfile({ ...profile, coverImages: ['placeholder1', 'placeholder2', 'placeholder3'] })}
+                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                            >
+                                <Camera className="w-10 h-10 mx-auto mb-3 text-gray-400" />
+                                <p className="font-medium text-gray-600">點擊上傳封面圖片</p>
+                                <p className="text-sm text-gray-400 mt-1">建議尺寸 1200 x 800，最多 5 張</p>
+                            </div>
+                        )}
+                    </div>
+
+                    {/* Social Links */}
+                    <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
+                        <h2 className="text-xl font-bold">社群媒體連結</h2>
+
+                        <div className="space-y-4">
+                            <div>
+                                <Label className="flex items-center gap-2">
+                                    <Instagram className="w-4 h-4" /> Instagram
+                                </Label>
+                                <Input
+                                    value={profile.socialLinks.instagram}
+                                    onChange={(e) => setProfile({
+                                        ...profile,
+                                        socialLinks: { ...profile.socialLinks, instagram: e.target.value }
+                                    })}
+                                    placeholder="@username"
+                                    className="mt-2"
+                                />
+                            </div>
+                            <div>
+                                <Label className="flex items-center gap-2">
+                                    <Linkedin className="w-4 h-4" /> LinkedIn
+                                </Label>
+                                <Input
+                                    value={profile.socialLinks.linkedin}
+                                    onChange={(e) => setProfile({
+                                        ...profile,
+                                        socialLinks: { ...profile.socialLinks, linkedin: e.target.value }
+                                    })}
+                                    placeholder="linkedin.com/in/username"
+                                    className="mt-2"
+                                />
+                            </div>
+                            <div>
+                                <Label className="flex items-center gap-2">
+                                    <span className="text-sm">🧵</span> Threads
+                                </Label>
+                                <Input
+                                    value={profile.socialLinks.threads}
+                                    onChange={(e) => setProfile({
+                                        ...profile,
+                                        socialLinks: { ...profile.socialLinks, threads: e.target.value }
+                                    })}
+                                    placeholder="@username"
+                                    className="mt-2"
+                                />
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Interaction Settings (New) */}
+                    <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
+                        <h2 className="text-xl font-bold">互動設定</h2>
+                        <div className="space-y-4">
+                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div>
+                                    <h3 className="font-bold">開放主辦方邀請</h3>
+                                    <p className="text-sm text-gray-500">允許主辦方在建立活動時直接邀請您加入 (Join Event)</p>
+                                </div>
+                                <div className="space-x-2">
+                                    {/* Mock Toggle */}
+                                    <Button variant="outline" className="rounded-full text-black border-black bg-white">
+                                        已開啟
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
+                                <div>
+                                    <h3 className="font-bold">私訊聯繫功能</h3>
+                                    <p className="text-sm text-gray-500">允許其他用戶透過平台私訊聯繫您 (Contact)</p>
+                                </div>
+                                <div className="space-x-2">
+                                    {/* Mock Toggle */}
+                                    <Button variant="outline" className="rounded-full text-gray-500 border-gray-300">
+                                        開發中
+                                    </Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Service Items */}
+                    <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <h2 className="text-xl font-bold">服務/產品項目</h2>
+                                <p className="text-sm text-gray-500">列出您提供的服務（最多 5 項）</p>
+                            </div>
+                            {profile.services.length < 5 && (
+                                <Button
+                                    onClick={() => setProfile({
+                                        ...profile,
+                                        services: [...profile.services, { name: '', description: '', price: '' }]
+                                    })}
+                                    variant="outline"
+                                    className="rounded-full"
+                                >
+                                    <Plus className="w-4 h-4 mr-2" /> 新增服務
+                                </Button>
+                            )}
+                        </div>
+
+                        <div className="space-y-4">
+                            {profile.services.map((service, index) => (
+                                <div key={index} className="border border-gray-200 rounded-xl p-4 space-y-3">
+                                    <div className="flex items-center justify-between">
+                                        <span className="font-medium text-gray-600">服務 #{index + 1}</span>
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => setProfile({
+                                                ...profile,
+                                                services: profile.services.filter((_, i) => i !== index)
+                                            })}
+                                            className="text-gray-400 hover:text-red-500"
+                                        >
+                                            <X className="w-4 h-4" />
+                                        </Button>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-3">
+                                        <div>
+                                            <Label className="text-sm">服務名稱</Label>
+                                            <Input
+                                                value={service.name}
+                                                onChange={(e) => {
+                                                    const newServices = [...profile.services];
+                                                    newServices[index].name = e.target.value;
+                                                    setProfile({ ...profile, services: newServices });
+                                                }}
+                                                placeholder="例如：活動攝影"
+                                                className="mt-1"
+                                            />
+                                        </div>
+                                        <div>
+                                            <Label className="text-sm">價格（選填）</Label>
+                                            <Input
+                                                value={service.price || ''}
+                                                onChange={(e) => {
+                                                    const newServices = [...profile.services];
+                                                    newServices[index].price = e.target.value;
+                                                    setProfile({ ...profile, services: newServices });
+                                                }}
+                                                placeholder="例如：$5,000 起"
+                                                className="mt-1"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <Label className="text-sm">服務描述</Label>
+                                        <Textarea
+                                            value={service.description}
+                                            onChange={(e) => {
+                                                const newServices = [...profile.services];
+                                                newServices[index].description = e.target.value;
+                                                setProfile({ ...profile, services: newServices });
+                                            }}
+                                            placeholder="簡述這項服務的內容..."
+                                            rows={2}
+                                            className="mt-1 resize-none"
+                                        />
+                                    </div>
+                                </div>
+                            ))}
+
+                            {profile.services.length === 0 && (
+                                <div className="text-center py-6 text-gray-400">
+                                    尚未新增服務項目
+                                </div>
+                            )}
                         </div>
                     </div>
 

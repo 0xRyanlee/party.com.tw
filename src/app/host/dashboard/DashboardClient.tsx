@@ -216,9 +216,31 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                                 style={{ backgroundImage: `url(${event.image})` }}
                                             />
                                             <div className="space-y-1">
-                                                <p className="text-base font-bold text-neutral-900 leading-none group-hover:text-black transition-colors">
-                                                    {event.title}
-                                                </p>
+                                                <div className="flex items-center gap-2">
+                                                    <p className="text-base font-bold text-neutral-900 leading-none group-hover:text-black transition-colors">
+                                                        {event.title}
+                                                    </p>
+                                                    {/* Status Badge */}
+                                                    {(() => {
+                                                        const isExpired = new Date(event.fullDate) < new Date();
+                                                        if (isExpired && event.status !== 'draft') { // Drafts don't "expire" visibly, they are just drafts. But active/pending do.
+                                                            return (
+                                                                <span className="px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border bg-neutral-100 text-neutral-500 border-neutral-200">
+                                                                    Expired
+                                                                </span>
+                                                            );
+                                                        }
+                                                        return (
+                                                            <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${event.status === 'active' ? 'bg-green-100 text-green-700 border-green-200' :
+                                                                    event.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
+                                                                        event.status === 'draft' ? 'bg-gray-100 text-gray-600 border-gray-200' :
+                                                                            'bg-red-50 text-red-600 border-red-100 line-through'
+                                                                }`}>
+                                                                {event.status}
+                                                            </span>
+                                                        );
+                                                    })()}
+                                                </div>
                                                 <div className="flex items-center text-sm text-neutral-500 gap-2">
                                                     <Calendar className="w-3.5 h-3.5" />
                                                     <span>{event.date}</span>

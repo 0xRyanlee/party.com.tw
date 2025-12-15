@@ -26,9 +26,15 @@ function HomeContent() {
   const searchParams = useSearchParams();
   const [showOnboarding, setShowOnboarding] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  // Filter active events only
+  const activeEvents = useMemo(() => {
+    return mockEvents.filter(e => e.status === 'active');
+  }, []);
+
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [sortMode, setSortMode] = useState<'upcoming' | 'nearby' | 'both'>('both');
 
   const handleToggleTag = (tag: string) => {
     setActiveTags(prev =>
@@ -58,10 +64,19 @@ function HomeContent() {
         return matchesTag && matchesSearch;
       })
       .sort((a, b) => {
-        if (a.distance !== b.distance) return a.distance - b.distance;
-        return 0;
+        if (sortMode === 'nearby') {
+          // 按距離排序
+          return a.distance - b.distance;
+        } else if (sortMode === 'upcoming') {
+          // 按日期排序（假設 date 是可排序的字串）
+          return a.date.localeCompare(b.date);
+        } else {
+          // both: 綜合排序（距離優先，距離相同則按日期）
+          if (a.distance !== b.distance) return a.distance - b.distance;
+          return a.date.localeCompare(b.date);
+        }
       });
-  }, [activeTags, searchQuery]);
+  }, [activeTags, searchQuery, sortMode]);
 
   const nearestEvent = filteredEvents[0];
   const otherEvents = filteredEvents.slice(1);
@@ -78,8 +93,17 @@ function HomeContent() {
       <PageTransition className="container mx-auto px-4 py-6 md:py-8 max-w-7xl flex-1">
         {/* 移除本地 header，使用全局 Header */}
 
-        {/* Hero Carousel */}
-        <HeroCarousel />
+        {/* Hero Carousel - 使用前 3 個活動作為 Banner */}
+        <HeroCarousel
+          events={activeEvents.slice(0, 3).map(e => ({
+            id: e.id,
+            title: e.title,
+            location: e.location,
+            date: e.date,
+            imageUrl: e.image,
+            tags: e.tags.slice(0, 3),
+          }))}
+        />
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
@@ -93,88 +117,152 @@ function HomeContent() {
               onToggleTag={handleToggleTag}
             />
 
-            {/* Upcoming Events Section */}
+            {/* Sort Mode Toggle */}
+            <div className="flex items-center gap-2 px-1">
+              <span className="text-xs text-gray-400 mr-2">排序：</span>
+              {(['upcoming', 'nearby', 'both'] as const).map((mode) => (
+                <button
+                  key={mode}
+                  onClick={() => setSortMode(mode)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-medium transition-all ${sortMode === mode
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
+                >
+                  {mode === 'upcoming' ? '時間優先' : mode === 'nearby' ? '距離優先' : '綜合'}
+                </button>
+              ))}
+            </div>
+
+            {/* Main Feed Section (List View) */}
             <motion.section
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="relative"
+              className="space-y-4"
             >
-              <div className="flex items-center justify-between mb-4 px-1">
-                <h2 className="text-sm font-bold text-gray-500 tracking-wider">UPCOMING</h2>
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-sm font-bold text-gray-500 tracking-wider">
+                  {sortMode === 'nearby' ? 'NEARBY EVENTS' : sortMode === 'upcoming' ? 'UPCOMING EVENTS' : 'FOR YOU'}
+                </h2>
               </div>
 
-              {/* Foolproof Carousel Container */}
-              <div className="relative -mx-4 sm:mx-0">
-                {/* Left Fade Gradient */}
-                <div className="absolute left-0 top-0 bottom-0 w-8 sm:w-12 bg-gradient-to-r from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none hidden sm:block" />
-                {/* Right Fade Gradient */}
-                <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
-
-                <div className="flex gap-3 sm:gap-4 overflow-x-auto pb-6 sm:pb-8 pt-2 px-4 sm:px-0 scrollbar-hide snap-x clip-path-padding">
-                  {otherEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="min-w-[280px] sm:min-w-[320px] lg:min-w-[22%] snap-start shrink-0 bg-white rounded-lg overflow-hidden border border-gray-100 hover:shadow-lg transition-all cursor-pointer group/card flex flex-col"
-                    >
-                      <div className="aspect-[4/3] bg-gray-200 relative overflow-hidden">
-                        <div
-                          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/card:scale-110"
-                          style={{ backgroundImage: `url(${event.image})` }}
-                        />
-                        <div className="absolute top-2 right-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm">
-                          {event.date}
-                        </div>
+              <div className="flex flex-col gap-6">
+                {otherEvents.slice(0, 5).map((event) => (
+                  <div
+                    key={event.id}
+                    className="bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg transition-all cursor-pointer group flex gap-4 sm:gap-6"
+                  >
+                    {/* Image (Left) */}
+                    <div className="w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-xl bg-gray-200 relative overflow-hidden">
+                      <div
+                        className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
+                        style={{ backgroundImage: `url(${event.image})` }}
+                      />
+                      <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm">
+                        {event.date}
                       </div>
-                      <div className="p-3 flex-1 flex flex-col">
-                        <h4 className="font-bold text-sm truncate mb-1 group-hover/card:text-gray-600 transition-colors">{event.title}</h4>
+                    </div>
 
-                        {/* Organizer & Vendors */}
-                        <div className="flex items-center gap-2 mb-2">
-                          <div className="flex items-center gap-1.5">
-                            <div
-                              className="w-5 h-5 rounded-full bg-gray-200 bg-cover bg-center border border-white"
-                              style={{ backgroundImage: `url(${event.organizer.avatar})` }}
-                            />
-                            <span className="text-[10px] text-gray-600 font-medium truncate max-w-[80px]">
-                              {event.organizer.name}
+                    {/* Content (Right) */}
+                    <div className="flex-1 flex flex-col justify-between py-1">
+                      <div>
+                        {/* Tags */}
+                        <div className="flex flex-wrap gap-1.5 mb-2">
+                          {event.tags.slice(0, 2).map(tag => (
+                            <span key={tag} className="text-[10px] px-2 py-0.5 bg-gray-100 text-gray-600 rounded-full">
+                              {tag}
                             </span>
-                            {event.organizer.verified && (
-                              <svg className="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
-                                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                              </svg>
-                            )}
-                          </div>
-                          {event.vendors && event.vendors.length > 0 && (
-                            <div className="flex items-center gap-0.5 ml-auto">
-                              <div className="flex -space-x-1">
-                                {event.vendors.slice(0, 2).map((vendor, idx) => (
-                                  <div
-                                    key={vendor.id}
-                                    className="w-4 h-4 rounded-full bg-gray-200 bg-cover bg-center border border-white"
-                                    style={{ backgroundImage: `url(${vendor.avatar})` }}
-                                  />
-                                ))}
-                              </div>
-                              <span className="text-[9px] text-gray-400 font-medium">+{event.vendors.length}</span>
-                            </div>
-                          )}
+                          ))}
+                        </div>
+                        <h3 className="font-bold text-base sm:text-lg text-gray-900 group-hover:text-gray-600 transition-colors line-clamp-1">
+                          {event.title}
+                        </h3>
+                        <p className="text-sm text-gray-500 line-clamp-1 mt-1">
+                          {event.location}
+                        </p>
+                      </div>
+
+                      <div className="flex items-center justify-between mt-2">
+                        {/* Organizer */}
+                        <div className="flex items-center gap-2">
+                          <div
+                            className="w-5 h-5 rounded-full bg-gray-200 bg-cover bg-center"
+                            style={{ backgroundImage: `url(${event.organizer.avatar})` }}
+                          />
+                          <span className="text-xs text-gray-600 font-medium">{event.organizer.name}</span>
                         </div>
 
-                        <div className="mt-auto flex items-center justify-between text-xs text-gray-400">
-                          <div className="flex items-center gap-1">
-                            <MapPin className="w-3 h-3" />
-                            <span className="truncate max-w-[100px]">{event.location.split(',')[0]}</span>
-                          </div>
-                          <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full text-[10px] font-medium shrink-0">
-                            {event.distance < 1 ? `${Math.round(event.distance * 1000)} m` : `${event.distance.toFixed(1)} km`}
+                        {/* Distance/Price */}
+                        <div className="flex items-center gap-3 text-xs font-medium">
+                          <span className="text-gray-400">
+                            {event.distance < 1 ? `${Math.round(event.distance * 1000)}m` : `${event.distance.toFixed(1)}km`}
+                          </span>
+                          <span className="text-black bg-gray-100 px-2 py-1 rounded-md">
+                            {event.price === '0' || event.price === 'Free' ? 'Free' : `$${event.price}`}
                           </span>
                         </div>
                       </div>
                     </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* Load More Button (Mock) */}
+              <div className="flex justify-center pt-4">
+                <Button variant="ghost" className="text-gray-500 hover:text-black hover:bg-gray-100 rounded-full text-sm">
+                  Show More <ChevronRight className="w-4 h-4 ml-1" />
+                </Button>
+              </div>
+            </motion.section>
+
+            {/* Recommendation Carousel (Moved below list) */}
+            <motion.section
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ delay: 0.2 }}
+              className="relative space-y-4 pt-4 border-t border-gray-100"
+            >
+              <div className="flex items-center justify-between px-1">
+                <h2 className="text-sm font-bold text-gray-500 tracking-wider">
+                  DISCOVER MORE
+                </h2>
+                <Link href="/discover" className="text-xs font-medium text-gray-400 hover:text-black flex items-center">
+                  See All <ChevronRight className="w-3 h-3 ml-1" />
+                </Link>
+              </div>
+
+              {/* Foolproof Carousel Container */}
+              <div className="relative -mx-4 sm:mx-0">
+                <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
+
+                <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-4 sm:px-0 scrollbar-hide snap-x clip-path-padding">
+                  {/* Show events from index 5 onwards, or mock recommendations */}
+                  {otherEvents.slice(5).concat(activeEvents.slice(0, 3)).map((event) => (
+                    <div
+                      key={`rec-${event.id}`}
+                      className="min-w-[240px] sm:min-w-[260px] snap-start shrink-0 bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-all cursor-pointer group/card flex flex-col"
+                    >
+                      <div className="aspect-[16/9] bg-gray-200 relative overflow-hidden">
+                        <div
+                          className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/card:scale-110"
+                          style={{ backgroundImage: `url(${event.image})` }}
+                        />
+                        <div className="absolute top-2 right-2 bg-black/60 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-bold text-white">
+                          {event.type}
+                        </div>
+                      </div>
+                      <div className="p-3 flex-1 flex flex-col">
+                        <h4 className="font-bold text-sm truncate mb-1 text-gray-900">{event.title}</h4>
+                        <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
+                          <span className="truncate max-w-[100px]">{event.location.split(',')[0]}</span>
+                          <span className="text-gray-400">{event.date}</span>
+                        </div>
+                      </div>
+                    </div>
                   ))}
-                  {/* Spacer for end of list */}
                   <div className="w-8 shrink-0" />
                 </div>
               </div>

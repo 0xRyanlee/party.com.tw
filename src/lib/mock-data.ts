@@ -29,12 +29,14 @@ export interface Event {
     organizer: Organizer; // Changed from string to Organizer object
     vendors?: Organizer[]; // Optional array of vendors/suppliers
     isPromoted?: boolean;
+    status: 'active' | 'pending' | 'draft' | 'expired';
 }
 
 export const mockEvents: Event[] = [
     {
         id: '1',
         title: '週五下班小酌 - 信義區',
+        status: 'active',
         type: 'party',
         format: 'indoor',
         attributes: ['public', 'pay_at_door', 'adults_only'],
@@ -78,6 +80,7 @@ export const mockEvents: Event[] = [
     {
         id: '2',
         title: 'React 開發者交流會',
+        status: 'active',
         type: 'meetup',
         format: 'indoor',
         attributes: ['public', 'free', 'english'],
@@ -99,7 +102,8 @@ export const mockEvents: Event[] = [
     },
     {
         id: '3',
-        title: '週末河濱晨跑',
+        title: '台北數位遊牧聚會',
+        status: 'pending',
         type: 'gathering',
         format: 'outdoor',
         attributes: ['public', 'free', 'pet_friendly'],
@@ -121,7 +125,8 @@ export const mockEvents: Event[] = [
     },
     {
         id: '4',
-        title: '手沖咖啡體驗課',
+        title: 'React 台灣年會 2023',
+        status: 'active',
         type: 'workshop',
         format: 'indoor',
         attributes: ['public', 'prepaid'],
@@ -143,7 +148,8 @@ export const mockEvents: Event[] = [
     },
     {
         id: '5',
-        title: '創業思維讀書會',
+        title: '產品經理交流夜',
+        status: 'draft',
         type: 'meetup',
         format: 'indoor',
         attributes: ['public', 'free_reservation'],
@@ -165,7 +171,8 @@ export const mockEvents: Event[] = [
     },
     {
         id: '6',
-        title: '週三爵士夜',
+        title: 'Techno 地下派對',
+        status: 'active',
         type: 'party',
         format: 'indoor',
         attributes: ['public', 'door', 'adults_only'],
@@ -188,6 +195,7 @@ export const mockEvents: Event[] = [
     {
         id: '7',
         title: '瑜伽伸展放鬆',
+        status: 'active',
         type: 'workshop',
         format: 'indoor',
         attributes: ['public', 'prepaid', 'lady_free'],

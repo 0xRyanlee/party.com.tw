@@ -36,6 +36,17 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         isRegistered = !!registration && ['confirmed', 'pending'].includes(registration.status);
     }
 
+    // Access Control Logic
+    // If not active, only organizer can view
+    const isOrganizer = user && user.id === dbEvent.organizer_id;
+    const isDraftOrPending = dbEvent.status !== 'active' && dbEvent.status !== 'expired'; // Expired is visible but read-only usually
+
+    if (isDraftOrPending && !isOrganizer) {
+        // Option: allow registered users to see pending? Maybe not.
+        // Strict: only organizer sees draft/pending
+        notFound();
+    }
+
     const startDate = new Date(dbEvent.start_time);
     const dateStr = startDate.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
     const dayOfWeek = startDate.toLocaleDateString('en-US', { weekday: 'short' });
@@ -51,6 +62,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     const event: Event = {
         id: dbEvent.id,
         title: dbEvent.title,
+        status: (dbEvent.status as any) || 'active',
         type: dbEvent.category || 'event',
         format: 'indoor',
         attributes: dbEvent.tags || [],

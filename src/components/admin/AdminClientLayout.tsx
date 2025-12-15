@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
-import { LayoutDashboard, Megaphone, Image as ImageIcon, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Megaphone, Image as ImageIcon, LogOut, Home, Flag, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 export default function AdminClientLayout({
@@ -64,8 +64,10 @@ export default function AdminClientLayout({
 
     const navItems = [
         { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
+        { href: "/admin/reports", label: "Reports", icon: Flag },
         { href: "/admin/banners", label: "Banners", icon: ImageIcon },
         { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
+        { href: "/admin/events", label: "Events", icon: Calendar },
     ];
 
     return (

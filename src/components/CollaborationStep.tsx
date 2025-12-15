@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Plus, X, DollarSign } from 'lucide-react';
 import { EventRole, EventResource } from '@/types/schema';
 
@@ -12,25 +13,9 @@ interface CollaborationStepProps {
     onResourcesChange: (resources: Omit<EventResource, 'id' | 'eventId' | 'createdAt'>[]) => void;
 }
 
-const roleTypes = [
-    { value: 'photographer', label: '攝影師 Photographer' },
-    { value: 'dj', label: 'DJ' },
-    { value: 'bartender', label: '調酒師 Bartender' },
-    { value: 'staff', label: '工作人員 Staff' },
-    { value: 'performer', label: '表演者 Performer' },
-    { value: 'mc', label: '主持人 MC' },
-    { value: 'security', label: '安全人員 Security' },
-    { value: 'other', label: '其他 Other' },
-];
-
-const resourceTypes = [
-    { value: 'venue', label: '場地 Venue' },
-    { value: 'sponsor', label: '贊助 Sponsor' },
-    { value: 'equipment', label: '設備租賃 Equipment' },
-    { value: 'catering', label: '餐飲 Catering' },
-    { value: 'partner', label: '協辦單位 Partner' },
-    { value: 'other', label: '其他 Other' },
-];
+// 常用角色類型建議
+const suggestedRoles = ['攝影師', 'DJ', '調酒師', '工作人員', '表演者', '主持人', '安全人員'];
+const suggestedResources = ['場地', '贊助', '設備租賃', '餐飲', '協辦單位'];
 
 export default function CollaborationStep({
     roles,
@@ -38,11 +23,15 @@ export default function CollaborationStep({
     onRolesChange,
     onResourcesChange,
 }: CollaborationStepProps) {
-    const addRole = () => {
+    const [roleInput, setRoleInput] = useState('');
+    const [resourceInput, setResourceInput] = useState('');
+
+    const addRole = (roleType: string) => {
+        if (!roleType.trim()) return;
         onRolesChange([
             ...roles,
             {
-                roleType: 'photographer',
+                roleType: roleType.trim(),
                 countNeeded: 1,
                 budgetMin: undefined,
                 budgetMax: undefined,
@@ -50,17 +39,20 @@ export default function CollaborationStep({
                 status: 'open',
             },
         ]);
+        setRoleInput('');
     };
 
-    const addResource = () => {
+    const addResource = (resourceType: string) => {
+        if (!resourceType.trim()) return;
         onResourcesChange([
             ...resources,
             {
-                resourceType: 'venue',
+                resourceType: resourceType.trim(),
                 description: '',
                 status: 'open',
             },
         ]);
+        setResourceInput('');
     };
 
     const updateRole = (index: number, field: string, value: any) => {
@@ -85,254 +77,203 @@ export default function CollaborationStep({
 
     return (
         <div className="space-y-8">
-            {/* Header */}
-            <div>
-                <h2 className="text-2xl font-bold mb-2">合作招募 Collaboration</h2>
-                <p className="text-gray-600">
-                    開放專業工作者和資源提供者申請參與您的活動
-                </p>
-            </div>
-
             {/* Vendor Roles Section */}
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-lg font-semibold">專業工作者 Vendors</h3>
-                        <p className="text-sm text-gray-500">需要的人員和角色</p>
-                    </div>
-                    <Button
-                        type="button"
-                        onClick={addRole}
-                        className="bg-black hover:bg-gray-800 text-white rounded-full"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        新增角色
-                    </Button>
+                <div>
+                    <h3 className="text-lg font-semibold">專業工作者 Vendors</h3>
+                    <p className="text-sm text-gray-500">需要的人員和角色</p>
                 </div>
 
-                <div className="space-y-4">
+                {/* Role Tag Input */}
+                <div className="space-y-3">
+                    <div className="flex gap-2">
+                        <Input
+                            value={roleInput}
+                            onChange={(e) => setRoleInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addRole(roleInput))}
+                            placeholder="輸入角色類型，如：攝影師、DJ..."
+                            className="flex-1"
+                        />
+                        <Button
+                            type="button"
+                            onClick={() => addRole(roleInput)}
+                            disabled={!roleInput.trim()}
+                            className="bg-black text-white rounded-full"
+                        >
+                            <Plus className="w-4 h-4 mr-1" /> 新增
+                        </Button>
+                    </div>
+
+                    {/* Suggested Tags */}
+                    <div className="flex flex-wrap gap-2">
+                        {suggestedRoles
+                            .filter(r => !roles.some(role => role.roleType === r))
+                            .map((role) => (
+                                <button
+                                    key={role}
+                                    type="button"
+                                    onClick={() => addRole(role)}
+                                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-full hover:border-gray-400 transition-colors"
+                                >
+                                    + {role}
+                                </button>
+                            ))}
+                    </div>
+                </div>
+
+                {/* Added Roles */}
+                <div className="space-y-3">
                     {roles.map((role, index) => (
                         <div
                             key={index}
-                            className="bg-white rounded-[24px] p-6 border border-gray-200 space-y-4"
+                            className="bg-gray-50 rounded-xl p-4 space-y-3"
                         >
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
-                                    {/* Role Type */}
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            角色類型
-                                        </label>
-                                        <select
-                                            value={role.roleType}
-                                            onChange={(e) =>
-                                                updateRole(index, 'roleType', e.target.value)
-                                            }
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
-                                        >
-                                            {roleTypes.map((type) => (
-                                                <option key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Count Needed */}
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            需求人數
-                                        </label>
-                                        <input
-                                            type="number"
-                                            min="1"
-                                            value={role.countNeeded}
-                                            onChange={(e) =>
-                                                updateRole(
-                                                    index,
-                                                    'countNeeded',
-                                                    parseInt(e.target.value) || 1
-                                                )
-                                            }
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
-                                        />
-                                    </div>
-
-                                    {/* Budget Range */}
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium mb-2">
-                                            預算範圍 (可選)
-                                        </label>
-                                        <div className="flex items-center gap-3">
-                                            <div className="flex items-center flex-1 border border-gray-300 rounded-xl px-4 py-2">
-                                                <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                                                <input
-                                                    type="number"
-                                                    placeholder="最低"
-                                                    value={role.budgetMin || ''}
-                                                    onChange={(e) =>
-                                                        updateRole(
-                                                            index,
-                                                            'budgetMin',
-                                                            e.target.value
-                                                                ? parseFloat(e.target.value)
-                                                                : undefined
-                                                        )
-                                                    }
-                                                    className="flex-1 outline-none"
-                                                />
-                                            </div>
-                                            <span className="text-gray-400">-</span>
-                                            <div className="flex items-center flex-1 border border-gray-300 rounded-xl px-4 py-2">
-                                                <DollarSign className="w-4 h-4 text-gray-400 mr-2" />
-                                                <input
-                                                    type="number"
-                                                    placeholder="最高"
-                                                    value={role.budgetMax || ''}
-                                                    onChange={(e) =>
-                                                        updateRole(
-                                                            index,
-                                                            'budgetMax',
-                                                            e.target.value
-                                                                ? parseFloat(e.target.value)
-                                                                : undefined
-                                                        )
-                                                    }
-                                                    className="flex-1 outline-none"
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-
-                                    {/* Description */}
-                                    <div className="md:col-span-2">
-                                        <label className="block text-sm font-medium mb-2">
-                                            工作描述
-                                        </label>
-                                        <textarea
-                                            value={role.description}
-                                            onChange={(e) =>
-                                                updateRole(index, 'description', e.target.value)
-                                            }
-                                            placeholder="例如：需要經驗豐富的攝影師，拍攝活動精彩瞬間..."
-                                            rows={3}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black resize-none"
-                                        />
-                                    </div>
-                                </div>
-
+                            <div className="flex items-center justify-between">
+                                <span className="font-medium bg-black text-white px-3 py-1 rounded-full text-sm">
+                                    {role.roleType}
+                                </span>
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeRole(index)}
-                                    className="ml-2 text-gray-400 hover:text-red-500"
+                                    className="text-gray-400 hover:text-red-500"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-4 h-4" />
                                 </Button>
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">需求人數</label>
+                                    <Input
+                                        type="number"
+                                        min="1"
+                                        value={role.countNeeded}
+                                        onChange={(e) => updateRole(index, 'countNeeded', parseInt(e.target.value) || 1)}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs text-gray-500 mb-1">預算（選填）</label>
+                                    <div className="flex gap-2 items-center">
+                                        <Input
+                                            type="number"
+                                            placeholder="最低"
+                                            value={role.budgetMin || ''}
+                                            onChange={(e) => updateRole(index, 'budgetMin', e.target.value ? parseFloat(e.target.value) : undefined)}
+                                        />
+                                        <span className="text-gray-400">-</span>
+                                        <Input
+                                            type="number"
+                                            placeholder="最高"
+                                            value={role.budgetMax || ''}
+                                            onChange={(e) => updateRole(index, 'budgetMax', e.target.value ? parseFloat(e.target.value) : undefined)}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">工作描述</label>
+                                <textarea
+                                    value={role.description}
+                                    onChange={(e) => updateRole(index, 'description', e.target.value)}
+                                    placeholder="描述這個角色的工作內容..."
+                                    rows={2}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-black"
+                                />
                             </div>
                         </div>
                     ))}
-
-                    {roles.length === 0 && (
-                        <div className="text-center py-8 text-gray-400">
-                            尚未新增任何角色需求
-                        </div>
-                    )}
                 </div>
             </div>
 
             {/* Supplier Resources Section */}
             <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h3 className="text-lg font-semibold">資源提供者 Suppliers</h3>
-                        <p className="text-sm text-gray-500">需要的場地、贊助或協辦</p>
-                    </div>
-                    <Button
-                        type="button"
-                        onClick={addResource}
-                        className="bg-black hover:bg-gray-800 text-white rounded-full"
-                    >
-                        <Plus className="w-4 h-4 mr-2" />
-                        新增需求
-                    </Button>
+                <div>
+                    <h3 className="text-lg font-semibold">資源提供者 Suppliers</h3>
+                    <p className="text-sm text-gray-500">需要的場地、贊助或協辦</p>
                 </div>
 
-                <div className="space-y-4">
+                {/* Resource Tag Input */}
+                <div className="space-y-3">
+                    <div className="flex gap-2">
+                        <Input
+                            value={resourceInput}
+                            onChange={(e) => setResourceInput(e.target.value)}
+                            onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addResource(resourceInput))}
+                            placeholder="輸入資源類型，如：場地、贊助..."
+                            className="flex-1"
+                        />
+                        <Button
+                            type="button"
+                            onClick={() => addResource(resourceInput)}
+                            disabled={!resourceInput.trim()}
+                            className="bg-black text-white rounded-full"
+                        >
+                            <Plus className="w-4 h-4 mr-1" /> 新增
+                        </Button>
+                    </div>
+
+                    {/* Suggested Tags */}
+                    <div className="flex flex-wrap gap-2">
+                        {suggestedResources
+                            .filter(r => !resources.some(res => res.resourceType === r))
+                            .map((res) => (
+                                <button
+                                    key={res}
+                                    type="button"
+                                    onClick={() => addResource(res)}
+                                    className="px-3 py-1.5 text-sm border border-gray-200 rounded-full hover:border-gray-400 transition-colors"
+                                >
+                                    + {res}
+                                </button>
+                            ))}
+                    </div>
+                </div>
+
+                {/* Added Resources */}
+                <div className="space-y-3">
                     {resources.map((resource, index) => (
                         <div
                             key={index}
-                            className="bg-white rounded-[24px] p-6 border border-gray-200 space-y-4"
+                            className="bg-gray-50 rounded-xl p-4 space-y-3"
                         >
-                            <div className="flex items-start justify-between">
-                                <div className="flex-1 space-y-4">
-                                    {/* Resource Type */}
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            資源類型
-                                        </label>
-                                        <select
-                                            value={resource.resourceType}
-                                            onChange={(e) =>
-                                                updateResource(index, 'resourceType', e.target.value)
-                                            }
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black"
-                                        >
-                                            {resourceTypes.map((type) => (
-                                                <option key={type.value} value={type.value}>
-                                                    {type.label}
-                                                </option>
-                                            ))}
-                                        </select>
-                                    </div>
-
-                                    {/* Description */}
-                                    <div>
-                                        <label className="block text-sm font-medium mb-2">
-                                            需求描述
-                                        </label>
-                                        <textarea
-                                            value={resource.description}
-                                            onChange={(e) =>
-                                                updateResource(index, 'description', e.target.value)
-                                            }
-                                            placeholder="例如：尋找能容納100人的活動場地，需有音響設備..."
-                                            rows={3}
-                                            className="w-full px-4 py-2 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-black resize-none"
-                                        />
-                                    </div>
-                                </div>
-
+                            <div className="flex items-center justify-between">
+                                <span className="font-medium bg-black text-white px-3 py-1 rounded-full text-sm">
+                                    {resource.resourceType}
+                                </span>
                                 <Button
                                     type="button"
                                     variant="ghost"
                                     size="icon"
                                     onClick={() => removeResource(index)}
-                                    className="ml-2 text-gray-400 hover:text-red-500"
+                                    className="text-gray-400 hover:text-red-500"
                                 >
-                                    <X className="w-5 h-5" />
+                                    <X className="w-4 h-4" />
                                 </Button>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs text-gray-500 mb-1">需求描述</label>
+                                <textarea
+                                    value={resource.description}
+                                    onChange={(e) => updateResource(index, 'description', e.target.value)}
+                                    placeholder="描述這項資源的需求..."
+                                    rows={2}
+                                    className="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm resize-none focus:outline-none focus:ring-2 focus:ring-black"
+                                />
                             </div>
                         </div>
                     ))}
-
-                    {resources.length === 0 && (
-                        <div className="text-center py-8 text-gray-400">
-                            尚未新增任何資源需求
-                        </div>
-                    )}
                 </div>
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50 border border-blue-200 rounded-[24px] p-6">
-                <h4 className="font-semibold text-blue-900 mb-2">💡 提示</h4>
-                <ul className="text-sm text-blue-800 space-y-1">
-                    <li>• 申請者將在活動詳情頁看到這些合作機會</li>
-                    <li>• 您可以在活動管理頁面查看和審核所有申請</li>
-                    <li>• 預算範圍為可選項目，但建議填寫以吸引更多申請</li>
-                </ul>
+            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
+                <p className="text-sm text-blue-800">
+                    💡 申請者將在活動詳情頁看到這些合作機會
+                </p>
             </div>
         </div>
     );

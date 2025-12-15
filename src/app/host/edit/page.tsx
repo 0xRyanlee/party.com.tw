@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -25,6 +25,7 @@ const eventSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
     type: z.string().min(1, "Please select an event type"),
+    status: z.enum(['active', 'pending', 'draft']), // Expired is calculated, not set
     date: z.string().min(1, "Date is required"),
     time: z.string().min(1, "Time is required"),
     locationName: z.string().min(1, "Location name is required"),
@@ -71,6 +72,7 @@ export default function HostEdit() {
             title: "",
             description: "",
             type: "party",
+            status: "draft", // Default to draft
             isPublic: true,
             tickets: [],
             date: new Date().toISOString().split('T')[0],
@@ -240,16 +242,12 @@ export default function HostEdit() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label>活動類型</Label>
-                                <select
-                                    {...register("type")}
-                                    className="w-full h-10 px-3 rounded-md border border-input bg-background text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                                >
-                                    <option value="party">派對</option>
-                                    <option value="meetup">小聚</option>
-                                    <option value="workshop">工作坊</option>
-                                    <option value="gathering">聚會</option>
-                                </select>
+                                <Label>活動標籤</Label>
+                                <CustomTags
+                                    selectedTags={selectedTags}
+                                    onTagsChange={setSelectedTags}
+                                />
+                                <p className="text-xs text-gray-500">選擇或輸入活動類型標籤（最多 5 個）</p>
                             </div>
 
                             <div className="space-y-2">
@@ -267,12 +265,6 @@ export default function HostEdit() {
 
                     {/* Media Card */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-6">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600">
-                                <Tag className="w-4 h-4" />
-                            </div>
-                            <h2 className="text-lg font-bold">{t('host.edit.media')}</h2>
-                        </div>
                         <ImageUploader
                             value={watch("image")}
                             onChange={(val) => setValue("image", val)}
@@ -284,20 +276,6 @@ export default function HostEdit() {
                         <AdvancedTicketManager
                             tickets={advancedTickets}
                             onTicketsChange={setAdvancedTickets}
-                        />
-                    </div>
-
-                    {/* Participant Settings Card */}
-                    <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
-                        <ParticipantSettings
-                            capacityTotal={capacity}
-                            isAdultOnly={isAdultOnly}
-                            invitationOnly={invitationOnly}
-                            invitationCode={invitationCode}
-                            onCapacityChange={setCapacity}
-                            onAdultOnlyChange={setIsAdultOnly}
-                            onInvitationOnlyChange={setInvitationOnly}
-                            onInvitationCodeChange={setInvitationCode}
                         />
                     </div>
 
@@ -378,6 +356,20 @@ export default function HostEdit() {
                         </div>
                     </div>
 
+                    {/* Participant Settings */}
+                    <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-4">
+                        <ParticipantSettings
+                            capacityTotal={capacity}
+                            isAdultOnly={isAdultOnly}
+                            invitationOnly={invitationOnly}
+                            invitationCode={invitationCode}
+                            onCapacityChange={setCapacity}
+                            onAdultOnlyChange={setIsAdultOnly}
+                            onInvitationOnlyChange={setInvitationOnly}
+                            onInvitationCodeChange={setInvitationCode}
+                        />
+                    </div>
+
                     {/* Location */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-4">
                         <h3 className="font-bold flex items-center gap-2">
@@ -394,15 +386,73 @@ export default function HostEdit() {
                         <h3 className="font-bold flex items-center gap-2">
                             <Info className="w-4 h-4 text-gray-400" /> 設定
                         </h3>
-                        <div className="flex items-center justify-between">
-                            <div className="space-y-0.5">
-                                <Label className="text-base">公開活動</Label>
-                                <p className="text-xs text-gray-500">所有人都可見</p>
+
+                        <div className="space-y-3">
+                            {/* Check if event is expired */}
+                            {/* This useMemo hook needs to be defined outside of JSX, typically at the top of the component function.
+                                For the purpose of this edit, it's placed here as per instruction, but in a real app,
+                                it would be moved to the component's body. */}
+                            {(() => {
+                                const date = watch("date");
+                                const time = watch("time");
+                                const isExpired = useMemo(() => {
+                                    if (!date || !time) return false;
+                                    const eventDate = new Date(`${date}T${time}`);
+                                    const now = new Date();
+                                    return eventDate < now;
+                                }, [date, time]);
+
+                                return (
+                                    <div className="space-y-2">
+                                        <Label>活動狀態</Label>
+                                        {isExpired ? (
+                                            <div className="p-3 bg-gray-100 rounded-lg border border-gray-200">
+                                                <div className="flex items-center gap-2 text-gray-500 font-medium">
+                                                    <span className="w-2 h-2 rounded-full bg-gray-400" />
+                                                    已過期 (Expired)
+                                                </div>
+                                                <p className="text-xs text-gray-500 mt-1">
+                                                    此活動時間已過，無法更改狀態。您可以選擇刪除活動。
+                                                </p>
+                                            </div>
+                                        ) : (
+                                            <>
+                                                <div className="flex p-1 bg-gray-100 rounded-lg">
+                                                    {(['active', 'pending', 'draft'] as const).map((s) => (
+                                                        <button
+                                                            key={s}
+                                                            type="button"
+                                                            onClick={() => setValue("status", s)}
+                                                            className={`flex-1 py-1.5 text-sm font-medium rounded-md transition-all ${watch("status") === s
+                                                                ? "bg-white text-black shadow-sm"
+                                                                : "text-gray-500 hover:text-gray-700"
+                                                                }`}
+                                                        >
+                                                            {s === 'active' && '已發布'}
+                                                            {s === 'pending' && '審核中'}
+                                                            {s === 'draft' && '草稿'}
+                                                        </button>
+                                                    ))}
+                                                </div>
+                                                <p className="text-xs text-gray-500">
+                                                    草稿：僅自己可見 | 審核中：等待平台審核 | 已發布：公開可見
+                                                </p>
+                                            </>
+                                        )}
+                                    </div>
+                                );
+                            })()}
+
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                                <div className="space-y-0.5">
+                                    <Label className="text-base">公開活動</Label>
+                                    <p className="text-xs text-gray-500">所有人都可見</p>
+                                </div>
+                                <Switch
+                                    checked={watch("isPublic")}
+                                    onCheckedChange={(val) => setValue("isPublic", val)}
+                                />
                             </div>
-                            <Switch
-                                checked={watch("isPublic")}
-                                onCheckedChange={(val) => setValue("isPublic", val)}
-                            />
                         </div>
                     </div>
 

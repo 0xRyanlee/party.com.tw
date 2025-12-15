@@ -39,6 +39,8 @@ export type EventType =
     | 'marathon' | 'training_camp' | 'language_exchange'
     | 'flea_market' | 'farmers_market';
 
+export type EventStatus = 'active' | 'pending' | 'draft' | 'expired';
+
 export interface Event {
     id: string;
     title: string;
@@ -54,6 +56,7 @@ export interface Event {
     organizerId: string; // User ID
     clubId?: string; // Optional Club ID
     isPublic: boolean;
+    status: EventStatus;
     price: number; // 0 for free
     currency: string;
     capacity?: number;
@@ -61,6 +64,7 @@ export interface Event {
     tags: string[];
     createdAt: string;
     updatedAt: string;
+    externalLink?: string;
 }
 
 export type RoleStatus = 'open' | 'closed';

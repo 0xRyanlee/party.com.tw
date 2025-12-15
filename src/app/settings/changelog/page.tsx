@@ -3,36 +3,47 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, CheckCircle2, Sparkles } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useLanguage } from "@/lib/i18n";
 import { Badge } from "@/components/ui/badge";
 
 export default function ChangelogPage() {
     const router = useRouter();
-    const { t } = useLanguage();
 
     const logs = [
         {
-            version: "1.0.0",
-            date: "2023-11-24",
-            title: "Initial Release",
+            version: "1.1.0",
+            date: "2024-12-16",
+            title: "12/16 更新",
             features: [
-                "Launched Party Aggregator MVP",
-                "Event discovery and search",
-                "Host dashboard for event management",
-                "Localization support (EN/ZH)",
-                "User settings and profile management"
+                "品牌更新：標語改為「城市活動行事曆」",
+                "首頁 Tag 可複選篩選",
+                "活動卡片顯示距離 Tag",
+                "Admin 活動發布頁面（自定義主辦方、社媒連結）",
+                "活動編輯新增外部連結欄位",
+                "會員頁面顯示用戶資訊和頭像",
+            ],
+            type: "major"
+        },
+        {
+            version: "1.0.0",
+            date: "2024-12-14",
+            title: "Quick Registration",
+            features: [
+                "一鍵報名功能",
+                "EventDetailClient / EventDetailModal 整合",
+                "RegistrationModal 改用 Server Action",
             ],
             type: "major"
         },
         {
             version: "0.9.5",
-            date: "2023-11-20",
-            title: "Beta Testing",
+            date: "2024-12-01",
+            title: "MVP 基礎功能",
             features: [
-                "Implemented Weekly Calendar",
-                "Added 'Recently Viewed' widget",
-                "Optimized mobile responsiveness",
-                "Integrated Mapbox preview"
+                "活動 CRUD 與報名流程",
+                "Host Dashboard 管理後台",
+                "Weekly Calendar 週曆檢視",
+                "地圖預覽功能",
+                "中英文切換",
             ],
             type: "minor"
         }
@@ -45,13 +56,13 @@ export default function ChangelogPage() {
                 <Button variant="ghost" size="icon" onClick={() => router.back()} className="-ml-2">
                     <ArrowLeft className="w-6 h-6" />
                 </Button>
-                <h1 className="text-xl font-bold">Changelog</h1>
+                <h1 className="text-xl font-bold">功能更新日誌</h1>
             </header>
 
             <div className="container mx-auto px-4 py-8 max-w-2xl space-y-8">
                 <div className="space-y-2">
                     <h2 className="text-3xl font-bold">What's New</h2>
-                    <p className="text-gray-500">Stay updated with the latest features and improvements.</p>
+                    <p className="text-gray-500">最新功能與改進。</p>
                 </div>
 
                 <div className="space-y-8 relative before:absolute before:inset-0 before:ml-5 before:-translate-x-px md:before:mx-auto md:before:translate-x-0 before:h-full before:w-0.5 before:bg-gradient-to-b before:from-transparent before:via-gray-200 before:to-transparent">

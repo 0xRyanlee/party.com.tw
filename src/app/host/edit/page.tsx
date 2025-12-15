@@ -21,7 +21,6 @@ import { Switch } from "@/components/ui/switch";
 import { EventRole, EventResource } from "@/types/schema";
 
 // Zod Schema
-// Zod Schema
 const eventSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
@@ -32,6 +31,7 @@ const eventSchema = z.object({
     address: z.string().min(1, "Address is required"),
     image: z.string().optional(),
     isPublic: z.boolean(),
+    externalLink: z.string().url().optional().or(z.literal("")),
     tickets: z.array(z.object({
         name: z.string().min(1, "Ticket name is required"),
         price: z.number().min(0, "Price cannot be negative"),
@@ -73,10 +73,11 @@ export default function HostEdit() {
             type: "party",
             isPublic: true,
             tickets: [],
-            date: new Date().toISOString().split('T')[0], // 今天的日期 (YYYY-MM-DD)
-            time: "18:00", // 默認晚上 6 點
+            date: new Date().toISOString().split('T')[0],
+            time: "18:00",
             locationName: "",
             address: "",
+            externalLink: "",
         }
     });
 
@@ -136,6 +137,7 @@ export default function HostEdit() {
                 invitationCode: invitationOnly ? invitationCode : null,
                 tags: selectedTags,
                 status: data.isPublic ? 'published' : 'draft',
+                externalLink: data.externalLink || null,
             };
 
             // 創建活動
@@ -248,6 +250,17 @@ export default function HostEdit() {
                                     <option value="workshop">工作坊</option>
                                     <option value="gathering">聚會</option>
                                 </select>
+                            </div>
+
+                            <div className="space-y-2">
+                                <Label>外部連結（選填）</Label>
+                                <Input
+                                    {...register("externalLink")}
+                                    placeholder="https://..."
+                                    type="url"
+                                />
+                                <p className="text-xs text-gray-500">可填入報名連結、活動頁面或社群連結</p>
+                                {errors.externalLink && <p className="text-xs text-red-500">{errors.externalLink.message}</p>}
                             </div>
                         </div>
                     </div>

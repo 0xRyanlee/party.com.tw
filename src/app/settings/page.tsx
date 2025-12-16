@@ -56,14 +56,6 @@ export default function SettingsPage() {
                                     {user ? email : t('settings.signInDesc')}
                                 </p>
                             </div>
-                            {!user && !loading && (
-                                <Button
-                                    onClick={() => setIsAuthModalOpen(true)}
-                                    className="ml-auto rounded-full bg-black text-white hover:bg-gray-800"
-                                >
-                                    {t('settings.signIn')}
-                                </Button>
-                            )}
                         </div>
                         <Link href="/settings/notifications" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
                             <div className="flex items-center gap-3">
@@ -78,6 +70,16 @@ export default function SettingsPage() {
                                 <span className="font-medium">{t('settings.privacy')}</span>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
+                        </Link>
+                        <Link href="/settings/language" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                            <div className="flex items-center gap-3">
+                                <span className="w-5 h-5 text-gray-400 text-center">🌐</span>
+                                <span className="font-medium">Language Options</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-sm text-gray-400">繁體中文</span>
+                                <ChevronRight className="w-5 h-5 text-gray-300" />
+                            </div>
                         </Link>
                     </div>
                 </section>

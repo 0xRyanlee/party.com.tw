@@ -1,66 +1,101 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import EventCard from '@/components/EventCard';
 import { Button } from '@/components/ui/button';
 import { Search, SlidersHorizontal } from 'lucide-react';
-import { mockEvents } from '@/lib/mock-data';
+import { mockEvents, tags } from '@/lib/mock-data';
+import CategoryFilter from '@/components/CategoryFilter';
 
 export default function DiscoverPage() {
-  const [activeFilter, setActiveFilter] = useState('全部');
+  const [activeTags, setActiveTags] = useState<string[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const handleToggleTag = (tag: string) => {
+    setActiveTags(prev =>
+      prev.includes(tag)
+        ? prev.filter(t => t !== tag)
+        : [...prev, tag]
+    );
+  };
+
+  const filteredEvents = mockEvents.filter(event => {
+    // Filter by status
+    if (event.status !== 'active') return false;
+
+    // Filter by tags if any selected
+    if (activeTags.length > 0 && !event.tags.some(tag => activeTags.includes(tag))) {
+      return false;
+    }
+
+    // Filter by search query
+    if (searchQuery) {
+      const query = searchQuery.toLowerCase();
+      return (
+        event.title.toLowerCase().includes(query) ||
+        event.location.toLowerCase().includes(query) ||
+        event.tags.some(tag => tag.toLowerCase().includes(query))
+      );
+    }
+
+    return true;
+  });
 
   return (
-    <main className="min-h-screen bg-white text-gray-900 pb-24">
-      <div className="pt-8 px-6 container mx-auto max-w-4xl">
+    <main className="min-h-screen bg-gray-50 pb-24">
+      <div className="pt-6 md:pt-8 container mx-auto max-w-5xl">
         {/* Header Section */}
-        <div className="mb-8 space-y-4">
-          <h1 className="text-3xl font-bold">探索活動</h1>
+        <div className="mb-6 space-y-4 px-4 sm:px-0">
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">探索活動</h1>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="搜尋活動、地點..."
-              className="w-full h-12 bg-gray-50 border border-gray-200 rounded-md pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-900/10"
+              className="w-full h-11 md:h-12 bg-white border border-gray-200 rounded-xl pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 text-sm md:text-base"
             />
           </div>
         </div>
 
-        {/* Filters */}
-        <div className="flex gap-3 overflow-x-auto pb-4 mb-6 scrollbar-hide">
-          <Button
-            variant="outline"
-            size="icon"
-            className="rounded-md w-10 h-10 shrink-0 border-gray-200 bg-white hover:bg-gray-50"
-          >
-            <SlidersHorizontal className="w-4 h-4" />
-          </Button>
-          {['全部', '小聚', '小會', '小活動', '小快閃'].map((filter) => (
-            <button
-              key={filter}
-              onClick={() => setActiveFilter(filter)}
-              className={`
-                px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all
-                ${activeFilter === filter
-                  ? 'bg-gray-900 text-white'
-                  : 'bg-gray-50 text-gray-600 hover:text-gray-900 hover:bg-gray-100 border border-gray-200'
-                }
-              `}
-            >
-              {filter}
-            </button>
-          ))}
+        {/* Category Filter - Using shared component */}
+        <div className="mb-4 md:mb-6">
+          <CategoryFilter
+            tags={tags}
+            activeTags={activeTags}
+            onToggleTag={handleToggleTag}
+          />
         </div>
 
         {/* Events Grid */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {mockEvents
-            .filter(event => event.status === 'active') // Filter only active events
-            .map((event) => (
-              <EventCard key={event.id} event={event} />
+        <div className="px-4 sm:px-0">
+          <div className="grid gap-3 md:gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
+            {filteredEvents.map((event) => (
+              <Link key={event.id} href={`/events/${event.id}`}>
+                <EventCard event={event} />
+              </Link>
             ))}
+          </div>
+
+          {filteredEvents.length === 0 && (
+            <div className="text-center py-12">
+              <p className="text-gray-500">找不到符合條件的活動</p>
+              <Button
+                variant="ghost"
+                onClick={() => {
+                  setActiveTags([]);
+                  setSearchQuery('');
+                }}
+                className="mt-4"
+              >
+                清除篩選條件
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </main>
   );
 }
-

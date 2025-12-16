@@ -101,10 +101,10 @@ export default function Header() {
                             />
                         </div>
 
-                        {/* Language Switcher */}
+                        {/* Language Switcher - Desktop Only */}
                         <button
                             onClick={() => setLocale(locale === 'zh' ? 'en' : 'zh')}
-                            className="flex items-center gap-1 text-sm text-gray-600 hover:text-black transition-colors"
+                            className="hidden md:flex items-center gap-1 text-sm text-gray-600 hover:text-black transition-colors"
                         >
                             <Globe className="w-4 h-4" />
                             <span>{locale === 'zh' ? '繁中' : 'EN'}</span>

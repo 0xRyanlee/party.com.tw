@@ -150,8 +150,9 @@ function HomeContent() {
 
               <div className="flex flex-col gap-2 md:gap-4 lg:gap-6">
                 {otherEvents.slice(0, 5).map((event) => (
-                  <div
+                  <Link
                     key={event.id}
+                    href={`/events/${event.id}`}
                     className="bg-white rounded-xl md:rounded-2xl p-3 md:p-4 border border-gray-100 hover:shadow-lg transition-all cursor-pointer group flex gap-3 md:gap-4 lg:gap-6 active:scale-[0.99]"
                   >
                     {/* Image (Left) */}
@@ -194,18 +195,18 @@ function HomeContent() {
                           <span className="text-xs text-gray-600 font-medium">{event.organizer.name}</span>
                         </div>
 
-                        {/* Distance/Price */}
-                        <div className="flex items-center gap-3 text-xs font-medium">
+                        {/* Distance + Date/Time */}
+                        <div className="flex items-center gap-2 text-xs font-medium">
                           <span className="text-gray-400">
                             {event.distance < 1 ? `${Math.round(event.distance * 1000)}m` : `${event.distance.toFixed(1)}km`}
                           </span>
-                          <span className="text-black bg-gray-100 px-2 py-1 rounded-md">
-                            {event.price === '0' || event.price === 'Free' ? 'Free' : `$${event.price}`}
+                          <span className="text-gray-600">
+                            {event.dayOfWeek} {event.time}
                           </span>
                         </div>
                       </div>
                     </div>
-                  </div>
+                  </Link>
                 ))}
               </div>
 
@@ -236,13 +237,12 @@ function HomeContent() {
 
               {/* Foolproof Carousel Container */}
               <div className="relative -mx-4 sm:mx-0">
-                <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
-
-                <div className="flex gap-2 md:gap-4 overflow-x-auto pb-4 md:pb-6 pt-2 px-4 sm:px-0 scrollbar-hide snap-x clip-path-padding">
+                <div className="flex gap-2 md:gap-4 overflow-x-auto pb-4 md:pb-6 pt-2 px-4 sm:px-0 scrollbar-hide snap-x">
                   {/* Show events from index 5 onwards, or mock recommendations */}
                   {otherEvents.slice(5).concat(activeEvents.slice(0, 3)).map((event) => (
-                    <div
+                    <Link
                       key={`rec-${event.id}`}
+                      href={`/events/${event.id}`}
                       className="min-w-[calc((100vw-48px)/3.6)] md:min-w-[200px] lg:min-w-[240px] snap-start shrink-0 bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-all cursor-pointer group/card flex flex-col active:scale-[0.98]"
                     >
                       <div className="aspect-[4/3] md:aspect-[16/9] bg-gray-200 relative overflow-hidden">
@@ -254,16 +254,16 @@ function HomeContent() {
                           {event.type}
                         </div>
                       </div>
-                      <div className="p-3 flex-1 flex flex-col">
-                        <h4 className="font-bold text-sm truncate mb-1 text-gray-900">{event.title}</h4>
-                        <div className="mt-auto flex items-center justify-between text-xs text-gray-500">
-                          <span className="truncate max-w-[100px]">{event.location.split(',')[0]}</span>
-                          <span className="text-gray-400">{event.date}</span>
+                      <div className="p-2 flex flex-col">
+                        <h4 className="font-bold text-xs md:text-sm truncate text-gray-900">{event.title}</h4>
+                        <div className="flex items-center justify-between text-[10px] md:text-xs text-gray-500 mt-1">
+                          <span className="truncate max-w-[80px]">{event.location.split(',')[0]}</span>
+                          <span className="text-gray-400">{event.dayOfWeek} {event.time}</span>
                         </div>
                       </div>
-                    </div>
+                    </Link>
                   ))}
-                  <div className="w-8 shrink-0" />
+                  <div className="w-4 shrink-0" />
                 </div>
               </div>
             </motion.section>

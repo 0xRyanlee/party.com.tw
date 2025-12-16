@@ -59,6 +59,17 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                                         {attr}
                                     </Badge>
                                 ))}
+                                {/* Source Tag - distinctive gray rounded rectangle */}
+                                {event.sourceName && event.sourceUrl && (
+                                    <a
+                                        href={event.sourceUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-500 rounded-xl text-sm font-medium transition-colors"
+                                    >
+                                        轉自 {event.sourceName} →
+                                    </a>
+                                )}
                             </div>
                             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-950 leading-tight">
                                 {event.title}
@@ -70,13 +81,24 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-end gap-2">
+                        <div className="flex flex-col items-end gap-3">
                             <div className="text-3xl font-bold text-neutral-950 tracking-tight">{event.price}</div>
                             {event.capacity && (
                                 <div className="text-sm text-neutral-500 font-medium bg-neutral-100 px-3 py-1 rounded-full">
                                     剩餘 {event.capacity - (event.attendees || 0)} 席
                                 </div>
                             )}
+                            {/* CTA next to price */}
+                            <QuickRegisterButton
+                                eventId={event.id}
+                                eventTitle={event.title}
+                                isLoggedIn={isLoggedIn}
+                                isAlreadyRegistered={isRegistered}
+                                onLoginRequired={() => setIsAuthModalOpen(true)}
+                                onSuccess={() => setIsRegistered(true)}
+                                size="default"
+                                className="hidden md:flex rounded-full px-6"
+                            />
                         </div>
                     </div>
                 </div>
@@ -113,6 +135,19 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                             <h2 className="text-2xl font-bold tracking-tight text-neutral-900">關於活動</h2>
                             <div className="prose prose-neutral max-w-none text-neutral-600 whitespace-pre-line leading-relaxed">
                                 {event.description}
+                            </div>
+                            {/* CTA at the bottom of description */}
+                            <div className="pt-4 border-t border-neutral-100">
+                                <QuickRegisterButton
+                                    eventId={event.id}
+                                    eventTitle={event.title}
+                                    isLoggedIn={isLoggedIn}
+                                    isAlreadyRegistered={isRegistered}
+                                    onLoginRequired={() => setIsAuthModalOpen(true)}
+                                    onSuccess={() => setIsRegistered(true)}
+                                    size="lg"
+                                    className="w-full md:w-auto rounded-full px-8"
+                                />
                             </div>
                         </div>
 

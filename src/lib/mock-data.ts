@@ -9,7 +9,25 @@ export interface Organizer {
 export interface Event {
     id: string;
     title: string;
-    type: 'gathering' | 'meetup' | 'workshop' | 'lecture' | 'conference' | 'event' | 'party' | 'rave' | 'potluck' | 'popup' | 'exhibition' | 'performance' | 'hackathon' | 'networking' | 'retreat' | 'coholding' | 'meeting' | 'sport' | 'expo' | 'festival' | 'marathon' | 'training_camp' | 'language_exchange' | 'flea_market' | 'farmers_market';
+    type:
+    // 社交類
+    | 'gathering' | 'meetup' | 'networking' | 'party' | 'rave' | 'potluck'
+    // 學習類
+    | 'workshop' | 'lecture' | 'conference' | 'seminar' | 'book_club' | 'language_exchange'
+    // 運動類
+    | 'sport' | 'marathon' | 'hiking' | 'climbing' | 'running' | 'yoga' | 'cycling' | 'swimming' | 'basketball' | 'volleyball' | 'badminton' | 'tennis' | 'gym'
+    // 藝文類
+    | 'exhibition' | 'performance' | 'concert' | 'movie' | 'theater' | 'gallery'
+    // 創業/科技類
+    | 'hackathon' | 'startup' | 'demo_day' | 'tech_talk'
+    // 生活類
+    | 'popup' | 'flea_market' | 'farmers_market' | 'food_tour' | 'wine_tasting' | 'coffee_tasting'
+    // 特殊類
+    | 'retreat' | 'coholding' | 'meeting' | 'training_camp' | 'expo' | 'festival'
+    // 主題類
+    | 'women_only' | 'lgbtq_friendly' | 'singles' | 'board_game' | 'mahjong' | 'card_game' | 'video_game'
+    // 通用
+    | 'event' | 'other';
     format: 'indoor' | 'outdoor' | 'online';
     attributes: string[]; // e.g., ['free', 'pet_friendly']
     date: string; // Display date e.g. "Today", "Nov 25"
@@ -29,7 +47,10 @@ export interface Event {
     organizer: Organizer; // Changed from string to Organizer object
     vendors?: Organizer[]; // Optional array of vendors/suppliers
     isPromoted?: boolean;
-    status: 'active' | 'pending' | 'draft' | 'expired';
+    status: 'active' | 'pending' | 'draft' | 'expired' | 'published';
+    // Source information for aggregated events
+    sourceUrl?: string;  // Original URL where event was sourced from
+    sourceName?: string; // Name of the source platform (e.g., "Meetup", "Accupass")
 }
 
 export const mockEvents: Event[] = [

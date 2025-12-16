@@ -5,7 +5,16 @@ export default function robots(): MetadataRoute.Robots {
         rules: {
             userAgent: "*",
             allow: "/",
-            disallow: "/admin/",
+            disallow: [
+                "/admin/",
+                "/settings/",
+                "/auth/",
+                "/api/",
+                "/host/dashboard/",
+                "/host/manage/",
+                "/host/edit/",
+                "/user/",
+            ],
         },
         sitemap: "https://party.com.tw/sitemap.xml", // Replace with actual domain
     };

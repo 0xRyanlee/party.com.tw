@@ -270,8 +270,8 @@ export default function CollaborationStep({
             </div>
 
             {/* Info Box */}
-            <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-                <p className="text-sm text-blue-800">
+            <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
+                <p className="text-sm text-gray-600">
                     💡 申請者將在活動詳情頁看到這些合作機會
                 </p>
             </div>

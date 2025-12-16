@@ -59,6 +59,20 @@ const TIER_FEATURES = {
             { name: '優先技術支援', included: true },
         ],
     },
+    ultra: {
+        name: 'Ultra',
+        price: '邀請制',
+        period: '',
+        events: '無限制',
+        capacity: '無限制',
+        features: [
+            { name: '所有 Pro 功能', included: true },
+            { name: 'Vendor 經營權限', included: true },
+            { name: 'Club 管理權限', included: true },
+            { name: 'Admin 後台存取', included: true },
+            { name: '專屬技術支援', included: true },
+        ],
+    },
 };
 
 const TRIGGER_MESSAGES = {
@@ -84,12 +98,12 @@ export default function UpgradeModal({
     onUpgrade,
 }: UpgradeModalProps) {
     const [selectedTier, setSelectedTier] = useState<UserTier>(
-        currentTier === 'free' ? 'plus' : 'pro'
+        currentTier === 'free' ? 'plus' : currentTier === 'plus' ? 'pro' : 'ultra'
     );
     const [loading, setLoading] = useState(false);
 
     const triggerMessage = TRIGGER_MESSAGES[trigger];
-    const recommended = currentTier === 'free' ? 'plus' : 'pro';
+    const recommended = currentTier === 'free' ? 'plus' : currentTier === 'plus' ? 'pro' : 'ultra';
 
     const handleUpgrade = async () => {
         setLoading(true);
@@ -199,8 +213,8 @@ export default function UpgradeModal({
                                 {!isCurrentTier && (
                                     <Button
                                         className={`w-full mt-6 rounded-full ${isSelected
-                                                ? 'bg-black text-white'
-                                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            ? 'bg-black text-white'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                             }`}
                                         onClick={() => setSelectedTier(tier)}
                                     >

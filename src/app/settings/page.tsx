@@ -100,6 +100,18 @@ export default function SettingsPage() {
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
                         </Link>
+                        <Link href="/club" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
+                                    <Users className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="font-bold block">Club 管理</span>
+                                    <span className="text-xs text-gray-400">創建或管理您的俱樂部</span>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                        </Link>
                         <Link href="/settings/report" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
@@ -112,13 +124,33 @@ export default function SettingsPage() {
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
                         </Link>
-                        <Link href="/settings/vendor" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
+                        <Link href="/settings/vendor" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
                             <div className="flex items-center gap-3">
-                                <Briefcase className="w-5 h-5 text-gray-400" />
-                                <span className="font-medium">{t('settings.businessCoop')}</span>
+                                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+                                    <Briefcase className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="font-bold block">{t('settings.businessCoop')}</span>
+                                    <span className="text-xs text-gray-400">成為 Vendor 供應商</span>
+                                </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
                         </Link>
+                        {/* Admin Entry - Only show for admin users */}
+                        {user?.email === 'ryan910814@gmail.com' && (
+                            <Link href="/admin" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
+                                <div className="flex items-center gap-3">
+                                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform">
+                                        <Shield className="w-4 h-4" />
+                                    </div>
+                                    <div>
+                                        <span className="font-bold block">Admin 後台</span>
+                                        <span className="text-xs text-gray-400">管理平台內容與用戶</span>
+                                    </div>
+                                </div>
+                                <ChevronRight className="w-5 h-5 text-gray-300" />
+                            </Link>
+                        )}
                     </div>
                 </section>
 

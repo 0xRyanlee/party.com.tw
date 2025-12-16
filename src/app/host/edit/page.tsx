@@ -16,6 +16,7 @@ import ParticipantSettings from "@/components/host/ParticipantSettings";
 import CustomTags from "@/components/host/CustomTags";
 import AdvancedTicketManager from "@/components/host/AdvancedTicketManager";
 import LocationPicker from "@/components/host/LocationPicker";
+import ExternalLinks from "@/components/host/ExternalLinks";
 import { Calendar, MapPin, Clock, Info, Tag, Briefcase } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { EventRole, EventResource } from "@/types/schema";
@@ -58,6 +59,7 @@ export default function HostEdit() {
     const [advancedTickets, setAdvancedTickets] = useState<any[]>([]);
     const [duration, setDuration] = useState(2); // 活動時長（小時）
     const [location, setLocation] = useState<{ name: string; address: string; lat?: number; lng?: number }>({ name: '', address: '' });
+    const [externalLinks, setExternalLinks] = useState<string[]>([]); // 外部連結多選
 
     const {
         register,
@@ -75,7 +77,7 @@ export default function HostEdit() {
             status: "draft", // Default to draft
             isPublic: true,
             tickets: [],
-            date: new Date().toISOString().split('T')[0],
+            date: "", // 空字串，避免默認今天導致過期判斷
             time: "18:00",
             locationName: "",
             address: "",
@@ -252,13 +254,11 @@ export default function HostEdit() {
 
                             <div className="space-y-2">
                                 <Label>外部連結（選填）</Label>
-                                <Input
-                                    {...register("externalLink")}
-                                    placeholder="https://..."
-                                    type="url"
+                                <ExternalLinks
+                                    value={externalLinks}
+                                    onChange={setExternalLinks}
+                                    maxLinks={3}
                                 />
-                                <p className="text-xs text-gray-500">可填入報名連結、活動頁面或社群連結</p>
-                                {errors.externalLink && <p className="text-xs text-red-500">{errors.externalLink.message}</p>}
                             </div>
                         </div>
                     </div>
@@ -279,13 +279,7 @@ export default function HostEdit() {
                         />
                     </div>
 
-                    {/* Custom Tags Card */}
-                    <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm">
-                        <CustomTags
-                            selectedTags={selectedTags}
-                            onTagsChange={setSelectedTags}
-                        />
-                    </div>
+
 
                     {/* Collaboration Card */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-6">
@@ -396,7 +390,7 @@ export default function HostEdit() {
                                 const date = watch("date");
                                 const time = watch("time");
                                 const isExpired = useMemo(() => {
-                                    if (!date || !time) return false;
+                                    if (!date || !time) return false; // 沒有選擇日期時間不顯示過期
                                     const eventDate = new Date(`${date}T${time}`);
                                     const now = new Date();
                                     return eventDate < now;

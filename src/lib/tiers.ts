@@ -1,6 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 
-export type UserTier = 'free' | 'plus' | 'pro';
+export type UserTier = 'free' | 'plus' | 'pro' | 'ultra';
 
 export interface TierLimits {
     max_events: number;
@@ -8,6 +8,9 @@ export interface TierLimits {
     has_advanced_ticketing: boolean;
     has_collaboration: boolean;
     has_full_analytics: boolean;
+    has_vendor_access: boolean;     // 新增：Vendor 功能
+    has_club_management: boolean;   // 新增：Club 管理
+    has_admin_access: boolean;      // 新增：Admin 後台
 }
 
 export interface UserTierInfo {
@@ -24,6 +27,9 @@ const TIER_LIMITS: Record<UserTier, TierLimits> = {
         has_advanced_ticketing: false,
         has_collaboration: false,
         has_full_analytics: false,
+        has_vendor_access: false,
+        has_club_management: false,
+        has_admin_access: false,
     },
     plus: {
         max_events: 5,
@@ -31,6 +37,9 @@ const TIER_LIMITS: Record<UserTier, TierLimits> = {
         has_advanced_ticketing: true,
         has_collaboration: true,
         has_full_analytics: true,
+        has_vendor_access: false,
+        has_club_management: false,
+        has_admin_access: false,
     },
     pro: {
         max_events: 999,
@@ -38,6 +47,19 @@ const TIER_LIMITS: Record<UserTier, TierLimits> = {
         has_advanced_ticketing: true,
         has_collaboration: true,
         has_full_analytics: true,
+        has_vendor_access: true,
+        has_club_management: true,
+        has_admin_access: false,
+    },
+    ultra: {
+        max_events: 999999,
+        max_capacity: 999999,
+        has_advanced_ticketing: true,
+        has_collaboration: true,
+        has_full_analytics: true,
+        has_vendor_access: true,
+        has_club_management: true,
+        has_admin_access: true,
     },
 };
 

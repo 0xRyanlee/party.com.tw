@@ -1,33 +1,41 @@
 "use client";
 
-import { Map, Marker, Overlay } from "pigeon-maps";
 import { useState, useEffect } from "react";
-import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
-import { ArrowLeft, List, Navigation } from "lucide-react";
+import { ArrowLeft, List, Filter } from "lucide-react";
 import Link from "next/link";
+import GoogleMapView, { MapLocation } from "@/components/GoogleMapView";
 import { mockEvents as events } from "@/lib/mock-data";
 import EventDetailModal from "@/components/EventDetailModal";
 import { Event } from "@/lib/mock-data";
 
 export default function MapPage() {
-  const { t } = useLanguage();
-  const [center, setCenter] = useState<[number, number]>([25.0330, 121.5654]);
-  const [zoom, setZoom] = useState(13);
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
-  const [mapHeight, setMapHeight] = useState(600); // Default height
 
-  useEffect(() => {
-    // Set map height after component mounts
-    setMapHeight(window.innerHeight);
-  }, []);
-
-  // Mock coordinates for events (distribute them around Taipei)
-  const eventLocations = events.map((event, index) => ({
-    ...event,
-    lat: 25.0330 + (Math.random() - 0.5) * 0.05,
-    lng: 121.5654 + (Math.random() - 0.5) * 0.05,
+  // 將 mock events 轉換為 MapLocation 格式
+  // 實際應用中應從 API 獲取真實座標
+  const eventLocations: MapLocation[] = events.map((event, index) => ({
+    id: event.id,
+    name: event.title,
+    address: event.location,
+    // Mock 座標：分布在台北市區
+    lat: 25.0330 + (Math.sin(index * 1.5) * 0.02),
+    lng: 121.5654 + (Math.cos(index * 1.5) * 0.03),
+    type: 'event',
+    info: {
+      title: event.title,
+      description: event.description?.slice(0, 100) + '...',
+      image: event.image,
+      url: `/events/${event.id}`,
+    },
   }));
+
+  const handleLocationClick = (location: MapLocation) => {
+    const event = events.find(e => e.id === location.id);
+    if (event) {
+      setSelectedEvent(event);
+    }
+  };
 
   return (
     <div className="h-screen w-full relative bg-gray-100">
@@ -40,56 +48,36 @@ export default function MapPage() {
             </Button>
           </Link>
           <div className="flex gap-2">
-            <Link href="/events">
+            <Button variant="secondary" className="rounded-full bg-white/90 hover:bg-white shadow-sm font-medium text-black">
+              <Filter className="w-4 h-4 mr-2" />
+              篩選
+            </Button>
+            <Link href="/discover">
               <Button variant="secondary" className="rounded-full bg-white/90 hover:bg-white shadow-sm font-medium text-black">
                 <List className="w-4 h-4 mr-2" />
-                List View
+                列表
               </Button>
             </Link>
           </div>
         </div>
       </div>
 
-      <Map
-        height={mapHeight}
-        defaultCenter={center}
-        defaultZoom={zoom}
-        onBoundsChanged={({ center, zoom }) => {
-          setCenter(center);
-          setZoom(zoom);
-        }}
-      >
-        {eventLocations.map((event) => (
-          <Marker
-            key={event.id}
-            width={50}
-            anchor={[event.lat, event.lng]}
-            color={selectedEvent?.id === event.id ? "#10b981" : "#ef4444"}
-            onClick={() => setSelectedEvent(event)}
-          />
-        ))}
+      {/* Google Map */}
+      <GoogleMapView
+        locations={eventLocations}
+        center={{ lat: 25.0330, lng: 121.5654 }}
+        zoom={13}
+        showUserLocation={true}
+        allowFullscreen={true}
+        height="100vh"
+        onLocationClick={handleLocationClick}
+        className="rounded-none"
+      />
 
-        {/* Selected Event Overlay Card */}
-        {selectedEvent && (
-          <Overlay anchor={[selectedEvent.lat, selectedEvent.lng]} offset={[120, 260]}>
-            <div className="bg-white p-3 rounded-2xl shadow-xl w-60 pointer-events-auto transform transition-all hover:scale-105">
-              <div
-                className="h-24 w-full bg-cover bg-center rounded-xl mb-2"
-                style={{ backgroundImage: `url(${selectedEvent.image})` }}
-              />
-              <h3 className="font-bold text-sm truncate">{selectedEvent.title}</h3>
-              <p className="text-xs text-gray-500 truncate mb-2">{selectedEvent.location}</p>
-              <Button
-                size="sm"
-                className="w-full rounded-lg bg-black text-white text-xs h-8"
-                onClick={() => setSelectedEvent(selectedEvent)} // Re-trigger to ensure modal opens if logic changes
-              >
-                View Details
-              </Button>
-            </div>
-          </Overlay>
-        )}
-      </Map>
+      {/* 活動數量提示 */}
+      <div className="absolute bottom-20 left-1/2 -translate-x-1/2 bg-white rounded-full px-4 py-2 shadow-lg text-sm font-medium">
+        找到 {events.length} 個活動
+      </div>
 
       {/* Event Detail Modal */}
       <EventDetailModal
@@ -100,3 +88,4 @@ export default function MapPage() {
     </div>
   );
 }
+

@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { Mail, MapPin, Clock, Send } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import LoadingButton from '@/components/LoadingButton';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 
@@ -40,7 +41,7 @@ export default function ContactPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pb-20">
             {/* Header */}
             <div className="bg-gray-900 text-white py-16">
                 <div className="container mx-auto px-4">
@@ -135,18 +136,15 @@ export default function ContactPage() {
                                 </div>
                             )}
 
-                            <Button
+                            <LoadingButton
                                 type="submit"
-                                disabled={isSubmitting}
+                                isLoading={isSubmitting}
+                                loadingText="發送中..."
                                 className="w-full rounded-full bg-gray-900 hover:bg-gray-800"
                             >
-                                {isSubmitting ? '發送中...' : (
-                                    <>
-                                        <Send className="w-4 h-4 mr-2" />
-                                        發送訊息
-                                    </>
-                                )}
-                            </Button>
+                                <Send className="w-4 h-4 mr-2" />
+                                發送訊息
+                            </LoadingButton>
                         </form>
                     </div>
 

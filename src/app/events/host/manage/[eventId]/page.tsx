@@ -39,7 +39,7 @@ export default async function ManageEventPage({
     const waitlistCount = 0; // TODO: Implement in Phase 12
 
     return (
-        <Suspense fallback={<div>Loading...</div>}>
+        <Suspense fallback={<div>載入中...</div>}>
             <ManageClient
                 event={event}
                 stats={{

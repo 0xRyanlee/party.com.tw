@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { Button } from "@/components/ui/button";
+import LoadingButton from "@/components/LoadingButton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -120,13 +121,14 @@ export default function AdminEventsCreate() {
                     <h1 className="text-2xl font-bold">Admin 活動發布</h1>
                     <p className="text-sm text-gray-500">建立外部活動或公共活動</p>
                 </div>
-                <Button
+                <LoadingButton
                     onClick={handleSubmit(onSubmit)}
-                    disabled={isSubmitting}
+                    isLoading={isSubmitting}
+                    loadingText="發布中..."
                     className="bg-black text-white rounded-full"
                 >
-                    {isSubmitting ? "發布中..." : "發布活動"}
-                </Button>
+                    發布活動
+                </LoadingButton>
             </div>
 
             <form className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -190,8 +192,8 @@ export default function AdminEventsCreate() {
                                         type="button"
                                         onClick={() => setValue("sourceTag", tag as any)}
                                         className={`px-4 py-2 rounded-full text-sm border transition-all ${watch("sourceTag") === tag
-                                                ? "bg-black text-white"
-                                                : "bg-white hover:bg-gray-50"
+                                            ? "bg-black text-white"
+                                            : "bg-white hover:bg-gray-50"
                                             }`}
                                     >
                                         {tag === 'external' ? '外部來源' : tag === 'public' ? '公共活動' : '精選活動'}
@@ -294,8 +296,8 @@ export default function AdminEventsCreate() {
                                         );
                                     }}
                                     className={`px-3 py-1 rounded-full text-sm border transition-all ${selectedTags.includes(tag)
-                                            ? "bg-black text-white"
-                                            : "bg-white hover:bg-gray-50"
+                                        ? "bg-black text-white"
+                                        : "bg-white hover:bg-gray-50"
                                         }`}
                                 >
                                     {tag}

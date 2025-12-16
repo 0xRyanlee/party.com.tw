@@ -73,41 +73,44 @@ export default function AdvancedTicketManager({
     };
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             {/* Header with Toggle */}
-            <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center">
-                        <Ticket className="w-5 h-5 text-zinc-600" />
+            <div className="flex flex-col gap-4">
+                {/* 第一行：標題和 Toggle */}
+                <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-full bg-zinc-100 flex items-center justify-center">
+                            <Ticket className="w-5 h-5 text-zinc-600" />
+                        </div>
+                        <div>
+                            <h3 className="text-lg font-semibold">票務設定</h3>
+                            <p className="text-sm text-zinc-500">設定票種、價格和庫存</p>
+                        </div>
                     </div>
-                    <div>
-                        <h3 className="text-lg font-semibold">票務設定</h3>
-                        <p className="text-sm text-zinc-500">設定票種、價格和庫存</p>
-                    </div>
-                </div>
-                <div className="flex items-center gap-3">
                     {showToggle && (
                         <div className="flex items-center gap-2">
-                            <span className="text-sm text-zinc-500">
-                                {enabled ? '已啟用' : '未啟用'}
-                            </span>
                             <Switch
                                 checked={enabled}
                                 onCheckedChange={handleToggle}
                             />
+                            <span className="text-sm text-zinc-500 min-w-[50px]">
+                                {enabled ? '已啟用' : '已關閉'}
+                            </span>
                         </div>
                     )}
-                    {enabled && (
-                        <Button
-                            type="button"
-                            onClick={addTicket}
-                            className="bg-black hover:bg-zinc-800 text-white rounded-full"
-                        >
-                            <Plus className="w-4 h-4 mr-2" />
-                            新增票種
-                        </Button>
-                    )}
                 </div>
+
+                {/* 第二行：新增按鈕（僅啟用時顯示） */}
+                {enabled && (
+                    <Button
+                        type="button"
+                        onClick={addTicket}
+                        className="bg-black hover:bg-zinc-800 text-white rounded-full w-full sm:w-auto"
+                    >
+                        <Plus className="w-4 h-4 mr-2" />
+                        新增票種
+                    </Button>
+                )}
             </div>
 
             {/* Content - Only show when enabled */}

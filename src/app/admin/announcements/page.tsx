@@ -178,8 +178,8 @@ export default function AnnouncementsPage() {
                             </div>
 
                             <div className="flex justify-end space-x-2 pt-4">
-                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                                <Button type="submit">Save</Button>
+                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>取消</Button>
+                                <Button type="submit">儲存</Button>
                             </div>
                         </form>
                     </DialogContent>
@@ -187,7 +187,7 @@ export default function AnnouncementsPage() {
             </div>
 
             {isLoading ? (
-                <div>Loading...</div>
+                <div>載入中...</div>
             ) : (
                 <div className="space-y-4">
                     {announcements.map((item) => (

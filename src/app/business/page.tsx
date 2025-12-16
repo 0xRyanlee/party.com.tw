@@ -33,7 +33,7 @@ export default function BusinessPage() {
 
                     <div className="relative pl-12">
                         <div className="absolute left-0 top-0 w-8 h-8 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center font-bold text-sm border-4 border-white">1</div>
-                        <h4 className="font-bold text-lg mb-2">Submit Inquiry</h4>
+                        <h4 className="font-bold text-lg mb-2">提交諮詢</h4>
                         <p className="text-gray-500 text-sm">Fill out our partnership form or send us an email with your proposal.</p>
                     </div>
 

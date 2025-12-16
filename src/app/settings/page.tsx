@@ -84,6 +84,25 @@ export default function SettingsPage() {
                     </div>
                 </section>
 
+                {/* Membership Tier */}
+                <section>
+                    <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">會員方案</h2>
+                    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm">
+                        <Link href="/settings/pricing" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                                    <Sparkles className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="font-bold block">會員方案</span>
+                                    <span className="text-xs text-gray-400">查看 Free / Plus 方案權益</span>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                        </Link>
+                    </div>
+                </section>
+
                 {/* Community & Business */}
                 <section>
                     <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">{t('settings.communityBusiness')}</h2>

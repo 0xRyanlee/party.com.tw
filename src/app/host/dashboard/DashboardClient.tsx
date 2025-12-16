@@ -194,7 +194,7 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                 <div className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                                     <Users className="w-5 h-5 text-white" />
                                 </div>
-                                <p className="text-sm text-neutral-400 font-medium">Waiting for real-time data...</p>
+                                <p className="text-sm text-neutral-400 font-medium">等待即時數據...</p>
                             </div>
                         </div>
                     </CardContent>
@@ -232,9 +232,9 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                                         }
                                                         return (
                                                             <span className={`px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider rounded-full border ${event.status === 'active' ? 'bg-green-100 text-green-700 border-green-200' :
-                                                                    event.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
-                                                                        event.status === 'draft' ? 'bg-gray-100 text-gray-600 border-gray-200' :
-                                                                            'bg-red-50 text-red-600 border-red-100 line-through'
+                                                                event.status === 'pending' ? 'bg-yellow-100 text-yellow-700 border-yellow-200' :
+                                                                    event.status === 'draft' ? 'bg-gray-100 text-gray-600 border-gray-200' :
+                                                                        'bg-red-50 text-red-600 border-red-100 line-through'
                                                                 }`}>
                                                                 {event.status}
                                                             </span>
@@ -245,7 +245,7 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                                     <Calendar className="w-3.5 h-3.5" />
                                                     <span>{event.date}</span>
                                                     <span>•</span>
-                                                    <span>{event.attendees} guests</span>
+                                                    <span>{event.attendees} 位報名</span>
                                                 </div>
                                             </div>
                                         </div>

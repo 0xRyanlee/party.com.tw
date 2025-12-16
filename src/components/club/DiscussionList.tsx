@@ -174,7 +174,7 @@ export function DiscussionList({
                         disabled={isLoading}
                         className="rounded-full"
                     >
-                        {isLoading ? 'Loading...' : 'Load More'}
+                        {isLoading ? '載入中...' : '載入更多'}
                     </Button>
                 </div>
             )}

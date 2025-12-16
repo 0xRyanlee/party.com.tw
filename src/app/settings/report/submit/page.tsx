@@ -210,7 +210,7 @@ function SubmitForm() {
 export default function ReportSubmitPage() {
     return (
         <main className="min-h-screen bg-gray-50 text-black pb-20">
-            <Suspense fallback={<div className="p-8 text-center text-gray-500">Loading...</div>}>
+            <Suspense fallback={<div className="p-8 text-center text-gray-500">載入中...</div>}>
                 <SubmitForm />
             </Suspense>
         </main>

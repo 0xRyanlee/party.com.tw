@@ -241,7 +241,7 @@ export default function MyEventsClient({ registrations }: { registrations: Regis
                             <div className="text-6xl mb-4">📅</div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">還沒有報名任何活動</h3>
                             <p className="text-gray-500 mb-6">探索精彩活動，開始您的社交之旅！</p>
-                            <Link href="/events">
+                            <Link href="/discover">
                                 <Button className="rounded-full bg-black text-white hover:bg-gray-800">
                                     探索活動
                                 </Button>

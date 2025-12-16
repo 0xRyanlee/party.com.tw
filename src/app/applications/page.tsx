@@ -75,7 +75,7 @@ export default function MyApplicationsPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-50">
+        <div className="min-h-screen bg-gray-50 pb-20">
             {/* Header */}
             <div className="bg-white border-b border-gray-100">
                 <div className="container mx-auto px-4 py-6">
@@ -101,15 +101,15 @@ export default function MyApplicationsPage() {
                                     key={tab.key}
                                     onClick={() => setFilter(tab.key as ApplicationStatus | 'all')}
                                     className={`flex items-center gap-2 py-4 border-b-2 transition-all whitespace-nowrap ${isActive
-                                            ? 'border-black text-black font-semibold'
-                                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                                        ? 'border-black text-black font-semibold'
+                                        : 'border-transparent text-gray-500 hover:text-gray-700'
                                         }`}
                                 >
                                     <span>{tab.label}</span>
                                     <span
                                         className={`px-2 py-0.5 rounded-full text-xs ${isActive
-                                                ? 'bg-black text-white'
-                                                : 'bg-gray-200 text-gray-600'
+                                            ? 'bg-black text-white'
+                                            : 'bg-gray-200 text-gray-600'
                                             }`}
                                     >
                                         {count}

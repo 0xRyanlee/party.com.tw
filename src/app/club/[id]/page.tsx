@@ -182,7 +182,7 @@ export default function ClubDetailPage() {
     if (loading) {
         return (
             <div className="min-h-screen bg-zinc-50 flex items-center justify-center">
-                <div className="animate-pulse text-zinc-400">Loading...</div>
+                <div className="animate-pulse text-zinc-400">載入中...</div>
             </div>
         );
     }

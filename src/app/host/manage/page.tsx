@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Search, Download, Users, Briefcase, Check, X, Mail, Phone } from "lucide-react";
+import { Search, Download, Users, Briefcase, Check, X, Mail, Phone, ExternalLink } from "lucide-react";
+import Link from "next/link";
 
 type TabType = 'registrations' | 'applications';
 
@@ -16,6 +17,7 @@ const mockApplications = [
         applicant: {
             name: 'John Doe',
             avatar: null,
+            vendorId: 'vendor-123', // 關聯的 Vendor ID
         },
         type: 'role' as const,
         roleType: 'Photographer',
@@ -30,6 +32,7 @@ const mockApplications = [
         applicant: {
             name: 'Jane Smith',
             avatar: null,
+            vendorId: 'vendor-456', // 關聯的 Vendor ID
         },
         type: 'resource' as const,
         resourceType: 'Venue',
@@ -68,8 +71,8 @@ export default function HostManage() {
                 <button
                     onClick={() => setActiveTab('registrations')}
                     className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-all ${activeTab === 'registrations'
-                            ? 'border-black text-black font-semibold'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ? 'border-black text-black font-semibold'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     <Users className="w-4 h-4" />
@@ -78,8 +81,8 @@ export default function HostManage() {
                 <button
                     onClick={() => setActiveTab('applications')}
                     className={`flex items-center gap-2 px-4 py-3 border-b-2 transition-all relative ${activeTab === 'applications'
-                            ? 'border-black text-black font-semibold'
-                            : 'border-transparent text-gray-500 hover:text-gray-700'
+                        ? 'border-black text-black font-semibold'
+                        : 'border-transparent text-gray-500 hover:text-gray-700'
                         }`}
                 >
                     <Briefcase className="w-4 h-4" />
@@ -153,19 +156,32 @@ export default function HostManage() {
                                         </span>
                                     </div>
 
+
                                     {/* Applicant Info */}
-                                    <div className="flex items-center gap-3 mb-4">
-                                        <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-                                            <span className="font-semibold text-gray-600">
-                                                {application.applicant.name[0]}
-                                            </span>
+                                    <div className="flex items-center justify-between mb-4">
+                                        <div className="flex items-center gap-3">
+                                            <div className="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
+                                                <span className="font-semibold text-gray-600">
+                                                    {application.applicant.name[0]}
+                                                </span>
+                                            </div>
+                                            <div>
+                                                <p className="font-medium">{application.applicant.name}</p>
+                                                <p className="text-xs text-gray-500">
+                                                    申請 {application.type === 'role' ? application.roleType : application.resourceType}
+                                                </p>
+                                            </div>
                                         </div>
-                                        <div>
-                                            <p className="font-medium">{application.applicant.name}</p>
-                                            <p className="text-xs text-gray-500">
-                                                申請 {application.type === 'role' ? application.roleType : application.resourceType}
-                                            </p>
-                                        </div>
+                                        {/* 查看合作方頁面入口 */}
+                                        {application.applicant.vendorId && (
+                                            <Link
+                                                href={`/vendor/${application.applicant.vendorId}`}
+                                                className="flex items-center gap-1 text-sm text-blue-600 hover:text-blue-800 hover:underline"
+                                            >
+                                                <ExternalLink className="w-3.5 h-3.5" />
+                                                查看頁面
+                                            </Link>
+                                        )}
                                     </div>
 
                                     {/* Message */}

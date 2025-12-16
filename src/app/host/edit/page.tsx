@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
+import LoadingButton from "@/components/LoadingButton";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
@@ -57,6 +58,7 @@ export default function HostEdit() {
     const [invitationCode, setInvitationCode] = useState<string>('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
     const [advancedTickets, setAdvancedTickets] = useState<any[]>([]);
+    const [ticketingEnabled, setTicketingEnabled] = useState(true); // 票務功能開關
     const [duration, setDuration] = useState(2); // 活動時長（小時）
     const [location, setLocation] = useState<{ name: string; address: string; lat?: number; lng?: number }>({ name: '', address: '' });
     const [externalLinks, setExternalLinks] = useState<string[]>([]); // 外部連結多選
@@ -203,9 +205,14 @@ export default function HostEdit() {
                 </div>
                 <div className="flex gap-2">
                     <Button type="button" variant="outline" className="rounded-full">放棄</Button>
-                    <Button type="submit" disabled={isSubmitting} className="bg-black text-white rounded-full min-w-[120px]">
-                        {isSubmitting ? "儲存中..." : "發佈活動"}
-                    </Button>
+                    <LoadingButton
+                        type="submit"
+                        isLoading={isSubmitting}
+                        loadingText="儲存中..."
+                        className="bg-black text-white rounded-full min-w-[120px]"
+                    >
+                        發佈活動
+                    </LoadingButton>
                 </div>
             </div>
 
@@ -276,6 +283,9 @@ export default function HostEdit() {
                         <AdvancedTicketManager
                             tickets={advancedTickets}
                             onTicketsChange={setAdvancedTickets}
+                            enabled={ticketingEnabled}
+                            onEnabledChange={setTicketingEnabled}
+                            showToggle={true}
                         />
                     </div>
 

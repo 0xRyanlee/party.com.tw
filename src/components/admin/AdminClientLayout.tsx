@@ -6,6 +6,7 @@ import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 import { LayoutDashboard, Megaphone, Image as ImageIcon, LogOut, Home, Flag, Calendar } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import AdminPasswordGate from "@/components/admin/AdminPasswordGate";
 
 export default function AdminClientLayout({
     children,
@@ -29,13 +30,16 @@ export default function AdminClientLayout({
                 return;
             }
 
+            // 允許特定 email 或 profile.role = admin
+            const isAdminEmail = user.email === 'ryan910814@gmail.com';
+
             const { data: profile } = await supabase
                 .from("profiles")
                 .select("role")
                 .eq("id", user.id)
                 .single();
 
-            if (profile?.role !== "admin") {
+            if (!isAdminEmail && profile?.role !== "admin") {
                 router.push("/");
                 return;
             }
@@ -49,6 +53,8 @@ export default function AdminClientLayout({
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
+        sessionStorage.removeItem('admin_auth_token');
+        sessionStorage.removeItem('admin_auth_expiry');
         router.push("/auth/login");
     };
 
@@ -71,53 +77,56 @@ export default function AdminClientLayout({
     ];
 
     return (
-        <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
-            {/* Sidebar */}
-            <aside className="w-64 bg-white dark:bg-gray-800 shadow-md flex flex-col">
-                <div className="p-6 border-b dark:border-gray-700">
-                    <h1 className="text-2xl font-bold text-primary">Admin</h1>
-                </div>
-                <nav className="flex-1 p-4 space-y-2">
-                    {navItems.map((item) => {
-                        const Icon = item.icon;
-                        const isActive = pathname === item.href;
-                        return (
-                            <Link
-                                key={item.href}
-                                href={item.href}
-                                className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
-                                    ? "bg-primary text-primary-foreground"
-                                    : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
-                                    }`}
-                            >
-                                <Icon className="h-5 w-5" />
-                                <span>{item.label}</span>
-                            </Link>
-                        );
-                    })}
-                </nav>
-                <div className="p-4 border-t dark:border-gray-700 space-y-2">
-                    <Link href="/">
-                        <Button variant="outline" className="w-full justify-start gap-2">
-                            <Home className="h-4 w-4" />
-                            Back to Site
+        <AdminPasswordGate>
+            <div className="flex h-screen bg-gray-100 dark:bg-gray-900">
+                {/* Sidebar */}
+                <aside className="w-64 bg-white dark:bg-gray-800 shadow-md flex flex-col">
+                    <div className="p-6 border-b dark:border-gray-700">
+                        <h1 className="text-2xl font-bold text-primary">Admin</h1>
+                    </div>
+                    <nav className="flex-1 p-4 space-y-2">
+                        {navItems.map((item) => {
+                            const Icon = item.icon;
+                            const isActive = pathname === item.href;
+                            return (
+                                <Link
+                                    key={item.href}
+                                    href={item.href}
+                                    className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-colors ${isActive
+                                        ? "bg-primary text-primary-foreground"
+                                        : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+                                        }`}
+                                >
+                                    <Icon className="h-5 w-5" />
+                                    <span>{item.label}</span>
+                                </Link>
+                            );
+                        })}
+                    </nav>
+                    <div className="p-4 border-t dark:border-gray-700 space-y-2">
+                        <Link href="/">
+                            <Button variant="outline" className="w-full justify-start gap-2">
+                                <Home className="h-4 w-4" />
+                                Back to Site
+                            </Button>
+                        </Link>
+                        <Button
+                            variant="ghost"
+                            className="w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
+                            onClick={handleSignOut}
+                        >
+                            <LogOut className="h-4 w-4" />
+                            Sign Out
                         </Button>
-                    </Link>
-                    <Button
-                        variant="ghost"
-                        className="w-full justify-start gap-2 text-red-500 hover:text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20"
-                        onClick={handleSignOut}
-                    >
-                        <LogOut className="h-4 w-4" />
-                        Sign Out
-                    </Button>
-                </div>
-            </aside>
+                    </div>
+                </aside>
 
-            {/* Main Content */}
-            <main className="flex-1 overflow-y-auto p-8">
-                <div className="max-w-7xl mx-auto">{children}</div>
-            </main>
-        </div>
+                {/* Main Content */}
+                <main className="flex-1 overflow-y-auto p-8">
+                    <div className="max-w-7xl mx-auto">{children}</div>
+                </main>
+            </div>
+        </AdminPasswordGate>
     );
 }
+

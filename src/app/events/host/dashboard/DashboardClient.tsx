@@ -194,7 +194,7 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                 <div className="w-12 h-12 bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                                     <Users className="w-5 h-5 text-white" />
                                 </div>
-                                <p className="text-sm text-neutral-400 font-medium">Waiting for real-time data...</p>
+                                <p className="text-sm text-neutral-400 font-medium">等待即時數據...</p>
                             </div>
                         </div>
                     </CardContent>
@@ -223,7 +223,7 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                                     <Calendar className="w-3.5 h-3.5" />
                                                     <span>{event.date}</span>
                                                     <span>•</span>
-                                                    <span>{event.attendees} guests</span>
+                                                    <span>{event.attendees} 位報名</span>
                                                 </div>
                                             </div>
                                         </div>

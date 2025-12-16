@@ -176,8 +176,8 @@ export default function BannersPage() {
                             </div>
 
                             <div className="flex justify-end space-x-2 pt-4">
-                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>Cancel</Button>
-                                <Button type="submit">Save</Button>
+                                <Button type="button" variant="outline" onClick={() => setIsDialogOpen(false)}>取消</Button>
+                                <Button type="submit">儲存</Button>
                             </div>
                         </form>
                     </DialogContent>
@@ -185,7 +185,7 @@ export default function BannersPage() {
             </div>
 
             {isLoading ? (
-                <div>Loading...</div>
+                <div>載入中...</div>
             ) : (
                 <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
                     {banners.map((banner) => (

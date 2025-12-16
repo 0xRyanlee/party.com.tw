@@ -59,7 +59,7 @@ export default function HeroCarousel({ events }: HeroCarouselProps) {
     const goToNext = () => setCurrentIndex((prev) => (prev + 1) % slides.length);
 
     return (
-        <div className="relative w-full aspect-[16/9] md:aspect-[21/9] rounded-2xl md:rounded-3xl overflow-hidden mb-8 group">
+        <div className="relative w-full h-[20vh] min-h-[120px] max-h-[180px] md:h-auto md:aspect-[16/9] lg:aspect-[21/9] rounded-xl md:rounded-2xl overflow-hidden mb-4 md:mb-8 group">
             <AnimatePresence mode="wait">
                 <motion.div
                     key={currentIndex}
@@ -81,14 +81,14 @@ export default function HeroCarousel({ events }: HeroCarouselProps) {
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
                     {/* Content */}
-                    <div className="relative z-10 h-full flex flex-col justify-end p-6 md:p-10">
+                    <div className="relative z-10 h-full flex flex-col justify-end p-4 md:p-6 lg:p-10">
                         {/* Tags */}
                         {slides[currentIndex].tags && (
-                            <div className="flex flex-wrap gap-2 mb-3">
+                            <div className="flex flex-wrap gap-1.5 mb-2 md:mb-3">
                                 {slides[currentIndex].tags.map((tag, i) => (
                                     <span
                                         key={i}
-                                        className="px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full text-xs text-white"
+                                        className="px-2 py-0.5 md:px-3 md:py-1 bg-white/20 backdrop-blur-sm rounded-full text-[10px] md:text-xs text-white"
                                     >
                                         {tag}
                                     </span>
@@ -97,12 +97,12 @@ export default function HeroCarousel({ events }: HeroCarouselProps) {
                         )}
 
                         {/* Title */}
-                        <h2 className="text-2xl md:text-4xl font-bold text-white mb-3 leading-tight">
+                        <h2 className="text-lg md:text-2xl lg:text-4xl font-bold text-white mb-1.5 md:mb-3 leading-tight line-clamp-1 md:line-clamp-none">
                             {slides[currentIndex].title}
                         </h2>
 
                         {/* Meta Info */}
-                        <div className="flex items-center gap-4 text-white/80 text-sm mb-4">
+                        <div className="hidden md:flex items-center gap-4 text-white/80 text-sm mb-4">
                             <span className="flex items-center gap-1">
                                 <MapPin className="w-4 h-4" />
                                 {slides[currentIndex].location}
@@ -113,9 +113,9 @@ export default function HeroCarousel({ events }: HeroCarouselProps) {
                             </span>
                         </div>
 
-                        {/* CTA Button */}
+                        {/* CTA Button - hidden on mobile for compact view */}
                         {events && events.length > 0 && (
-                            <Link href={`/events/${slides[currentIndex].id}`}>
+                            <Link href={`/events/${slides[currentIndex].id}`} className="hidden md:inline-block">
                                 <Button className="bg-white text-black hover:bg-gray-100 rounded-full px-6">
                                     查看詳情
                                     <ChevronRight className="w-4 h-4 ml-1" />
@@ -133,8 +133,8 @@ export default function HeroCarousel({ events }: HeroCarouselProps) {
                         key={index}
                         onClick={() => setCurrentIndex(index)}
                         className={`h-1.5 rounded-full transition-all duration-300 ${index === currentIndex
-                                ? "w-8 bg-white"
-                                : "w-2 bg-white/40 hover:bg-white/60"
+                            ? "w-8 bg-white"
+                            : "w-2 bg-white/40 hover:bg-white/60"
                             }`}
                     />
                 ))}

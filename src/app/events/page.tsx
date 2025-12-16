@@ -56,7 +56,8 @@ export default async function EventsPage() {
         role: 'member',
         verified: dbEvent.organizer_verified
       },
-      isPromoted: false
+      isPromoted: false,
+      status: dbEvent.status || 'published'
     };
   }) : [];
 

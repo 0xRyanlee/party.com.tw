@@ -106,9 +106,9 @@ function HomeContent() {
         />
 
         {/* Main Content Grid */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-6 lg:gap-8">
           {/* Left Column - Main Feed */}
-          <div className="lg:col-span-8 space-y-6 lg:space-y-8">
+          <div className="lg:col-span-8 space-y-3 md:space-y-6 lg:space-y-8">
 
             {/* Category Filter */}
             <CategoryFilter
@@ -148,14 +148,14 @@ function HomeContent() {
                 </h2>
               </div>
 
-              <div className="flex flex-col gap-6">
+              <div className="flex flex-col gap-2 md:gap-4 lg:gap-6">
                 {otherEvents.slice(0, 5).map((event) => (
                   <div
                     key={event.id}
-                    className="bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-lg transition-all cursor-pointer group flex gap-4 sm:gap-6"
+                    className="bg-white rounded-xl md:rounded-2xl p-3 md:p-4 border border-gray-100 hover:shadow-lg transition-all cursor-pointer group flex gap-3 md:gap-4 lg:gap-6 active:scale-[0.99]"
                   >
                     {/* Image (Left) */}
-                    <div className="w-24 h-24 sm:w-32 sm:h-32 shrink-0 rounded-xl bg-gray-200 relative overflow-hidden">
+                    <div className="w-20 h-20 md:w-24 md:h-24 lg:w-32 lg:h-32 shrink-0 rounded-lg md:rounded-xl bg-gray-200 relative overflow-hidden">
                       <div
                         className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
                         style={{ backgroundImage: `url(${event.image})` }}
@@ -238,14 +238,14 @@ function HomeContent() {
               <div className="relative -mx-4 sm:mx-0">
                 <div className="absolute right-0 top-0 bottom-0 w-16 sm:w-24 bg-gradient-to-l from-gray-50 via-gray-50/80 to-transparent z-10 pointer-events-none" />
 
-                <div className="flex gap-4 overflow-x-auto pb-6 pt-2 px-4 sm:px-0 scrollbar-hide snap-x clip-path-padding">
+                <div className="flex gap-2 md:gap-4 overflow-x-auto pb-4 md:pb-6 pt-2 px-4 sm:px-0 scrollbar-hide snap-x clip-path-padding">
                   {/* Show events from index 5 onwards, or mock recommendations */}
                   {otherEvents.slice(5).concat(activeEvents.slice(0, 3)).map((event) => (
                     <div
                       key={`rec-${event.id}`}
-                      className="min-w-[240px] sm:min-w-[260px] snap-start shrink-0 bg-white rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-all cursor-pointer group/card flex flex-col"
+                      className="min-w-[calc((100vw-48px)/3.6)] md:min-w-[200px] lg:min-w-[240px] snap-start shrink-0 bg-white rounded-lg md:rounded-xl overflow-hidden border border-gray-100 hover:shadow-md transition-all cursor-pointer group/card flex flex-col active:scale-[0.98]"
                     >
-                      <div className="aspect-[16/9] bg-gray-200 relative overflow-hidden">
+                      <div className="aspect-[4/3] md:aspect-[16/9] bg-gray-200 relative overflow-hidden">
                         <div
                           className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover/card:scale-110"
                           style={{ backgroundImage: `url(${event.image})` }}

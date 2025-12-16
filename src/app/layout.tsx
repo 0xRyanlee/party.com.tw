@@ -25,6 +25,7 @@ export const metadata: Metadata = {
 import { I18nProvider } from "@/lib/i18n";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import MobileNav from "@/components/MobileNav";
 import { Analytics } from "@vercel/analytics/react";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import GoogleOneTap from "@/components/GoogleOneTap";
@@ -49,8 +50,11 @@ export default function RootLayout({
       >
         <I18nProvider>
           <Header />
-          {children}
+          <div className="pb-[60px] md:pb-0">
+            {children}
+          </div>
           <Footer />
+          <MobileNav />
           <Analytics />
           <GoogleAnalytics />
           <GoogleOneTap />

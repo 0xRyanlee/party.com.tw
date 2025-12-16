@@ -58,7 +58,8 @@ export default async function HostDashboard() {
                 name: 'You',
                 role: 'member',
             },
-            isPromoted: false
+            isPromoted: false,
+            status: dbEvent.status || 'published'
         };
     }) : [];
 

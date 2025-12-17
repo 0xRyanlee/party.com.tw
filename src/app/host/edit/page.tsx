@@ -327,7 +327,7 @@ export default function HostEdit() {
                                 <Input type="time" {...register("time")} />
                                 {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
                             </div>
-                            <div className="space-y-1">
+                            <div className="space-y-2">
                                 <Label className="text-xs text-gray-500">活動時長</Label>
                                 <div className="flex flex-wrap gap-2">
                                     {[1, 2, 3, 4, 6, 8].map((hours) => (
@@ -335,7 +335,7 @@ export default function HostEdit() {
                                             key={hours}
                                             type="button"
                                             onClick={() => setDuration(hours)}
-                                            className={`w-14 px-3 py-2 rounded-full border text-sm font-medium transition-all ${duration === hours
+                                            className={`min-w-[48px] px-3 py-2 rounded-full border text-sm font-medium transition-all ${duration === hours
                                                 ? 'border-gray-900 bg-gray-100 text-gray-900'
                                                 : 'border-gray-200 hover:border-gray-300'
                                                 }`}
@@ -344,16 +344,18 @@ export default function HostEdit() {
                                         </button>
                                     ))}
                                 </div>
-                                <Input
-                                    type="number"
-                                    min="0.5"
-                                    step="0.5"
-                                    value={duration}
-                                    onChange={(e) => setDuration(parseFloat(e.target.value) || 2)}
-                                    placeholder="或輸入自定義時長"
-                                    className="text-sm"
-                                />
-                                <p className="text-xs text-gray-500">
+                                <div className="mt-3">
+                                    <Input
+                                        type="number"
+                                        min="0.5"
+                                        step="0.5"
+                                        value={duration}
+                                        onChange={(e) => setDuration(parseFloat(e.target.value) || 2)}
+                                        placeholder="或輸入自定義時長"
+                                        className="text-sm"
+                                    />
+                                </div>
+                                <p className="text-xs text-gray-500 mt-1">
                                     結束時間：{duration}小時後
                                 </p>
                             </div>

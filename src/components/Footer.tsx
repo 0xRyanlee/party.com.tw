@@ -45,6 +45,11 @@ export default function Footer() {
                                 </Link>
                             </li>
                             <li>
+                                <Link href="/map" className="text-gray-600 hover:text-black transition-colors">
+                                    地圖找活動
+                                </Link>
+                            </li>
+                            <li>
                                 <Link href="/host/edit" className="text-gray-600 hover:text-black transition-colors">
                                     發起活動
                                 </Link>
@@ -52,6 +57,11 @@ export default function Footer() {
                             <li>
                                 <Link href="/club" className="text-gray-600 hover:text-black transition-colors">
                                     社群俱樂部
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/business" className="text-gray-600 hover:text-black transition-colors">
+                                    商業合作
                                 </Link>
                             </li>
                         </ul>
@@ -69,6 +79,11 @@ export default function Footer() {
                             <li>
                                 <Link href="/contact" className="text-gray-600 hover:text-black transition-colors">
                                     聯絡我們
+                                </Link>
+                            </li>
+                            <li>
+                                <Link href="/settings/report" className="text-gray-600 hover:text-black transition-colors">
+                                    投訴舉報
                                 </Link>
                             </li>
                         </ul>

@@ -72,7 +72,7 @@ export default function CreateClubPage() {
     };
 
     return (
-        <main className="min-h-screen bg-zinc-50">
+        <main className="min-h-screen bg-zinc-50 pb-20">
             {/* Header */}
             <header className="bg-white sticky top-0 z-10 border-b border-zinc-100 px-4 py-4 flex items-center gap-4">
                 <Button variant="ghost" size="icon" onClick={() => router.back()} className="-ml-2">
@@ -155,8 +155,8 @@ export default function CreateClubPage() {
                                         type="button"
                                         onClick={() => setForm(prev => ({ ...prev, club_type: type.value as never }))}
                                         className={`p-4 rounded-xl border-2 transition-all text-center ${isSelected
-                                                ? 'border-black bg-black text-white'
-                                                : 'border-zinc-200 bg-white hover:border-zinc-300'
+                                            ? 'border-black bg-black text-white'
+                                            : 'border-zinc-200 bg-white hover:border-zinc-300'
                                             }`}
                                     >
                                         <Icon className={`w-6 h-6 mx-auto mb-2 ${isSelected ? 'text-white' : 'text-zinc-600'}`} />

@@ -194,7 +194,7 @@ export default function ClubDetailPage() {
     const isMember = !!club.membership;
 
     return (
-        <main className="min-h-screen bg-zinc-50">
+        <main className="min-h-screen bg-zinc-50 pb-20">
             <ClubHeader
                 club={club}
                 currentUserId={currentUserId || undefined}

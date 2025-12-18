@@ -95,11 +95,22 @@ function SubmitForm() {
         setIsSubmitting(true);
 
         try {
-            // TODO: Replace with actual API call
-            // await fetch('/api/reports', { ... })
+            // 調用真實 API
+            const response = await fetch('/api/reports', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    reportType: type,
+                    category,
+                    content,
+                    contactEmail: contact || null,
+                }),
+            });
 
-            // Simulate API delay
-            await new Promise(resolve => setTimeout(resolve, 1500));
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || '提交失敗');
+            }
 
             // Success feedback
             toast({

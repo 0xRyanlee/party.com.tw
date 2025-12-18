@@ -48,13 +48,13 @@ export default function HostManage() {
     const [activeTab, setActiveTab] = useState<TabType>('registrations');
 
     const handleApprove = (applicationId: string) => {
-        console.log('Approving application:', applicationId);
         // TODO: Implement API call
+        void applicationId;
     };
 
     const handleReject = (applicationId: string) => {
-        console.log('Rejecting application:', applicationId);
         // TODO: Implement API call
+        void applicationId;
     };
 
     return (

@@ -268,7 +268,7 @@ export default function DashboardClient({ events }: DashboardClientProps) {
 }
 
 // Sub-component for clean code
-function MetricCard({ title, value, trend, icon: Icon }: { title: string, value: string, trend: string, icon: any }) {
+function MetricCard({ title, value, trend, icon: Icon }: { title: string, value: string, trend: string, icon: React.ComponentType<{ className?: string }> }) {
     return (
         <Card className="rounded-[32px] border-neutral-100 shadow-sm bg-white hover:shadow-lg hover:-translate-y-1 transition-all duration-300">
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">

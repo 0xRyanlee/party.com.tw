@@ -23,6 +23,7 @@ export const metadata: Metadata = {
 };
 
 import { I18nProvider } from "@/lib/i18n";
+import { QueryProvider } from "@/providers/QueryProvider";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileNav from "@/components/MobileNav";
@@ -48,18 +49,20 @@ export default function RootLayout({
       <body
         className={`antialiased`}
       >
-        <I18nProvider>
-          <Header />
-          <div className="pb-[60px] md:pb-0">
-            {children}
-          </div>
-          <Footer />
-          <MobileNav />
-          <Analytics />
-          <GoogleAnalytics />
-          <GoogleOneTap />
-          <PWAInstallPrompt />
-        </I18nProvider>
+        <QueryProvider>
+          <I18nProvider>
+            <Header />
+            <div className="pb-[60px] md:pb-0">
+              {children}
+            </div>
+            <Footer />
+            <MobileNav />
+            <Analytics />
+            <GoogleAnalytics />
+            <GoogleOneTap />
+            <PWAInstallPrompt />
+          </I18nProvider>
+        </QueryProvider>
       </body>
     </html>
   );

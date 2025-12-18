@@ -8,10 +8,12 @@ import { Search, SlidersHorizontal } from 'lucide-react';
 import { mockEvents, tags } from '@/lib/mock-data';
 import CategoryFilter from '@/components/CategoryFilter';
 import PullToRefresh from '@/components/PullToRefresh';
+import { useDebounce } from '@/hooks/use-debounce';
 
 export default function DiscoverPage() {
   const [activeTags, setActiveTags] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const debouncedSearch = useDebounce(searchQuery, 500);
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleToggleTag = (tag: string) => {
@@ -28,7 +30,6 @@ export default function DiscoverPage() {
     await new Promise(resolve => setTimeout(resolve, 1000));
     // 觸發重新渲染
     setRefreshKey(prev => prev + 1);
-    console.log('頁面已刷新');
   }, []);
 
   const filteredEvents = mockEvents.filter(event => {
@@ -40,9 +41,9 @@ export default function DiscoverPage() {
       return false;
     }
 
-    // Filter by search query
-    if (searchQuery) {
-      const query = searchQuery.toLowerCase();
+    // Filter by search query (使用 debounced 值)
+    if (debouncedSearch) {
+      const query = debouncedSearch.toLowerCase();
       return (
         event.title.toLowerCase().includes(query) ||
         event.location.toLowerCase().includes(query) ||

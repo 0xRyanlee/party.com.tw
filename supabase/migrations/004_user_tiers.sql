@@ -1,8 +1,12 @@
 -- User Tiers Migration
 -- Implements Free/Plus membership tiers with activity limits
 
--- Create enum for tier types
-CREATE TYPE user_tier_type AS ENUM ('free', 'plus', 'pro');
+-- Create enum for tier types (safe: skip if already exists)
+DO $$ BEGIN
+    CREATE TYPE user_tier_type AS ENUM ('free', 'plus', 'pro');
+EXCEPTION
+    WHEN duplicate_object THEN null;
+END $$;
 
 -- Create user_tiers table
 CREATE TABLE IF NOT EXISTS user_tiers (
@@ -29,8 +33,8 @@ CREATE TABLE IF NOT EXISTS user_tiers (
 );
 
 -- Create index for faster lookups
-CREATE INDEX idx_user_tiers_user_id ON user_tiers(user_id);
-CREATE INDEX idx_user_tiers_tier ON user_tiers(tier);
+CREATE INDEX IF NOT EXISTS idx_user_tiers_user_id ON user_tiers(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_tiers_tier ON user_tiers(tier);
 
 -- Create function to auto-create free tier for new users
 CREATE OR REPLACE FUNCTION create_default_user_tier()
@@ -44,6 +48,7 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- Trigger to auto-create tier when user signs up
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
 CREATE TRIGGER on_auth_user_created
     AFTER INSERT ON auth.users
     FOR EACH ROW
@@ -134,17 +139,20 @@ $$ LANGUAGE plpgsql;
 -- Enable RLS
 ALTER TABLE user_tiers ENABLE ROW LEVEL SECURITY;
 
--- RLS Policies
+-- RLS Policies (drop if exists first)
+DROP POLICY IF EXISTS "Users can view their own tier" ON user_tiers;
 CREATE POLICY "Users can view their own tier"
     ON user_tiers FOR SELECT
     USING (auth.uid() = user_id);
 
+DROP POLICY IF EXISTS "Users can update their own tier metadata" ON user_tiers;
 CREATE POLICY "Users can update their own tier metadata"
     ON user_tiers FOR UPDATE
     USING (auth.uid() = user_id)
     WITH CHECK (auth.uid() = user_id);
 
--- Admin can manage all tiers (you'll need to implement admin role check)
+-- Admin can manage all tiers
+DROP POLICY IF EXISTS "Admins can manage all tiers" ON user_tiers;
 CREATE POLICY "Admins can manage all tiers"
     ON user_tiers FOR ALL
     USING (

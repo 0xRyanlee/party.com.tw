@@ -75,7 +75,6 @@ export default function VendorProfilePage() {
         setIsSaving(true);
         // TODO: API call to save profile
         await new Promise((resolve) => setTimeout(resolve, 1500));
-        console.log('Saving Vendor Profile:', profile);
         alert(t('vendor.profile.saved'));
         setIsSaving(false);
     };

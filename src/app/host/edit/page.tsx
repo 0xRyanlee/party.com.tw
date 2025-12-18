@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
+import { useRouter } from 'next/navigation';
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import LoadingButton from "@/components/LoadingButton";
@@ -20,7 +21,7 @@ import LocationPicker from "@/components/host/LocationPicker";
 import ExternalLinks from "@/components/host/ExternalLinks";
 import { Calendar, MapPin, Clock, Info, Tag, Briefcase } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
-import { EventRole, EventResource } from "@/types/schema";
+import { EventRole, EventResource, TicketType } from "@/types/schema";
 
 // Zod Schema
 const eventSchema = z.object({
@@ -46,6 +47,7 @@ type EventFormValues = z.infer<typeof eventSchema>;
 
 export default function HostEdit() {
     const { t } = useLanguage();
+    const router = useRouter();
 
     // Collaboration state
     const [roles, setRoles] = useState<Omit<EventRole, 'id' | 'eventId' | 'createdAt'>[]>([]);
@@ -57,8 +59,9 @@ export default function HostEdit() {
     const [isAdultOnly, setIsAdultOnly] = useState(false);
     const [invitationCode, setInvitationCode] = useState<string>('');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
-    const [advancedTickets, setAdvancedTickets] = useState<any[]>([]);
+    const [advancedTickets, setAdvancedTickets] = useState<TicketType[]>([]);
     const [ticketingEnabled, setTicketingEnabled] = useState(true); // 票務功能開關
+    const [mediaEnabled, setMediaEnabled] = useState(true); // 媒體素材開關
     const [duration, setDuration] = useState(2); // 活動時長（小時）
     const [location, setLocation] = useState<{ name: string; address: string; lat?: number; lng?: number }>({ name: '', address: '' });
     const [externalLinks, setExternalLinks] = useState<string[]>([]); // 外部連結多選
@@ -89,7 +92,6 @@ export default function HostEdit() {
 
     const onSubmit = async (data: EventFormValues) => {
         try {
-            console.log("Submitting Event Data:", data);
 
             // 驗證並準備日期時間
             let startTime: string;
@@ -188,7 +190,8 @@ export default function HostEdit() {
             }
 
             alert("活動已成功建立！");
-            // TODO: 導航到活動詳情頁或主辦方儀表板
+            // 導航到主辦方儀表板
+            router.push('/host/dashboard');
         } catch (error: any) {
             console.error('Error saving event:', error);
             alert(error.message || '儲存活動失敗，請稍後再試');
@@ -275,6 +278,9 @@ export default function HostEdit() {
                         <ImageUploader
                             value={watch("image")}
                             onChange={(val) => setValue("image", val)}
+                            enabled={mediaEnabled}
+                            onEnabledChange={setMediaEnabled}
+                            showToggle={true}
                         />
                     </div>
 

@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendTemplateEmail } from '@/lib/email';
 
 // POST /api/events/[eventId]/registrations - Create a new registration
 export async function POST(
@@ -115,7 +116,14 @@ export async function POST(
             );
         }
 
-        // TODO: Send confirmation email
+        // 發送確認郵件
+        if (attendee_email) {
+            sendTemplateEmail(attendee_email, 'registration_confirmation', {
+                eventTitle: event.title,
+                eventDate: new Date().toLocaleString('zh-TW'),
+                eventLocation: '活動地點',
+            }).catch(err => console.error('Email send failed:', err));
+        }
 
         return NextResponse.json({
             registration,

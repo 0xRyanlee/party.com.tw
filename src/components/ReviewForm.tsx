@@ -41,8 +41,28 @@ export default function ReviewForm({ eventId, onSubmit, onCancel }: ReviewFormPr
             isAnonymous,
         };
 
-        // TODO: API 提交
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // API 提交
+        try {
+            const response = await fetch('/api/reviews', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    eventId,
+                    rating,
+                    title,
+                    content,
+                    isAnonymous,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error('提交失敗');
+            }
+        } catch (error) {
+            console.error('Review submit error:', error);
+            setIsSubmitting(false);
+            return;
+        }
 
         onSubmit?.(reviewData);
         setIsSubmitting(false);

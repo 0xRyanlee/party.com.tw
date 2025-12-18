@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server';
 import { NextRequest, NextResponse } from 'next/server';
+import { sendTemplateEmail } from '@/lib/email';
 
 // DELETE /api/events/[eventId]/registrations/[registrationId] - Cancel a registration
 export async function DELETE(
@@ -59,7 +60,12 @@ export async function DELETE(
             );
         }
 
-        // TODO: Send cancellation email
+        // 發送取消郵件
+        if (registration.attendee_email) {
+            sendTemplateEmail(registration.attendee_email, 'registration_cancelled', {
+                eventTitle: '活動',
+            }).catch(err => console.error('Email send failed:', err));
+        }
 
         return NextResponse.json({
             message: 'Registration cancelled successfully',

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
+import { sendTemplateEmail } from '@/lib/email';
 
 /**
  * PATCH /api/applications/[applicationId]
@@ -62,7 +63,14 @@ export async function PATCH(
             throw error;
         }
 
-        // TODO: 發送通知給申請者
+        // 發送通知給申請者
+        if (application.email) {
+            const template = status === 'approved' ? 'application_approved' : 'application_rejected';
+            sendTemplateEmail(application.email, template, {
+                eventTitle: '活動',
+                roleName: application.role_name || '參與者',
+            }).catch(err => console.error('Email send failed:', err));
+        }
 
         return NextResponse.json({ application: data });
     } catch (error: any) {

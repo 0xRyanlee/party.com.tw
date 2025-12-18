@@ -33,10 +33,15 @@ export default async function ManageEventPage({
         redirect('/host/dashboard');
     }
 
-    // Fetch registrations count (placeholder - will implement in Phase 12)
-    const registeredCount = event.registered_count || 0;
-    const checkedInCount = 0; // TODO: Implement in Phase 12
-    const waitlistCount = 0; // TODO: Implement in Phase 12
+    // Fetch registration stats
+    const { data: registrations } = await supabase
+        .from('registrations')
+        .select('status, checked_in')
+        .eq('event_id', params.eventId);
+
+    const registeredCount = registrations?.filter(r => r.status === 'confirmed').length || 0;
+    const checkedInCount = registrations?.filter(r => r.checked_in === true).length || 0;
+    const waitlistCount = registrations?.filter(r => r.status === 'waitlist').length || 0;
 
     return (
         <Suspense fallback={<div>載入中...</div>}>

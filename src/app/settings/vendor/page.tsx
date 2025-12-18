@@ -73,10 +73,25 @@ export default function VendorProfilePage() {
 
     const handleSave = async () => {
         setIsSaving(true);
-        // TODO: API call to save profile
-        await new Promise((resolve) => setTimeout(resolve, 1500));
-        alert(t('vendor.profile.saved'));
-        setIsSaving(false);
+        try {
+            const response = await fetch('/api/vendor/profile', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(profile),
+            });
+
+            if (!response.ok) {
+                const data = await response.json();
+                throw new Error(data.error || '儲存失敗');
+            }
+
+            alert(t('vendor.profile.saved'));
+        } catch (error) {
+            console.error('Save error:', error);
+            alert('儲存失敗，請稍後再試');
+        } finally {
+            setIsSaving(false);
+        }
     };
 
     const serviceCategories = [
@@ -203,10 +218,9 @@ export default function VendorProfilePage() {
                             </div>
                         ) : (
                             <div
-                                onClick={() => setProfile({ ...profile, coverImages: ['placeholder1', 'placeholder2', 'placeholder3'] })}
-                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-gray-400 transition-colors cursor-pointer"
+                                className="border-2 border-dashed border-gray-300 rounded-xl p-8 text-center hover:border-gray-400 transition-colors cursor-pointer group"
                             >
-                                <Camera className="w-10 h-10 mx-auto mb-3 text-gray-400" />
+                                <Camera className="w-10 h-10 mx-auto mb-3 text-gray-400 group-hover:text-gray-600 transition-colors" />
                                 <p className="font-medium text-gray-600">點擊上傳封面圖片</p>
                                 <p className="text-sm text-gray-400 mt-1">建議尺寸 1200 x 800，最多 5 張</p>
                             </div>

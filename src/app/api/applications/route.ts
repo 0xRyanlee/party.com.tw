@@ -89,7 +89,8 @@ export async function POST(request: NextRequest) {
 export async function GET(request: NextRequest) {
     const supabase = await createClient();
     const { searchParams } = new URL(request.url);
-    const status = searchParams.get('status'); // 可選篩選
+    const status = searchParams.get('status');
+    const isHost = searchParams.get('isHost') === 'true';
 
     try {
         // 驗證用戶
@@ -102,18 +103,38 @@ export async function GET(request: NextRequest) {
             return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
         }
 
-        let query = supabase
-            .from('applications')
-            .select(
-                `
-        *,
-        event:events(id, title, start_time, status),
-        role:event_roles(id, role_type, budget_min, budget_max),
-        resource:event_resources(id, resource_type, description)
-      `
-            )
-            .eq('user_id', user.id)
-            .order('created_at', { ascending: false });
+        let query;
+
+        if (isHost) {
+            // 作為主辦方，獲取自己活動的所有申請
+            query = supabase
+                .from('applications')
+                .select(
+                    `
+                        *,
+                        event:events!inner(id, title, start_time, status, organizer_id),
+                        applicant:profiles!applications_user_id_fkey(id, full_name, avatar_url, email),
+                        role:event_roles(id, role_type),
+                        resource:event_resources(id, resource_type)
+                    `
+                )
+                .eq('events.organizer_id', user.id);
+        } else {
+            // 作為申請者，獲取自己的申請
+            query = supabase
+                .from('applications')
+                .select(
+                    `
+                        *,
+                        event:events(id, title, start_time, status),
+                        role:event_roles(id, role_type, budget_min, budget_max),
+                        resource:event_resources(id, resource_type, description)
+                    `
+                )
+                .eq('user_id', user.id);
+        }
+
+        query = query.order('created_at', { ascending: false });
 
         if (status) {
             query = query.eq('status', status);

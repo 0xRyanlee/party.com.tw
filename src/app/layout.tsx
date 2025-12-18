@@ -28,6 +28,7 @@ import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import MobileNav from "@/components/MobileNav";
 import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import GoogleOneTap from "@/components/GoogleOneTap";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
@@ -58,6 +59,7 @@ export default function RootLayout({
             <Footer />
             <MobileNav />
             <Analytics />
+            <SpeedInsights />
             <GoogleAnalytics />
             <GoogleOneTap />
             <PWAInstallPrompt />

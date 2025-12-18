@@ -1,5 +1,6 @@
 import { NormalizedEvent } from "./types";
 import { createHash } from "crypto";
+import { createClient } from "@/lib/supabase/server";
 
 export type EventStatus = 'draft' | 'verified' | 'published' | 'rejected';
 
@@ -20,17 +21,19 @@ export class CrawlerWorkflow {
         return createHash('md5').update(data).digest('hex');
     }
 
-    /**
-     * Checks if the event is a duplicate.
-     * In a real app, this would query the database.
-     * For MVP, we'll use an in-memory Set.
-     */
-    private existingHashes = new Set<string>();
-
     async isDuplicate(hash: string): Promise<boolean> {
-        // TODO: Replace with DB query
-        // const existing = await supabase.from('events').select('id').eq('hash', hash).single();
-        return this.existingHashes.has(hash);
+        const supabase = await createClient();
+        const { data, error } = await supabase
+            .from('events')
+            .select('id')
+            .eq('crawler_hash', hash)
+            .maybeSingle();
+
+        if (error) {
+            console.error('Error checking duplicate event:', error);
+            return false;
+        }
+        return !!data;
     }
 
     /**
@@ -46,8 +49,6 @@ export class CrawlerWorkflow {
             console.log(`Duplicate event found: ${event.title}`);
             return null;
         }
-
-        this.existingHashes.add(hash);
 
         return {
             ...event,

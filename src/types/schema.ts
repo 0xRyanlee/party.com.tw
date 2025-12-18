@@ -103,3 +103,13 @@ export interface Application {
     status: ApplicationStatus;
     createdAt: string;
 }
+
+export interface TicketType {
+    id: string;
+    name: string;
+    price: number;
+    quantity: number;
+    includeMeal: boolean;
+    description?: string;
+}
+

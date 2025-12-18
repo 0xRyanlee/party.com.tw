@@ -10,8 +10,8 @@ export async function GET(request: NextRequest) {
     const code = searchParams.get('code');
     const error = searchParams.get('error');
 
-    console.log('🔵 LINE callback triggered');
-    console.log('🔑 Code present:', code ? 'YES' : 'NO');
+    // console.log('🔵 LINE callback triggered');
+    // console.log('🔑 Code present:', code ? 'YES' : 'NO');
 
     if (error) {
         console.error('❌ LINE auth error:', error);
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
     try {
         // 1. Exchange code for access token
-        console.log('📡 Exchanging code for token...');
+        // console.log('📡 Exchanging code for token...');
         const tokenResponse = await fetch('https://api.line.me/oauth2/v2.1/token', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
@@ -46,10 +46,10 @@ export async function GET(request: NextRequest) {
 
         const tokenData = await tokenResponse.json();
         const { access_token } = tokenData;
-        console.log('✅ Got access token');
+        // console.log('✅ Got access token');
 
         // 2. Get user profile
-        console.log('👤 Fetching user profile...');
+        // console.log('👤 Fetching user profile...');
         const profileResponse = await fetch('https://api.line.me/v2/profile', {
             headers: { Authorization: `Bearer ${access_token}` },
         });
@@ -60,7 +60,7 @@ export async function GET(request: NextRequest) {
 
         const profile = await profileResponse.json();
         const { userId, displayName, pictureUrl } = profile;
-        console.log('✅ Got user profile:', displayName);
+        // console.log('✅ Got user profile:', displayName);
 
         // 3. Create Supabase client
         const supabase = await createClient();
@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
         const email = `${userId}@line.party.com.tw`;
         const password = userId; // 使用 LINE user ID 作為密碼
 
-        console.log('🔐 Attempting Supabase auth...');
+        // console.log('🔐 Attempting Supabase auth...');
 
         // 嘗試登入
         let { data: authData, error: signInError } = await supabase.auth.signInWithPassword({
@@ -79,7 +79,7 @@ export async function GET(request: NextRequest) {
 
         // 如果用戶不存在，創建新用戶
         if (signInError?.message.includes('Invalid login credentials')) {
-            console.log('📝 Creating new user...');
+            // console.log('📝 Creating new user...');
             const { data: signUpData, error: signUpError } = await supabase.auth.signUp({
                 email,
                 password,
@@ -99,17 +99,17 @@ export async function GET(request: NextRequest) {
                 throw signUpError;
             }
             authData = signUpData as any;
-            console.log('✅ New user created');
+            // console.log('✅ New user created');
         } else if (signInError) {
             console.error('❌ Sign in error:', signInError);
             throw signInError;
         } else {
-            console.log('✅ User signed in');
+            // console.log('✅ User signed in');
         }
 
         // 5. 更新或創建 profile
         if (authData.user) {
-            console.log('💾 Updating profile...');
+            // console.log('💾 Updating profile...');
             const { error: profileError } = await supabase
                 .from('profiles')
                 .upsert({
@@ -124,7 +124,7 @@ export async function GET(request: NextRequest) {
                 console.error('⚠️  Profile update error:', profileError);
                 // 不拋出錯誤，因為主要的認證已經成功
             } else {
-                console.log('✅ Profile updated');
+                // console.log('✅ Profile updated');
             }
         }
 

@@ -51,6 +51,7 @@ export interface Event {
     // Source information for aggregated events
     sourceUrl?: string;  // Original URL where event was sourced from
     sourceName?: string; // Name of the source platform (e.g., "Meetup", "Accupass")
+    content_images?: string[]; // Additional content images (max 3, plus main image = 4 total)
 }
 
 export const mockEvents: Event[] = [

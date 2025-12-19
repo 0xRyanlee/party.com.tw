@@ -35,6 +35,7 @@ export default function RegistrationModal({
     const [loading, setLoading] = useState(false);
     const [success, setSuccess] = useState(false);
     const [error, setError] = useState('');
+    const [checkinCode, setCheckinCode] = useState<string | null>(null);
 
     const [formData, setFormData] = useState({
         attendee_name: '',
@@ -62,19 +63,10 @@ export default function RegistrationModal({
             }
 
             setSuccess(true);
+            setCheckinCode(result.checkin_code || null);
 
-            // Close modal and refresh after 2 seconds
-            setTimeout(() => {
-                router.refresh();
-                onClose();
-                setSuccess(false);
-                setFormData({
-                    attendee_name: '',
-                    attendee_email: '',
-                    attendee_phone: '',
-                    ticket_type_id: ticketTypes[0]?.name || '',
-                });
-            }, 2000);
+            // Let user see the code, don't auto-close too fast
+            // Or remove auto-close to let them screenshot
 
         } catch (err: any) {
             setError(err.message);
@@ -101,12 +93,35 @@ export default function RegistrationModal({
                 </DialogHeader>
 
                 {success ? (
-                    <div className="py-8 text-center">
-                        <CheckCircle className="w-16 h-16 mx-auto mb-4 text-green-600" />
-                        <h3 className="text-xl font-bold mb-2">報名成功！</h3>
-                        <p className="text-gray-600">
-                            確認郵件已發送到您的信箱
-                        </p>
+                    <div className="py-8 text-center space-y-6">
+                        <div className="flex flex-col items-center">
+                            <CheckCircle className="w-16 h-16 mb-4 text-green-600" />
+                            <h3 className="text-2xl font-bold mb-1">報名成功！</h3>
+                            <p className="text-neutral-500 text-sm">
+                                確認郵件已發送到您的信箱
+                            </p>
+                        </div>
+
+                        {checkinCode && (
+                            <div className="bg-neutral-50 p-6 rounded-[32px] border border-neutral-100 space-y-3">
+                                <p className="text-xs font-bold text-neutral-400 uppercase tracking-widest">您的專屬簽到碼</p>
+                                <div className="text-4xl font-black font-mono tracking-[0.3em] text-neutral-900 border-b-2 border-neutral-200 pb-2 inline-block">
+                                    {checkinCode}
+                                </div>
+                                <p className="text-xs text-neutral-500">請妥善保存，於活動現場向主辦方出示</p>
+                            </div>
+                        )}
+
+                        <Button
+                            onClick={() => {
+                                router.refresh();
+                                onClose();
+                                setSuccess(false);
+                            }}
+                            className="w-full rounded-full h-12 bg-neutral-900 font-bold"
+                        >
+                            完成
+                        </Button>
                     </div>
                 ) : (
                     <form onSubmit={handleSubmit} className="space-y-4 py-4">

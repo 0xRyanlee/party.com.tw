@@ -13,6 +13,7 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
 
     // Get current user
     const { data: { user } } = await supabase.auth.getUser();
+    const currentUserId = user?.id || '';
 
     const { data: dbEvent, error } = await supabase
         .from('events')
@@ -93,7 +94,10 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
         <EventDetailClient
             event={event}
             isLoggedIn={!!user}
+            currentUserId={currentUserId}
             initialIsRegistered={isRegistered}
+            rawStartTime={dbEvent.start_time}
+            rawEndTime={dbEvent.end_time || dbEvent.start_time}
         />
     );
 }

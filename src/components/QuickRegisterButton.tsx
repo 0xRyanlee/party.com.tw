@@ -56,7 +56,10 @@ export default function QuickRegisterButton({
 
             if (result.success) {
                 setState('success');
-                toast.success(result.message || 'Successfully registered!');
+                const successMsg = result.checkin_code
+                    ? `報名成功！簽到碼：${result.checkin_code}`
+                    : result.message || 'Successfully registered!';
+                toast.success(successMsg);
                 onSuccess?.();
             } else {
                 setState('error');

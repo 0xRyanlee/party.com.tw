@@ -6,8 +6,11 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe, Instagram, Linkedin, ChevronLeft, ChevronRight, Image, MapPin } from 'lucide-react';
+import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe, Instagram, Linkedin, ChevronLeft, ChevronRight, Image, MapPin, ExternalLink } from 'lucide-react';
 import LocationPicker from "@/components/host/LocationPicker";
+import { useEffect } from 'react';
+import { useUser } from '@/hooks/useUser';
+import Link from 'next/link';
 
 export default function VendorProfilePage() {
     const { t } = useLanguage();
@@ -38,6 +41,53 @@ export default function VendorProfilePage() {
     });
 
     const [isSaving, setIsSaving] = useState(false);
+    const { user } = useUser();
+
+    useEffect(() => {
+        const fetchProfile = async () => {
+            try {
+                const response = await fetch('/api/vendor/profile');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.profile) {
+                        const p = data.profile;
+                        setProfile({
+                            displayName: p.display_name || '',
+                            bio: p.bio || '',
+                            location: {
+                                name: p.location_name || '',
+                                address: p.location_address || '',
+                                lat: p.location_lat || 0,
+                                lng: p.location_lng || 0
+                            },
+                            categories: p.categories || [],
+                            coverImages: p.cover_images || [],
+                            portfolio: p.portfolio || [],
+                            contact: {
+                                email: p.contact_email || '',
+                                phone: p.contact_phone || '',
+                                website: p.contact_website || '',
+                            },
+                            socialLinks: {
+                                instagram: p.social_instagram || '',
+                                linkedin: p.social_linkedin || '',
+                                threads: p.social_threads || '',
+                            },
+                            services: p.services || [],
+                            pricing: {
+                                min: p.pricing_min?.toString() || '',
+                                max: p.pricing_max?.toString() || '',
+                                currency: p.pricing_currency || 'TWD',
+                            },
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error('Fetch profile error:', error);
+            }
+        };
+        fetchProfile();
+    }, []);
 
     const handleCategoryToggle = (category: string) => {
         setProfile((prev) => ({
@@ -115,14 +165,24 @@ export default function VendorProfilePage() {
                         <h1 className="text-2xl font-bold">{t('vendor.profile.title')}</h1>
                         <p className="text-sm text-gray-500">{t('vendor.profile.subtitle')}</p>
                     </div>
-                    <Button
-                        onClick={handleSave}
-                        disabled={isSaving}
-                        className="bg-black hover:bg-gray-800 text-white rounded-full px-6"
-                    >
-                        <Save className="w-4 h-4 mr-2" />
-                        {isSaving ? t('vendor.profile.saving') : t('vendor.profile.saveButton')}
-                    </Button>
+                    <div className="flex gap-3">
+                        {user && (
+                            <Link href={`/vendor/${user.id}`} target="_blank">
+                                <Button variant="outline" className="rounded-full border-neutral-200">
+                                    <ExternalLink className="w-4 h-4 mr-2" />
+                                    查看公開頁面
+                                </Button>
+                            </Link>
+                        )}
+                        <Button
+                            onClick={handleSave}
+                            disabled={isSaving}
+                            className="bg-black hover:bg-gray-800 text-white rounded-full px-6"
+                        >
+                            <Save className="w-4 h-4 mr-2" />
+                            {isSaving ? t('vendor.profile.saving') : t('vendor.profile.saveButton')}
+                        </Button>
+                    </div>
                 </div>
             </div>
 

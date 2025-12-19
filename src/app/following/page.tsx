@@ -107,7 +107,10 @@ export default function FollowingPage() {
                                             <Badge variant="outline" className="text-[10px] uppercase tracking-wider h-5 px-1.5 border-neutral-200 text-neutral-400">Host</Badge>
                                         </div>
                                         <div className="flex items-center gap-3 mt-1">
-                                            <button className="text-xs text-neutral-400 hover:text-neutral-600 flex items-center gap-1 transition-colors">
+                                            <button
+                                                onClick={() => window.location.href = `mailto:contact@party.com?subject=Inquiry to ${item.following.full_name}`}
+                                                className="text-xs text-neutral-400 hover:text-neutral-600 flex items-center gap-1 transition-colors"
+                                            >
                                                 <MessageCircle className="w-3 h-3" />
                                                 聯絡
                                             </button>

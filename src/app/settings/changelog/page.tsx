@@ -10,6 +10,22 @@ export default function ChangelogPage() {
 
     const logs = [
         {
+            version: "2.0.0",
+            date: "2024-12-20",
+            title: "票夾與導航重構 + 合規頁面",
+            features: [
+                "全新導航結構：首頁-活動-票夾-社群-我的",
+                "票夾頁面 (/wallet)：管理所有票券、4 種狀態分類",
+                "票券詳情 Modal：QR Code、簽到碼、轉送入口",
+                "內嵌兌換功能：支援 URL 參數自動填入",
+                "分享通路追蹤：自定義 1-3 個推廣渠道",
+                "活動管理新增「推廣追蹤」分頁",
+                "法律頁面雙語化：服務條款/隱私政策/免責聲明",
+                "新增金流服務聲明頁面 (/payment-terms)",
+            ],
+            type: "major"
+        },
+        {
             version: "1.1.0",
             date: "2024-12-16",
             title: "12/16 更新",

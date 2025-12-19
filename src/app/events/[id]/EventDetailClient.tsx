@@ -14,15 +14,28 @@ import AuthModal from '@/components/AuthModal';
 import StructuredImage from '@/components/common/StructuredImage';
 import EventReviews from '@/components/EventReviews';
 import { useEffect } from 'react';
+import { useBrowsingHistory } from '@/hooks/useBrowsingHistory';
+import ChatRoom from '@/components/ChatRoom';
 
 interface EventDetailClientProps {
     event: Event;
     isLoggedIn: boolean;
+    currentUserId: string;
     initialIsRegistered: boolean;
+    rawStartTime: string;
+    rawEndTime: string;
 }
 
-export default function EventDetailClient({ event, isLoggedIn, initialIsRegistered }: EventDetailClientProps) {
+export default function EventDetailClient({
+    event,
+    isLoggedIn,
+    currentUserId,
+    initialIsRegistered,
+    rawStartTime,
+    rawEndTime
+}: EventDetailClientProps) {
     const { t } = useLanguage();
+    const [activeTab, setActiveTab] = useState<'info' | 'chat'>('info');
     const [showRegistrationModal, setShowRegistrationModal] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isRegistered, setIsRegistered] = useState(initialIsRegistered);
@@ -53,6 +66,14 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
         }
     };
 
+    const { history, addToHistory } = useBrowsingHistory();
+
+    const now = new Date();
+    const startTime = new Date(rawStartTime);
+    const endTime = new Date(rawEndTime);
+    const windowStart = new Date(startTime.getTime() - 24 * 60 * 60 * 1000);
+    const windowEnd = new Date(endTime.getTime() + 24 * 60 * 60 * 1000);
+
     useEffect(() => {
         const checkFollowStatus = async () => {
             if (isLoggedIn && event.organizer.id) {
@@ -69,7 +90,19 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
         };
 
         checkFollowStatus();
-    }, [isLoggedIn, event.organizer.id]);
+
+        // Add to browsing history
+        if (event) {
+            addToHistory({
+                id: event.id,
+                title: event.title,
+                image: event.image,
+                date: event.date,
+                location: event.location,
+                tags: event.tags,
+            });
+        }
+    }, [isLoggedIn, event.organizer.id, event, addToHistory]);
 
     // Swiss Vibe: Large radii, monochrome palette, high contrast
     return (
@@ -161,62 +194,178 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                     </div>
                 </div>
 
+                <div className="flex items-center gap-1 mt-6 border-b border-neutral-100 overflow-x-auto scrollbar-hide">
+                    <button
+                        onClick={() => setActiveTab('info')}
+                        className={`px-6 py-3 text-sm font-bold tracking-tight border-b-2 transition-all shrink-0 ${activeTab === 'info'
+                            ? 'border-neutral-900 text-neutral-900'
+                            : 'border-transparent text-neutral-400 hover:text-neutral-600'
+                            }`}
+                    >
+                        活動詳情
+                    </button>
+                    {((isRegistered && now >= windowStart && now <= windowEnd) ||
+                        (isLoggedIn && currentUserId === event.organizer.id)) && (
+                            <button
+                                onClick={() => setActiveTab('chat')}
+                                className={`px-6 py-3 text-sm font-bold tracking-tight border-b-2 transition-all shrink-0 flex items-center gap-2 ${activeTab === 'chat'
+                                    ? 'border-neutral-900 text-neutral-900'
+                                    : 'border-transparent text-neutral-400 hover:text-neutral-600'
+                                    }`}
+                            >
+                                Room 303 <span className={`flex h-2 w-2 rounded-full ${now > windowEnd ? 'bg-neutral-400' : 'bg-green-500'}`} />
+                            </button>
+                        )}
+                </div>
+
                 <div className="grid lg:grid-cols-12 gap-8 mt-8">
-                    {/* Left Column: Details */}
+                    {/* Left Column: Details or Chat */}
                     <div className="lg:col-span-8 space-y-8">
-                        {/* Info Cards */}
-                        <div className="grid sm:grid-cols-2 gap-4">
-                            <div className="bg-neutral-50 p-6 rounded-3xl border border-neutral-100 flex items-start gap-4 hover:bg-neutral-100 transition-colors">
-                                <div className="w-12 h-12 rounded-full bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 shrink-0 shadow-sm">
-                                    <Calendar className="w-5 h-5" />
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="font-bold text-base text-neutral-900">日期與時間</h3>
-                                    <p className="text-neutral-600 font-medium">{event.fullDate}</p>
-                                    <p className="text-neutral-500">{event.time}</p>
-                                </div>
-                            </div>
-                            <div className="bg-neutral-50 p-6 rounded-3xl border border-neutral-100 flex items-start gap-4 hover:bg-neutral-100 transition-colors">
-                                <div className="w-12 h-12 rounded-full bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 shrink-0 shadow-sm">
-                                    <MapPin className="w-5 h-5" />
-                                </div>
-                                <div className="space-y-1">
-                                    <h3 className="font-bold text-base text-neutral-900">地點</h3>
-                                    <p className="text-neutral-600 font-medium leading-relaxed">{event.location}</p>
-                                    <p className="text-xs text-neutral-400 font-medium uppercase tracking-wide">View on Map</p>
-                                </div>
-                            </div>
-                        </div>
+                        {activeTab === 'info' ? (
+                            <>
+                                {/* Card 1: Basic Info - 基本訊息 */}
+                                <div className="bg-white p-6 md:p-8 rounded-3xl border border-neutral-100 shadow-sm space-y-6">
+                                    <h2 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
+                                        基本訊息
+                                    </h2>
 
-                        {/* Description */}
-                        <div className="space-y-6 bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm">
-                            <h2 className="text-2xl font-bold tracking-tight text-neutral-900">關於活動</h2>
-                            <div className="prose prose-neutral max-w-none text-neutral-600 whitespace-pre-line leading-relaxed">
-                                {event.description}
-                            </div>
-                            {/* CTA at the bottom of description */}
-                            <div className="pt-4 border-t border-neutral-100">
-                                <QuickRegisterButton
-                                    eventId={event.id}
-                                    eventTitle={event.title}
-                                    isLoggedIn={isLoggedIn}
-                                    isAlreadyRegistered={isRegistered}
-                                    onLoginRequired={() => setIsAuthModalOpen(true)}
-                                    onSuccess={() => setIsRegistered(true)}
-                                    size="lg"
-                                    className="w-full md:w-auto rounded-full px-8"
-                                />
-                            </div>
-                        </div>
+                                    {/* Info Grid */}
+                                    <div className="grid grid-cols-2 gap-4">
+                                        {/* Date & Time */}
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
+                                                <Calendar className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-neutral-500">時間</p>
+                                                <p className="font-semibold text-neutral-900">{event.fullDate}</p>
+                                                <p className="text-sm text-neutral-600">{event.time}</p>
+                                            </div>
+                                        </div>
 
-                        {/* Reviews Section */}
-                        <div className="pt-8 border-t border-neutral-100">
-                            <EventReviews
+                                        {/* Capacity */}
+                                        <div className="flex items-start gap-3">
+                                            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
+                                                <Clock className="w-4 h-4" />
+                                            </div>
+                                            <div>
+                                                <p className="text-sm text-neutral-500">人數</p>
+                                                <p className="font-semibold text-neutral-900">{event.attendees} 人已報名</p>
+                                                {event.capacity && (
+                                                    <p className="text-sm text-neutral-600">剩餘 {event.capacity - (event.attendees || 0)} 席</p>
+                                                )}
+                                            </div>
+                                        </div>
+
+                                        {/* Location */}
+                                        <div className="flex items-start gap-3 col-span-2">
+                                            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
+                                                <MapPin className="w-4 h-4" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="text-sm text-neutral-500">地點</p>
+                                                <p className="font-semibold text-neutral-900">{event.location}</p>
+                                                <button className="text-xs text-neutral-500 hover:text-neutral-700 font-medium mt-1 underline">
+                                                    在地圖上查看
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {/* Tags */}
+                                    {event.tags && event.tags.length > 0 && (
+                                        <div className="pt-4 border-t border-neutral-100">
+                                            <p className="text-sm text-neutral-500 mb-2">標籤</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {event.tags.map((tag: string) => (
+                                                    <span key={tag} className="px-3 py-1 bg-neutral-100 text-neutral-700 rounded-full text-sm font-medium">
+                                                        {tag}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* Conditions/Attributes */}
+                                    {event.attributes && event.attributes.length > 0 && (
+                                        <div className="pt-4 border-t border-neutral-100">
+                                            <p className="text-sm text-neutral-500 mb-2">報名條件</p>
+                                            <div className="flex flex-wrap gap-2">
+                                                {event.attributes.map((attr: string) => (
+                                                    <span key={attr} className="px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-sm font-medium">
+                                                        {attr}
+                                                    </span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {/* Card 2: Details - 詳情介紹 */}
+                                <div className="bg-white p-6 md:p-8 rounded-3xl border border-neutral-100 shadow-sm space-y-6">
+                                    <h2 className="text-xl font-bold tracking-tight text-neutral-900">詳情介紹</h2>
+
+                                    {/* Description */}
+                                    <div className="prose prose-neutral max-w-none text-neutral-600 whitespace-pre-line leading-relaxed">
+                                        {event.description}
+                                    </div>
+
+                                    {/* Content Images Gallery (max 3 images) */}
+                                    {event.content_images && event.content_images.length > 0 && (
+                                        <div className="pt-4 border-t border-neutral-100">
+                                            <p className="text-sm text-neutral-500 mb-3">活動照片</p>
+                                            <div className={`grid gap-3 ${event.content_images.length === 1 ? 'grid-cols-1' :
+                                                event.content_images.length === 2 ? 'grid-cols-2' :
+                                                    'grid-cols-3'
+                                                }`}>
+                                                {event.content_images.slice(0, 3).map((img: string, idx: number) => (
+                                                    <div key={idx} className="aspect-video rounded-2xl overflow-hidden bg-neutral-100">
+                                                        <StructuredImage
+                                                            src={img}
+                                                            alt={`${event.title} 照片 ${idx + 1}`}
+                                                            size="card"
+                                                            aspectRatio="auto"
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    {/* CTA at the bottom */}
+                                    <div className="pt-4 border-t border-neutral-100">
+                                        <QuickRegisterButton
+                                            eventId={event.id}
+                                            eventTitle={event.title}
+                                            isLoggedIn={isLoggedIn}
+                                            isAlreadyRegistered={isRegistered}
+                                            onLoginRequired={() => setIsAuthModalOpen(true)}
+                                            onSuccess={() => setIsRegistered(true)}
+                                            size="lg"
+                                            className="w-full md:w-auto rounded-full px-8"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* Reviews Section */}
+                                <div className="pt-8 border-t border-neutral-100">
+                                    <EventReviews
+                                        eventId={event.id}
+                                        isLoggedIn={isLoggedIn}
+                                        canReview={isLoggedIn && isRegistered}
+                                    />
+                                </div>
+                            </>
+                        ) : (
+                            <ChatRoom
                                 eventId={event.id}
-                                isLoggedIn={isLoggedIn}
-                                canReview={isLoggedIn && isRegistered}
+                                currentUserId={currentUserId}
+                                eventStartTime={rawStartTime}
+                                eventEndTime={rawEndTime}
+                                isOrganizer={isLoggedIn && currentUserId === event.organizer.id}
                             />
-                        </div>
+                        )}
                     </div>
 
                     {/* Right Column: Sidebar */}
@@ -231,7 +380,9 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                                 />
                                 <div>
                                     <div className="flex items-center gap-1.5">
-                                        <h4 className="font-bold text-lg text-neutral-900">{event.organizer.name}</h4>
+                                        <Link href={`/vendor/${event.organizer.id}`} className="hover:underline">
+                                            <h4 className="font-bold text-lg text-neutral-900">{event.organizer.name}</h4>
+                                        </Link>
                                         {event.organizer.verified && (
                                             <CheckCircle2 className="w-4 h-4 text-neutral-900" />
                                         )}

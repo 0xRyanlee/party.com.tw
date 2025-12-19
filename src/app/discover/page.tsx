@@ -9,6 +9,7 @@ import { mockEvents, tags } from '@/lib/mock-data';
 import CategoryFilter from '@/components/CategoryFilter';
 import PullToRefresh from '@/components/PullToRefresh';
 import { useDebounce } from '@/hooks/use-debounce';
+import DiscoveryRecommendations from '@/components/DiscoveryRecommendations';
 
 export default function DiscoverPage() {
   const [activeTags, setActiveTags] = useState<string[]>([]);
@@ -80,6 +81,13 @@ export default function DiscoverPage() {
             onToggleTag={handleToggleTag}
           />
         </div>
+
+        {/* Personality Recommendations */}
+        {!searchQuery && activeTags.length === 0 && (
+          <div className="mb-8">
+            <DiscoveryRecommendations />
+          </div>
+        )}
 
         {/* Events Grid */}
         <div className="px-4 sm:px-0">

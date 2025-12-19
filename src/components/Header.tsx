@@ -13,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Plus, Globe, LogOut, Calendar, Settings, User, Users } from 'lucide-react';
+import { Search, Plus, Globe, LogOut, Calendar, Settings, User, Users, Ticket } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import AuthModal from '@/components/AuthModal';
 import { useLanguage } from '@/lib/i18n';
@@ -34,13 +34,13 @@ export default function Header() {
         router.refresh();
     };
 
-    // Navigation items with active state logic
+    // Navigation items with active state logic - 並列結構
     const navItems = [
         { href: '/', label: '首頁', matchExact: true },
         { href: '/events', label: '活動', matchExact: false },
-        { href: '/club', label: '社團', matchExact: false },
-        { href: '/following', label: '追蹤', matchExact: true },
-        { href: '/settings', label: '設定', matchExact: true },
+        { href: '/wallet', label: '票夾', matchExact: true },
+        { href: '/club', label: '社群', matchExact: false },
+        { href: '/settings', label: '我的', matchExact: false },
     ];
 
     const isActive = (item: typeof navItems[0]) => {

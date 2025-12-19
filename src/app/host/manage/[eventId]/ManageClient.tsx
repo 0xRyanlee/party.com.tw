@@ -8,6 +8,7 @@ import { ArrowLeft, Edit, Share2, XCircle, CheckCircle, Users, UserCheck, Clock,
 import Link from 'next/link';
 import RegistrationsTab from './RegistrationsTab';
 import CheckInTab from './CheckInTab';
+import PromotionTab from './PromotionTab';
 
 interface Event {
     id: string;
@@ -269,7 +270,9 @@ export default function ManageClient({
 
                     {/* Tab 4: Share & Promotion */}
                     <TabsContent value="share" className="space-y-6">
-                        {/* Share Links */}
+                        <PromotionTab eventId={event.id} eventTitle={event.title} />
+
+                        {/* Basic Share Links */}
                         <div className="bg-white p-6 rounded-[16px] shadow-sm border border-gray-100">
                             <h3 className="text-lg font-bold mb-4">分享連結</h3>
                             <div className="space-y-4">
@@ -292,64 +295,6 @@ export default function ManageClient({
                                         </Button>
                                     </div>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-medium mb-2">活動代碼</label>
-                                    <div className="flex gap-2">
-                                        <input
-                                            type="text"
-                                            readOnly
-                                            value={event.id.substring(0, 8).toUpperCase()}
-                                            className="px-4 py-2 border border-gray-300 rounded-lg bg-gray-50 font-mono text-lg"
-                                        />
-                                        <Button
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(event.id.substring(0, 8).toUpperCase());
-                                                alert('代碼已複製！');
-                                            }}
-                                        >
-                                            複製
-                                        </Button>
-                                    </div>
-                                    <p className="text-sm text-gray-600 mt-2">
-                                        參與者可使用此代碼快速找到活動
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* QR Code */}
-                        <div className="bg-white p-6 rounded-[16px] shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-bold mb-4">QR Code</h3>
-                            <div className="flex flex-col md:flex-row gap-6">
-                                <div className="flex-1">
-                                    <div className="bg-gray-100 p-8 rounded-lg flex items-center justify-center">
-                                        <div className="w-48 h-48 bg-white p-4 rounded-lg shadow-sm flex items-center justify-center">
-                                            <div className="text-center text-gray-400">
-                                                <div className="text-4xl mb-2 text-neutral-300">QR</div>
-                                                <div className="text-sm">QR Code</div>
-                                                <div className="text-xs mt-1">即將推出</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <div className="flex-1 space-y-4">
-                                    <p className="text-gray-600">
-                                        掃描 QR Code 即可快速訪問活動頁面，適合印刷在海報、傳單或展示在現場。
-                                    </p>
-                                    <div className="space-y-2">
-                                        <Button variant="outline" className="w-full justify-start" disabled>
-                                            <Share2 className="w-4 h-4 mr-2" />
-                                            下載 QR Code (PNG)
-                                        </Button>
-                                        <Button variant="outline" className="w-full justify-start" disabled>
-                                            <Share2 className="w-4 h-4 mr-2" />
-                                            下載 QR Code (SVG)
-                                        </Button>
-                                    </div>
-                                    <p className="text-xs text-gray-500">
-                                        * QR Code 生成功能即將推出
-                                    </p>
-                                </div>
                             </div>
                         </div>
 
@@ -362,7 +307,6 @@ export default function ManageClient({
                                     className="w-full justify-start"
                                     onClick={() => {
                                         const url = `${window.location.origin}/events/${event.id}`;
-                                        const text = `${event.title} - ${event.venue_name}`;
                                         window.open(`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`, '_blank');
                                     }}
                                 >
@@ -399,32 +343,6 @@ export default function ManageClient({
                                     複製分享文字
                                 </Button>
                             </div>
-                        </div>
-
-                        {/* Poster Templates */}
-                        <div className="bg-white p-6 rounded-[16px] shadow-sm border border-gray-100">
-                            <h3 className="text-lg font-bold mb-4">海報模板</h3>
-                            <p className="text-gray-600 mb-4">
-                                選擇模板自動生成活動海報，適合印刷或在社交媒體分享。
-                            </p>
-                            <div className="grid md:grid-cols-3 gap-4">
-                                {['簡約風格', '活潑風格', '專業風格'].map((template, idx) => (
-                                    <div key={idx} className="border border-gray-200 rounded-lg p-4 hover:border-purple-600 cursor-pointer transition-colors">
-                                        <div className="aspect-[3/4] bg-gradient-to-br from-purple-100 to-pink-100 rounded-lg mb-3 flex items-center justify-center">
-                                            <div className="text-center text-gray-500">
-                                                <div className="text-2xl mb-1">🎨</div>
-                                                <div className="text-sm">{template}</div>
-                                            </div>
-                                        </div>
-                                        <Button variant="outline" className="w-full" size="sm" disabled>
-                                            使用此模板
-                                        </Button>
-                                    </div>
-                                ))}
-                            </div>
-                            <p className="text-xs text-gray-500 mt-4">
-                                * 海報生成功能即將推出
-                            </p>
                         </div>
                     </TabsContent>
 

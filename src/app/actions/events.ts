@@ -7,6 +7,7 @@ export type RegistrationResult = {
     success: boolean;
     message: string;
     status?: 'pending' | 'confirmed' | 'cancelled';
+    checkin_code?: string;
 };
 
 export async function registerForEvent(eventId: string): Promise<RegistrationResult> {
@@ -42,16 +43,26 @@ export async function registerForEvent(eventId: string): Promise<RegistrationRes
 
     if (error) {
         console.error("Registration error:", error);
-        return { success: false, message: "Failed to register. Please try again." };
+        return { success: false, message: "報名失敗，請稍後再試" };
     }
 
-    // 4. Update Event Count (Optional: could be a trigger)
-    // For MVP, we'll let the client revalidate or rely on a trigger if we added one.
-    // Here we just revalidate the path to refresh UI
+    // 4. Fetch the code we just created (since trigger handles it)
+    const { data: regData } = await supabase
+        .from('registrations')
+        .select('checkin_code')
+        .eq('event_id', eventId)
+        .eq('user_id', user.id)
+        .single();
+
     revalidatePath(`/events/${eventId}`);
     revalidatePath('/user/my-events');
 
-    return { success: true, message: "Successfully registered!", status: 'confirmed' };
+    return {
+        success: true,
+        message: "Successfully registered!",
+        status: 'confirmed',
+        checkin_code: regData?.checkin_code
+    };
 }
 
 export async function getUserRegistrations() {
@@ -157,8 +168,21 @@ export async function registerWithDetails(
         return { success: false, message: "報名失敗，請稍後再試" };
     }
 
+    // 5. Fetch the code we just created (since trigger handles it)
+    const { data: regData } = await supabase
+        .from('registrations')
+        .select('checkin_code')
+        .eq('event_id', eventId)
+        .eq('user_id', user.id)
+        .single();
+
     revalidatePath(`/events/${eventId}`);
     revalidatePath('/user/my-events');
 
-    return { success: true, message: "報名成功！", status: 'confirmed' };
+    return {
+        success: true,
+        message: "報名成功！",
+        status: 'confirmed',
+        checkin_code: regData?.checkin_code
+    };
 }

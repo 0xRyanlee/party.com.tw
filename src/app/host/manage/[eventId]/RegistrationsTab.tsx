@@ -38,6 +38,7 @@ interface Registration {
     attendee_phone: string;
     status: 'confirmed' | 'pending' | 'rejected' | 'cancelled' | 'waitlist';
     checked_in: boolean;
+    checkin_code?: string;
     created_at: string;
     waitlist_position?: number;
 }
@@ -277,6 +278,7 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
                         <TableHeader>
                             <TableRow>
                                 <TableHead>姓名</TableHead>
+                                <TableHead>簽到碼</TableHead>
                                 <TableHead>聯絡資訊</TableHead>
                                 <TableHead>狀態</TableHead>
                                 <TableHead>簽到</TableHead>
@@ -294,6 +296,11 @@ export default function RegistrationsTab({ eventId }: { eventId: string }) {
                                                 #{reg.waitlist_position}
                                             </span>
                                         )}
+                                    </TableCell>
+                                    <TableCell>
+                                        <code className="text-xs font-mono bg-neutral-50 px-2 py-1 rounded border border-neutral-100">
+                                            {reg.checkin_code || '-'}
+                                        </code>
                                     </TableCell>
                                     <TableCell>
                                         <div className="space-y-1 text-sm">

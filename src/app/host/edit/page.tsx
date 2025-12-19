@@ -31,7 +31,7 @@ const eventSchema = z.object({
     title: z.string().min(3, "Title must be at least 3 characters"),
     description: z.string().min(10, "Description must be at least 10 characters"),
     type: z.string().min(1, "Please select an event type"),
-    status: z.enum(['active', 'pending', 'draft']), // Expired is calculated, not set
+    status: z.enum(['active', 'draft']), // Simplified: no 'pending'
     date: z.string().min(1, "Date is required"),
     time: z.string().min(1, "Time is required"),
     locationName: z.string().min(1, "Location name is required"),
@@ -71,6 +71,7 @@ export default function HostEdit() {
     const [externalLinks, setExternalLinks] = useState<string[]>([]);
     const [editMode] = useState<EditMode>('new'); // TODO: set based on URL params
     const [isSavingDraft, setIsSavingDraft] = useState(false);
+    const [collaborationEnabled, setCollaborationEnabled] = useState(false); // Collaboration toggle
 
     const {
         register,
@@ -351,6 +352,57 @@ export default function HostEdit() {
                         </div>
                     </div>
 
+                    {/* Date & Time Card - Moved from sidebar */}
+                    <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-4">
+                        <h3 className="font-bold flex items-center gap-2">
+                            <Calendar className="w-4 h-4 text-gray-400" /> 日期時間
+                        </h3>
+                        <div className="grid md:grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                                <Label className="text-xs text-gray-500">活動日期</Label>
+                                <Input type="date" {...register("date")} />
+                                {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
+                            </div>
+                            <div className="space-y-1">
+                                <Label className="text-xs text-gray-500">開始時間</Label>
+                                <Input type="time" {...register("time")} />
+                                {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
+                            </div>
+                        </div>
+                        <div className="space-y-2">
+                            <Label className="text-xs text-gray-500">活動時長</Label>
+                            <div className="flex flex-wrap gap-2">
+                                {[1, 2, 3, 4, 6, 8].map((hours) => (
+                                    <button
+                                        key={hours}
+                                        type="button"
+                                        onClick={() => setDuration(hours)}
+                                        className={`min-w-[48px] px-3 py-2 rounded-full border text-sm font-medium transition-all ${duration === hours
+                                            ? 'border-gray-900 bg-gray-100 text-gray-900'
+                                            : 'border-gray-200 hover:border-gray-300'
+                                            }`}
+                                    >
+                                        {hours}h
+                                    </button>
+                                ))}
+                            </div>
+                            <div className="mt-3">
+                                <Input
+                                    type="number"
+                                    min="0.5"
+                                    step="0.5"
+                                    value={duration}
+                                    onChange={(e) => setDuration(parseFloat(e.target.value) || 2)}
+                                    placeholder="或輸入自定義時長"
+                                    className="text-sm"
+                                />
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                                結束時間：{duration}小時後
+                            </p>
+                        </div>
+                    </div>
+
                     {/* Media Card */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-6">
                         <ImageUploader
@@ -380,74 +432,35 @@ export default function HostEdit() {
 
                     {/* Collaboration Card */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-6">
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600">
-                                <Briefcase className="w-4 h-4" />
+                        <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-md bg-gray-100 flex items-center justify-center text-gray-600">
+                                    <Briefcase className="w-4 h-4" />
+                                </div>
+                                <h2 className="text-lg font-bold">合作招募</h2>
                             </div>
-                            <h2 className="text-lg font-bold">合作招募</h2>
+                            <Switch
+                                checked={collaborationEnabled}
+                                onCheckedChange={setCollaborationEnabled}
+                            />
                         </div>
-                        <CollaborationStep
-                            roles={roles}
-                            resources={resources}
-                            onRolesChange={setRoles}
-                            onResourcesChange={setResources}
-                        />
+                        {collaborationEnabled ? (
+                            <CollaborationStep
+                                roles={roles}
+                                resources={resources}
+                                onRolesChange={setRoles}
+                                onResourcesChange={setResources}
+                            />
+                        ) : (
+                            <p className="text-sm text-gray-400 text-center py-4">
+                                開啟此功能即可設定合作報名需求與資源徠换。
+                            </p>
+                        )}
                     </div>
                 </div>
 
                 {/* Right Column: Sidebar Details */}
                 <div className="space-y-6">
-
-                    {/* Date & Time */}
-                    <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-4">
-                        <h3 className="font-bold flex items-center gap-2">
-                            <Calendar className="w-4 h-4 text-gray-400" /> 日期時間
-                        </h3>
-                        <div className="space-y-3">
-                            <div className="space-y-1">
-                                <Label className="text-xs text-gray-500">活動日期</Label>
-                                <Input type="date" {...register("date")} />
-                                {errors.date && <p className="text-xs text-red-500">{errors.date.message}</p>}
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-xs text-gray-500">開始時間</Label>
-                                <Input type="time" {...register("time")} />
-                                {errors.time && <p className="text-xs text-red-500">{errors.time.message}</p>}
-                            </div>
-                            <div className="space-y-2">
-                                <Label className="text-xs text-gray-500">活動時長</Label>
-                                <div className="flex flex-wrap gap-2">
-                                    {[1, 2, 3, 4, 6, 8].map((hours) => (
-                                        <button
-                                            key={hours}
-                                            type="button"
-                                            onClick={() => setDuration(hours)}
-                                            className={`min-w-[48px] px-3 py-2 rounded-full border text-sm font-medium transition-all ${duration === hours
-                                                ? 'border-gray-900 bg-gray-100 text-gray-900'
-                                                : 'border-gray-200 hover:border-gray-300'
-                                                }`}
-                                        >
-                                            {hours}h
-                                        </button>
-                                    ))}
-                                </div>
-                                <div className="mt-3">
-                                    <Input
-                                        type="number"
-                                        min="0.5"
-                                        step="0.5"
-                                        value={duration}
-                                        onChange={(e) => setDuration(parseFloat(e.target.value) || 2)}
-                                        placeholder="或輸入自定義時長"
-                                        className="text-sm"
-                                    />
-                                </div>
-                                <p className="text-xs text-gray-500 mt-1">
-                                    結束時間：{duration}小時後
-                                </p>
-                            </div>
-                        </div>
-                    </div>
 
                     {/* Participant Settings */}
                     <div className="bg-white p-6 rounded-[24px] border border-gray-100 shadow-sm space-y-4">
@@ -511,7 +524,7 @@ export default function HostEdit() {
                                         ) : (
                                             <>
                                                 <div className="flex p-1 bg-gray-100 rounded-lg">
-                                                    {(['active', 'pending', 'draft'] as const).map((s) => (
+                                                    {(['active', 'draft'] as const).map((s) => (
                                                         <button
                                                             key={s}
                                                             type="button"
@@ -522,13 +535,12 @@ export default function HostEdit() {
                                                                 }`}
                                                         >
                                                             {s === 'active' && '已發布'}
-                                                            {s === 'pending' && '審核中'}
                                                             {s === 'draft' && '草稿'}
                                                         </button>
                                                     ))}
                                                 </div>
                                                 <p className="text-xs text-gray-500">
-                                                    草稿：僅自己可見 | 審核中：等待平台審核 | 已發布：公開可見
+                                                    草稿：僅自己可見 | 已發布：公開可見
                                                 </p>
                                             </>
                                         )}

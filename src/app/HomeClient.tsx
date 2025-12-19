@@ -19,6 +19,8 @@ import CategoryFilter from '@/components/CategoryFilter';
 import { Suspense } from 'react';
 import AttendedEventsWidget from '@/components/AttendedEventsWidget';
 import StructuredImage from '@/components/common/StructuredImage';
+import DiscoveryRecommendations from '@/components/DiscoveryRecommendations';
+import { useBrowsingHistory } from '@/hooks/useBrowsingHistory';
 
 export interface Banner {
     id: string;
@@ -40,6 +42,7 @@ function HomeContent({ initialEvents, initialBanners = [] }: HomeClientProps) {
     const [showOnboarding, setShowOnboarding] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [events, setEvents] = useState<Event[]>(initialEvents);
+    const { getTopTags } = useBrowsingHistory();
 
     // Filter active events only
     const activeEvents = useMemo(() => {
@@ -118,6 +121,9 @@ function HomeContent({ initialEvents, initialBanners = [] }: HomeClientProps) {
                         linkUrl: b.link_url,
                     }))}
                 />
+
+                {/* Discovery & History Sections */}
+                <DiscoveryRecommendations />
 
                 {/* Main Content Grid */}
                 <div className="grid grid-cols-1 lg:grid-cols-12 gap-3 md:gap-6 lg:gap-8">
@@ -294,14 +300,20 @@ function HomeContent({ initialEvents, initialBanners = [] }: HomeClientProps) {
                             </div>
                         </motion.div>
 
-                        {/* Quick Stats */}
                         <div className="bg-neutral-900 text-white rounded-3xl p-6">
                             <h3 className="text-lg font-bold mb-2">{t('home.sidebar.yourVibe')}</h3>
-                            <p className="text-gray-400 text-sm mb-4">探索更多符合你風格的活動</p>
+                            <p className="text-gray-400 text-sm mb-4">根據您的瀏覽紀錄推薦</p>
                             <div className="space-y-2">
-                                <div className="flex justify-between items-center p-3 bg-white/10 rounded-2xl text-sm">
-                                    <span>熱門標籤</span>
-                                    <span className="font-bold">Tech, Party</span>
+                                <div className="flex flex-wrap gap-2">
+                                    {getTopTags(5).length > 0 ? (
+                                        getTopTags(5).map(tag => (
+                                            <span key={tag} className="px-3 py-1 bg-white/10 rounded-full text-xs font-bold">
+                                                {tag}
+                                            </span>
+                                        ))
+                                    ) : (
+                                        <span className="text-xs text-neutral-500 italic">展開探索以獲得推薦</span>
+                                    )}
                                 </div>
                             </div>
                         </div>

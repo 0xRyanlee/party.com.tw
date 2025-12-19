@@ -5,7 +5,14 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Users, Copy, RefreshCw, QrCode } from 'lucide-react';
+import { Users, Copy, RefreshCw, QrCode, Plus, Trash2, X } from 'lucide-react';
+import QRCodeGenerator from '@/components/QRCodeGenerator';
+
+interface InvitationChannel {
+    id: string;
+    name: string;
+    code: string;
+}
 
 interface ParticipantSettingsProps {
     capacityTotal?: number;
@@ -30,6 +37,10 @@ export default function ParticipantSettings({
 }: ParticipantSettingsProps) {
     const [customCapacity, setCustomCapacity] = useState(capacityTotal);
     const [showCustomInput, setShowCustomInput] = useState(false);
+    const [channels, setChannels] = useState<InvitationChannel[]>([
+        { id: '1', name: 'Default', code: '' }
+    ]);
+    const [activeQRChannel, setActiveQRChannel] = useState<InvitationChannel | null>(null);
 
     const quickCapacities = [20, 50];
 
@@ -57,11 +68,39 @@ export default function ParticipantSettings({
         onInvitationCodeChange?.(code);
     };
 
-    const copyInvitationCode = () => {
-        if (invitationCode) {
-            navigator.clipboard.writeText(invitationCode);
-            alert('邀請碼已複製！');
+    const copyInvitationCode = (code: string) => {
+        navigator.clipboard.writeText(code);
+        alert('邀請碼已複製！');
+    };
+
+    const addChannel = () => {
+        if (channels.length >= 3) return;
+        const newId = String(Date.now());
+        setChannels([...channels, { id: newId, name: '', code: '' }]);
+    };
+
+    const removeChannel = (id: string) => {
+        setChannels(channels.filter(c => c.id !== id));
+    };
+
+    const updateChannelName = (id: string, name: string) => {
+        setChannels(channels.map(c => c.id === id ? { ...c, name } : c));
+    };
+
+    const generateChannelCode = (id: string) => {
+        const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let code = '';
+        for (let i = 0; i < 8; i++) {
+            code += chars.charAt(Math.floor(Math.random() * chars.length));
         }
+        setChannels(channels.map(c => c.id === id ? { ...c, code } : c));
+        // Also update primary invitation code for compatibility
+        onInvitationCodeChange?.(code);
+    };
+
+    const getInvitationUrl = (code: string, channelName: string) => {
+        if (typeof window === 'undefined') return '';
+        return `${window.location.origin}/register?invite=${code}&ref=${encodeURIComponent(channelName)}`;
     };
 
     return (
@@ -147,74 +186,116 @@ export default function ParticipantSettings({
 
             {/* 邀請碼管理 - 只在邀請制開啟時顯示 */}
             {invitationOnly && (
-                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 space-y-3">
-                    <Label className="text-sm font-medium text-gray-700">邀請碼設定</Label>
-
-                    {/* 邀請碼輸入 */}
-                    <div className="flex gap-2">
-                        <Input
-                            type="text"
-                            value={invitationCode}
-                            onChange={(e) => onInvitationCodeChange?.(e.target.value.toUpperCase())}
-                            placeholder="輸入自定義邀請碼"
-                            className="flex-1 uppercase"
-                            maxLength={12}
-                        />
-                        <Button
-                            type="button"
-                            variant="outline"
-                            onClick={generateInvitationCode}
-                            className="gap-2"
-                        >
-                            <RefreshCw className="w-4 h-4" />
-                            自動生成
-                        </Button>
+                <div className="border-2 border-dashed border-gray-300 rounded-xl p-4 space-y-4">
+                    <div className="flex items-center justify-between">
+                        <Label className="text-sm font-medium text-gray-700">邀請通路設定 (最多 3 個)</Label>
+                        {channels.length < 3 && (
+                            <Button
+                                type="button"
+                                variant="ghost"
+                                size="sm"
+                                onClick={addChannel}
+                                className="gap-1 text-xs"
+                            >
+                                <Plus className="w-3 h-3" />
+                                新增通路
+                            </Button>
+                        )}
                     </div>
 
-                    {/* 邀請碼顯示與操作 */}
-                    {invitationCode && (
-                        <div className="bg-white rounded-xl p-4 border border-gray-200">
-                            <div className="flex items-center justify-between mb-3">
-                                <div>
-                                    <p className="text-xs text-gray-500 mb-1">當前邀請碼</p>
-                                    <p className="text-2xl font-bold tracking-wider font-mono">
-                                        {invitationCode}
-                                    </p>
+                    {/* Channel List */}
+                    <div className="space-y-3">
+                        {channels.map((channel, index) => (
+                            <div key={channel.id} className="bg-white rounded-xl p-4 border border-gray-200 space-y-3">
+                                <div className="flex items-center gap-2">
+                                    <Input
+                                        type="text"
+                                        value={channel.name}
+                                        onChange={(e) => updateChannelName(channel.id, e.target.value)}
+                                        placeholder={`通路名稱 (如: FB, IG, LINE)`}
+                                        className="flex-1 text-sm"
+                                    />
+                                    {channels.length > 1 && (
+                                        <Button
+                                            type="button"
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={() => removeChannel(channel.id)}
+                                            className="text-red-500 hover:text-red-600"
+                                        >
+                                            <Trash2 className="w-4 h-4" />
+                                        </Button>
+                                    )}
                                 </div>
-                                <div className="flex gap-2">
+
+                                <div className="flex items-center gap-2">
+                                    <div className="flex-1 bg-gray-50 rounded-lg px-3 py-2 font-mono text-sm">
+                                        {channel.code || <span className="text-gray-400">點擊生成邀請碼</span>}
+                                    </div>
                                     <Button
                                         type="button"
                                         variant="outline"
                                         size="sm"
-                                        onClick={copyInvitationCode}
-                                        className="gap-2"
+                                        onClick={() => generateChannelCode(channel.id)}
+                                        className="gap-1"
                                     >
-                                        <Copy className="w-3 h-3" />
-                                        複製
-                                    </Button>
-                                    <Button
-                                        type="button"
-                                        variant="outline"
-                                        size="sm"
-                                        className="gap-2"
-                                    >
-                                        <QrCode className="w-3 h-3" />
-                                        QR Code
+                                        <RefreshCw className="w-3 h-3" />
+                                        生成
                                     </Button>
                                 </div>
+
+                                {channel.code && (
+                                    <div className="flex gap-2">
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => copyInvitationCode(channel.code)}
+                                            className="flex-1 gap-1"
+                                        >
+                                            <Copy className="w-3 h-3" />
+                                            複製碼
+                                        </Button>
+                                        <Button
+                                            type="button"
+                                            variant="outline"
+                                            size="sm"
+                                            onClick={() => setActiveQRChannel(channel)}
+                                            className="flex-1 gap-1"
+                                        >
+                                            <QrCode className="w-3 h-3" />
+                                            顯示 QR
+                                        </Button>
+                                    </div>
+                                )}
                             </div>
+                        ))}
+                    </div>
 
-                            <p className="text-xs text-gray-500">
-                                提示：參與者需輸入此邀請碼才能報名。您可以隨時更改邀請碼。
-                            </p>
+                    <p className="text-xs text-gray-500">
+                        提示：各通路的邀請碼可分別追蹤蛟換來源，方便分析行銷成效。
+                    </p>
+                </div>
+            )}
+
+            {/* QR Code Modal */}
+            {activeQRChannel && (
+                <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={() => setActiveQRChannel(null)}>
+                    <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between mb-4">
+                            <h3 className="font-bold text-lg">邀請 QR Code</h3>
+                            <Button variant="ghost" size="icon" onClick={() => setActiveQRChannel(null)}>
+                                <X className="w-5 h-5" />
+                            </Button>
                         </div>
-                    )}
-
-                    {!invitationCode && (
-                        <p className="text-xs text-gray-500 text-center py-2">
-                            請輸入或生成邀請碼
-                        </p>
-                    )}
+                        <QRCodeGenerator
+                            value={getInvitationUrl(activeQRChannel.code, activeQRChannel.name)}
+                            type="promotion"
+                            label={activeQRChannel.name || '預設通路'}
+                            defaultErrorLevel="Q"
+                            allowErrorLevelChange={true}
+                        />
+                    </div>
                 </div>
             )}
         </div>

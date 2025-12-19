@@ -325,7 +325,7 @@ export default function ManageClient({
                                     <div className="bg-gray-100 p-8 rounded-lg flex items-center justify-center">
                                         <div className="w-48 h-48 bg-white p-4 rounded-lg shadow-sm flex items-center justify-center">
                                             <div className="text-center text-gray-400">
-                                                <div className="text-4xl mb-2">📱</div>
+                                                <div className="text-4xl mb-2 text-neutral-300">QR</div>
                                                 <div className="text-sm">QR Code</div>
                                                 <div className="text-xs mt-1">即將推出</div>
                                             </div>

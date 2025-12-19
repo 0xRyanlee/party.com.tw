@@ -1,5 +1,7 @@
 'use client';
 
+import { Calendar, MapPin, Users, Star } from 'lucide-react';
+
 interface EventDetailProps {
   event?: {
     id: string;
@@ -34,8 +36,8 @@ export default function EventDetail({ event }: EventDetailProps) {
   return (
     <div className="flex flex-col h-full">
       {/* Header Image */}
-      <div className="h-48 md:h-64 bg-gradient-to-br from-primary to-secondary flex items-center justify-center">
-        <span className="text-8xl">🎉</span>
+      <div className="h-48 md:h-64 bg-gradient-to-br from-neutral-800 to-neutral-900 flex items-center justify-center">
+        <Calendar className="w-16 h-16 text-white/50" />
       </div>
 
       {/* Content */}
@@ -43,7 +45,7 @@ export default function EventDetail({ event }: EventDetailProps) {
         {/* Title & Type */}
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-surface text-xs font-medium mb-3">
-            <span>📅</span>
+            <Calendar className="w-3 h-3" />
             <span>{event.type}</span>
           </div>
           <h1 className="text-3xl font-bold mb-2">{event.title}</h1>
@@ -52,21 +54,27 @@ export default function EventDetail({ event }: EventDetailProps) {
         {/* Key Info */}
         <div className="space-y-3 p-4 bg-surface rounded-2xl">
           <div className="flex items-center gap-3">
-            <span className="text-2xl">📅</span>
+            <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center">
+              <Calendar className="w-4 h-4 text-neutral-600" />
+            </div>
             <div>
               <p className="text-sm text-text-secondary">日期時間</p>
               <p className="font-medium">{event.date} {event.time}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-2xl">📍</span>
+            <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center">
+              <MapPin className="w-4 h-4 text-neutral-600" />
+            </div>
             <div>
               <p className="text-sm text-text-secondary">地點</p>
               <p className="font-medium">{event.location}</p>
             </div>
           </div>
           <div className="flex items-center gap-3">
-            <span className="text-2xl">👥</span>
+            <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center">
+              <Users className="w-4 h-4 text-neutral-600" />
+            </div>
             <div>
               <p className="text-sm text-text-secondary">參與人數</p>
               <p className="font-medium">{event.attendees}/{event.capacity} 人</p>
@@ -84,12 +92,15 @@ export default function EventDetail({ event }: EventDetailProps) {
         <div className="p-4 bg-surface rounded-2xl">
           <h3 className="text-sm font-medium text-text-secondary mb-3">組織者</h3>
           <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-accent to-secondary flex items-center justify-center text-white font-bold">
+            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-neutral-700 to-neutral-900 flex items-center justify-center text-white font-bold">
               {event.organizer.avatar}
             </div>
             <div className="flex-1">
               <p className="font-medium">{event.organizer.name}</p>
-              <p className="text-sm text-text-secondary">⭐ {event.organizer.rating}</p>
+              <div className="flex items-center gap-1 text-sm text-text-secondary">
+                <Star className="w-3 h-3 text-yellow-500 fill-yellow-500" />
+                <span>{event.organizer.rating}</span>
+              </div>
             </div>
           </div>
         </div>
@@ -101,7 +112,7 @@ export default function EventDetail({ event }: EventDetailProps) {
             {[...Array(5)].map((_, i) => (
               <div
                 key={i}
-                className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-secondary flex items-center justify-center text-white text-sm font-bold border-2 border-background"
+                className="w-10 h-10 rounded-full bg-gradient-to-br from-neutral-600 to-neutral-800 flex items-center justify-center text-white text-sm font-bold border-2 border-background"
               >
                 {String.fromCharCode(65 + i)}
               </div>
@@ -117,14 +128,14 @@ export default function EventDetail({ event }: EventDetailProps) {
 
       {/* Action Buttons */}
       <div className="p-6 border-t border-border space-y-3">
-        <button className="w-full px-6 py-3 bg-primary text-white rounded-xl font-semibold shadow-md hover-lift">
+        <button className="w-full px-6 py-3 bg-neutral-900 text-white rounded-full font-semibold shadow-md hover:bg-neutral-800 transition-colors">
           報名參加
         </button>
         <div className="flex gap-3">
-          <button className="flex-1 px-4 py-3 bg-surface text-text-primary rounded-xl font-semibold hover-lift">
+          <button className="flex-1 px-4 py-3 bg-surface text-text-primary rounded-full font-semibold hover:bg-neutral-100 transition-colors">
             分享
           </button>
-          <button className="flex-1 px-4 py-3 bg-surface text-text-primary rounded-xl font-semibold hover-lift">
+          <button className="flex-1 px-4 py-3 bg-surface text-text-primary rounded-full font-semibold hover:bg-neutral-100 transition-colors">
             收藏
           </button>
         </div>

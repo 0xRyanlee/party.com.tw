@@ -624,7 +624,7 @@ export default function VendorProfilePage() {
 
                     {/* Info Box */}
                     <div className="bg-blue-50 border border-blue-200 rounded-[24px] p-6">
-                        <h4 className="font-semibold text-blue-900 mb-2">💡 個人檔案提示</h4>
+                        <h4 className="font-semibold text-blue-900 mb-2">個人檔案提示</h4>
                         <ul className="text-sm text-blue-800 space-y-1">
                             <li>• 完整的個人檔案能提高申請通過率</li>
                             <li>• 作品集是展示專業能力的最佳方式</li>

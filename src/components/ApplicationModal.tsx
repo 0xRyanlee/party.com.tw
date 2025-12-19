@@ -209,7 +209,7 @@ export default function ApplicationModal({
                                 {/* Info */}
                                 <div className="bg-blue-50 border border-blue-200 rounded-[20px] p-4">
                                     <p className="text-sm text-blue-800">
-                                        💡 提交後，主辦方將會審核您的申請。您可以在「我的申請」中查看狀態。
+                                        <span className="font-medium">提示：</span>提交後，主辦方將會審核您的申請。您可以在「我的申請」中查看狀態。
                                     </p>
                                 </div>
                             </div>

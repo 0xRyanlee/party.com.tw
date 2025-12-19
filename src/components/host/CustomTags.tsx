@@ -141,7 +141,7 @@ export default function CustomTags({
                     {/* 智能標籤提示 */}
                     {showSmartSuggestions && impliedTags.length > 0 && (
                         <p className="text-xs text-zinc-400">
-                            💡 系統根據您的選擇自動添加了相關標籤
+                            提示：系統根據您的選擇自動添加了相關標籤
                         </p>
                     )}
                 </div>
@@ -203,7 +203,7 @@ export default function CustomTags({
                     </button>
                 </div>
                 <p className="text-xs text-zinc-400">
-                    💡 提示：輸入活動特色，系統會自動匹配相關標籤。按 Enter 快速新增。
+                    提示：輸入活動特色，系統會自動匹配相關標籤。按 Enter 快速新增。
                 </p>
             </div>
 

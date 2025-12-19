@@ -19,9 +19,12 @@ import CustomTags from "@/components/host/CustomTags";
 import AdvancedTicketManager from "@/components/host/AdvancedTicketManager";
 import LocationPicker from "@/components/host/LocationPicker";
 import ExternalLinks from "@/components/host/ExternalLinks";
-import { Calendar, MapPin, Clock, Info, Tag, Briefcase } from "lucide-react";
+import { Calendar, MapPin, Clock, Info, Tag, Briefcase, ArrowLeft } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { EventRole, EventResource, TicketType } from "@/types/schema";
+
+// Edit mode type
+type EditMode = 'new' | 'draft' | 'published';
 
 // Zod Schema
 const eventSchema = z.object({
@@ -64,7 +67,9 @@ export default function HostEdit() {
     const [mediaEnabled, setMediaEnabled] = useState(true); // 媒體素材開關
     const [duration, setDuration] = useState(2); // 活動時長（小時）
     const [location, setLocation] = useState<{ name: string; address: string; lat?: number; lng?: number }>({ name: '', address: '' });
-    const [externalLinks, setExternalLinks] = useState<string[]>([]); // 外部連結多選
+    const [externalLinks, setExternalLinks] = useState<string[]>([]);
+    const [editMode] = useState<EditMode>('new'); // TODO: set based on URL params
+    const [isSavingDraft, setIsSavingDraft] = useState(false);
 
     const {
         register,
@@ -197,25 +202,95 @@ export default function HostEdit() {
             alert(error.message || '儲存活動失敗，請稍後再試');
         }
     };
+    // Save as draft handler
+    const handleSaveDraft = async () => {
+        setIsSavingDraft(true);
+        try {
+            const formData = watch();
+            // Validate minimal required fields for draft
+            if (!formData.title || formData.title.length < 3) {
+                alert('請輸入活動標題（至少 3 個字）');
+                return;
+            }
+
+            let startTime: string | null = null;
+            let endTime: string | null = null;
+
+            if (formData.date && formData.time) {
+                const timeWithSeconds = formData.time.length === 5 ? `${formData.time}:00` : formData.time;
+                const dateTimeString = `${formData.date}T${timeWithSeconds}`;
+                const startDate = new Date(dateTimeString);
+                if (!isNaN(startDate.getTime())) {
+                    startTime = startDate.toISOString();
+                    const durationInHours = Number(duration) || 2;
+                    const endDate = new Date(startDate.getTime() + durationInHours * 60 * 60 * 1000);
+                    endTime = endDate.toISOString();
+                }
+            }
+
+            const draftPayload = {
+                title: formData.title,
+                descriptionLong: formData.description || '',
+                descriptionShort: (formData.description || '').substring(0, 200),
+                category: formData.type,
+                coverImage: formData.image,
+                venueName: location.name || formData.locationName || '',
+                address: location.address || formData.address || '',
+                gpsLat: location.lat,
+                gpsLng: location.lng,
+                startTime,
+                endTime,
+                ticketTypes: advancedTickets,
+                capacityTotal: capacity,
+                isAdultOnly,
+                invitationOnly,
+                invitationCode: invitationOnly ? invitationCode : null,
+                tags: selectedTags,
+                status: 'draft',
+                externalLink: formData.externalLink || null,
+            };
+
+            const response = await fetch('/api/events', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(draftPayload),
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Failed to save draft');
+            }
+
+            alert('草稿已保存');
+            router.push('/host/dashboard');
+        } catch (error: any) {
+            console.error('Error saving draft:', error);
+            alert(error.message || '保存草稿失敗');
+        } finally {
+            setIsSavingDraft(false);
+        }
+    };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-8 pb-20">
-            {/* Header Actions */}
-            <div className="flex items-center justify-between sticky top-0 bg-gray-50/80 backdrop-blur-sm py-4 z-10 -mx-4 px-4 md:mx-0 md:px-0">
+        <form onSubmit={handleSubmit(onSubmit)} className="max-w-4xl mx-auto space-y-6 pb-32">
+            {/* Header */}
+            <div className="flex items-center gap-4 sticky top-0 bg-gray-50/80 backdrop-blur-sm py-4 z-10 -mx-4 px-4 md:mx-0 md:px-0">
+                <Button
+                    type="button"
+                    variant="ghost"
+                    size="icon"
+                    onClick={() => router.back()}
+                    className="-ml-2"
+                >
+                    <ArrowLeft className="w-5 h-5" />
+                </Button>
                 <div>
-                    <h1 className="text-2xl font-bold">{t('host.edit.title')}</h1>
-                    <p className="text-sm text-gray-500">建立或編輯您的活動詳情</p>
-                </div>
-                <div className="flex gap-2">
-                    <Button type="button" variant="outline" className="rounded-full">放棄</Button>
-                    <LoadingButton
-                        type="submit"
-                        isLoading={isSubmitting}
-                        loadingText="儲存中..."
-                        className="bg-black text-white rounded-full min-w-[120px]"
-                    >
-                        發佈活動
-                    </LoadingButton>
+                    <h1 className="text-xl font-bold">
+                        {editMode === 'new' ? '創建活動' : editMode === 'draft' ? '編輯草稿' : '編輯活動'}
+                    </h1>
+                    <p className="text-sm text-gray-500">
+                        {editMode === 'new' ? '建立您的新活動' : '修改活動詳情'}
+                    </p>
                 </div>
             </div>
 
@@ -468,6 +543,64 @@ export default function HostEdit() {
                         </div>
                     </div>
 
+                </div>
+            </div>
+
+            {/* Bottom Action Bar */}
+            <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-100 p-4 z-20">
+                <div className="max-w-4xl mx-auto flex gap-3">
+                    {editMode === 'new' && (
+                        <>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="flex-1 rounded-full h-12"
+                                onClick={handleSaveDraft}
+                                disabled={isSavingDraft || isSubmitting}
+                            >
+                                {isSavingDraft ? '保存中...' : '保存草稿'}
+                            </Button>
+                            <LoadingButton
+                                type="submit"
+                                isLoading={isSubmitting}
+                                loadingText="發佈中..."
+                                className="flex-1 bg-black text-white rounded-full h-12"
+                            >
+                                立即發佈
+                            </LoadingButton>
+                        </>
+                    )}
+                    {editMode === 'draft' && (
+                        <>
+                            <Button
+                                type="button"
+                                variant="outline"
+                                className="flex-1 rounded-full h-12"
+                                onClick={handleSaveDraft}
+                                disabled={isSavingDraft || isSubmitting}
+                            >
+                                {isSavingDraft ? '保存中...' : '更新草稿'}
+                            </Button>
+                            <LoadingButton
+                                type="submit"
+                                isLoading={isSubmitting}
+                                loadingText="發佈中..."
+                                className="flex-1 bg-black text-white rounded-full h-12"
+                            >
+                                發佈活動
+                            </LoadingButton>
+                        </>
+                    )}
+                    {editMode === 'published' && (
+                        <LoadingButton
+                            type="submit"
+                            isLoading={isSubmitting}
+                            loadingText="更新中..."
+                            className="flex-1 bg-black text-white rounded-full h-12"
+                        >
+                            更新活動
+                        </LoadingButton>
+                    )}
                 </div>
             </div>
         </form>

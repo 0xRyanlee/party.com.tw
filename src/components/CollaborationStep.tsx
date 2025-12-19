@@ -272,7 +272,7 @@ export default function CollaborationStep({
             {/* Info Box */}
             <div className="bg-gray-50 border border-gray-200 rounded-xl p-4">
                 <p className="text-sm text-gray-600">
-                    💡 申請者將在活動詳情頁看到這些合作機會
+                    提示：申請者將在活動詳情頁看到這些合作機會
                 </p>
             </div>
         </div>

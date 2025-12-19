@@ -73,8 +73,8 @@ export default function SettingsPage() {
                         </Link>
                         <Link href="/settings/language" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
                             <div className="flex items-center gap-3">
-                                <span className="w-5 h-5 text-gray-400 text-center">🌐</span>
-                                <span className="font-medium">Language Options</span>
+                                <span className="w-5 h-5 text-gray-400 text-center text-sm">A</span>
+                                <span className="font-medium">語言設定</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-400">繁體中文</span>
@@ -109,7 +109,7 @@ export default function SettingsPage() {
                     <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm divide-y divide-gray-50">
                         <Link href="/host/edit" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 group-hover:scale-110 transition-transform">
+                                <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
                                     <Users className="w-4 h-4" />
                                 </div>
                                 <div>
@@ -121,7 +121,7 @@ export default function SettingsPage() {
                         </Link>
                         <Link href="/club" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform">
+                                <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
                                     <Users className="w-4 h-4" />
                                 </div>
                                 <div>
@@ -133,7 +133,7 @@ export default function SettingsPage() {
                         </Link>
                         <Link href="/settings/report" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform">
+                                <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
                                     <MessageSquare className="w-4 h-4" />
                                 </div>
                                 <div>
@@ -145,7 +145,7 @@ export default function SettingsPage() {
                         </Link>
                         <Link href="/settings/vendor" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 group-hover:scale-110 transition-transform">
+                                <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
                                     <Briefcase className="w-4 h-4" />
                                 </div>
                                 <div>
@@ -155,21 +155,6 @@ export default function SettingsPage() {
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
                         </Link>
-                        {/* Admin Entry - Only show for admin users */}
-                        {user?.email === 'ryan910814@gmail.com' && (
-                            <Link href="/admin" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center text-red-600 group-hover:scale-110 transition-transform">
-                                        <Shield className="w-4 h-4" />
-                                    </div>
-                                    <div>
-                                        <span className="font-bold block">Admin 後台</span>
-                                        <span className="text-xs text-gray-400">管理平台內容與用戶</span>
-                                    </div>
-                                </div>
-                                <ChevronRight className="w-5 h-5 text-gray-300" />
-                            </Link>
-                        )}
                     </div>
                 </section>
 
@@ -185,8 +170,8 @@ export default function SettingsPage() {
                             className="w-full flex items-center justify-between p-4 hover:bg-gray-50 transition-colors"
                         >
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
-                                    <span className="text-white text-sm">📱</span>
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-neutral-700 to-neutral-900 flex items-center justify-center">
+                                    <span className="text-white text-xs">+</span>
                                 </div>
                                 <div className="text-left">
                                     <span className="font-bold block">加入主畫面</span>

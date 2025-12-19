@@ -66,17 +66,30 @@ export default function HostManage() {
                 fetch('/api/applications?isHost=true')
             ]);
 
+            // Handle registrations response
             if (regRes.ok) {
                 const regData = await regRes.json();
                 setRegistrations(regData.registrations || []);
+            } else {
+                // Log error but don't block - show empty state
+                console.error('Registrations API error:', regRes.status);
+                setRegistrations([]);
             }
 
+            // Handle applications response
             if (appRes.ok) {
                 const appData = await appRes.json();
                 setApplications(appData.applications || []);
+            } else {
+                // Log error but don't block - show empty state
+                console.error('Applications API error:', appRes.status);
+                setApplications([]);
             }
         } catch (error) {
             console.error('Error fetching data:', error);
+            // Ensure we clear loading and show empty state
+            setRegistrations([]);
+            setApplications([]);
             toast({
                 title: '載入失敗',
                 description: '請稍後再試',

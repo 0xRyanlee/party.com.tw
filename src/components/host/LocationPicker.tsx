@@ -210,7 +210,7 @@ export default function LocationPicker({ value, onChange }: LocationPickerProps)
             {!useGoogleMaps && (
                 <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-3">
                     <p className="text-xs text-yellow-800">
-                        💡 目前使用簡化模式（熱門地點）。如需更精確搜索，請配置 Google Maps API Key。
+                        提示：目前使用簡化模式（熱門地點）。如需更精確搜索，請配置 Google Maps API Key。
                     </p>
                 </div>
             )}

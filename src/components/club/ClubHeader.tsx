@@ -71,7 +71,7 @@ export default function ClubHeader({
         } catch {
             // Fallback: copy to clipboard
             await navigator.clipboard.writeText(window.location.href);
-            toast.success('Link copied to clipboard');
+            toast.success('連結已複製到剪貼簿');
         }
     };
 
@@ -145,15 +145,15 @@ export default function ClubHeader({
                         <div className="flex items-center gap-4 mt-4 text-sm text-zinc-600">
                             <div className="flex items-center gap-1">
                                 <Users className="w-4 h-4" />
-                                <span>{club.member_count} members</span>
+                                <span>{club.member_count} 位成員</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <MessageSquare className="w-4 h-4" />
-                                <span>Discussion</span>
+                                <span>討論</span>
                             </div>
                             <div className="flex items-center gap-1">
                                 <Calendar className="w-4 h-4" />
-                                <span>Events</span>
+                                <span>活動</span>
                             </div>
                         </div>
 
@@ -171,9 +171,9 @@ export default function ClubHeader({
                                 )}
                                 <div>
                                     <p className="text-sm font-medium">
-                                        {club.owner.full_name || 'Unknown'}
+                                        {club.owner.full_name || '未知用戶'}
                                     </p>
-                                    <p className="text-xs text-zinc-400">Owner</p>
+                                    <p className="text-xs text-zinc-400">負責人</p>
                                 </div>
                             </div>
                         )}
@@ -185,11 +185,11 @@ export default function ClubHeader({
                             onClick={handleJoinLeave}
                             disabled={isLoading}
                             className={`rounded-full px-6 ${isMember
-                                    ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
-                                    : 'bg-black text-white hover:bg-zinc-800'
+                                ? 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                                : 'bg-black text-white hover:bg-zinc-800'
                                 }`}
                         >
-                            {isLoading ? '...' : isMember ? 'Leave' : 'Join'}
+                            {isLoading ? '...' : isMember ? '退出' : '加入'}
                         </Button>
                     )}
                 </div>

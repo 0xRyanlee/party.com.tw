@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, ChevronLeft, Calendar, MapPin } from "lucide-react";
@@ -15,37 +15,64 @@ interface HeroEvent {
     tags?: string[];
 }
 
-interface HeroCarouselProps {
-    events?: HeroEvent[];
+interface HeroBanner {
+    id: string;
+    title: string;
+    imageUrl?: string;
+    linkUrl?: string;
 }
 
-export default function HeroCarousel({ events }: HeroCarouselProps) {
+interface HeroCarouselProps {
+    events?: HeroEvent[];
+    banners?: HeroBanner[];
+}
+
+interface CarouselSlide {
+    id: string;
+    title: string;
+    location?: string;
+    date?: string;
+    imageUrl?: string;
+    tags?: string[];
+    linkUrl?: string;
+    type: 'event' | 'banner';
+}
+
+export default function HeroCarousel({ events, banners }: HeroCarouselProps) {
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // 使用傳入的活動或預設活動
-    const slides = events && events.length > 0 ? events : [
-        {
-            id: "1",
-            title: "探索城市精彩活動",
-            location: "台北 / 新北",
-            date: "每天更新",
-            tags: ["社交", "工作坊", "聚會"],
-        },
-        {
-            id: "2",
-            title: "即將舉辦的熱門活動",
-            location: "全台各地",
-            date: "本週精選",
-            tags: ["音樂", "藝術", "美食"],
-        },
-        {
-            id: "3",
-            title: "認識新朋友",
-            location: "隨時隨地",
-            date: "加入社群",
-            tags: ["Networking", "Meetup"],
-        },
-    ];
+    // 混合模式：Banners 優先顯示，然後是活動
+    const slides: CarouselSlide[] = useMemo(() => {
+        const bannerSlides: CarouselSlide[] = (banners || []).map(b => ({
+            id: b.id,
+            title: b.title,
+            imageUrl: b.imageUrl,
+            linkUrl: b.linkUrl,
+            type: 'banner' as const,
+        }));
+
+        const eventSlides: CarouselSlide[] = (events || []).map(e => ({
+            id: e.id,
+            title: e.title,
+            location: e.location,
+            date: e.date,
+            imageUrl: e.imageUrl,
+            tags: e.tags,
+            type: 'event' as const,
+        }));
+
+        const combined = [...bannerSlides, ...eventSlides];
+
+        // 如果沒有任何內容，顯示預設
+        if (combined.length === 0) {
+            return [
+                { id: "1", title: "探索城市精彩活動", location: "台北 / 新北", date: "每天更新", tags: ["社交", "工作坊"], type: 'event' as const },
+                { id: "2", title: "即將舉辦的熱門活動", location: "全台各地", date: "本週精選", tags: ["音樂", "藝術"], type: 'event' as const },
+            ];
+        }
+
+        return combined;
+    }, [events, banners]);
 
     // Auto-advance
     useEffect(() => {
@@ -101,23 +128,33 @@ export default function HeroCarousel({ events }: HeroCarouselProps) {
                             {slides[currentIndex].title}
                         </h2>
 
-                        {/* Meta Info */}
-                        <div className="hidden md:flex items-center gap-4 text-white/80 text-sm mb-4">
-                            <span className="flex items-center gap-1">
-                                <MapPin className="w-4 h-4" />
-                                {slides[currentIndex].location}
-                            </span>
-                            <span className="flex items-center gap-1">
-                                <Calendar className="w-4 h-4" />
-                                {slides[currentIndex].date}
-                            </span>
-                        </div>
+                        {/* Meta Info - only for events */}
+                        {slides[currentIndex].location && (
+                            <div className="hidden md:flex items-center gap-4 text-white/80 text-sm mb-4">
+                                <span className="flex items-center gap-1">
+                                    <MapPin className="w-4 h-4" />
+                                    {slides[currentIndex].location}
+                                </span>
+                                {slides[currentIndex].date && (
+                                    <span className="flex items-center gap-1">
+                                        <Calendar className="w-4 h-4" />
+                                        {slides[currentIndex].date}
+                                    </span>
+                                )}
+                            </div>
+                        )}
 
-                        {/* CTA Button - hidden on mobile for compact view */}
-                        {events && events.length > 0 && (
-                            <Link href={`/events/${slides[currentIndex].id}`} className="hidden md:inline-block">
+                        {/* CTA Button */}
+                        {slides.length > 0 && (
+                            <Link
+                                href={slides[currentIndex].type === 'banner' && slides[currentIndex].linkUrl
+                                    ? slides[currentIndex].linkUrl!
+                                    : `/events/${slides[currentIndex].id}`}
+                                className="hidden md:inline-block"
+                                target={slides[currentIndex].type === 'banner' && slides[currentIndex].linkUrl?.startsWith('http') ? '_blank' : undefined}
+                            >
                                 <Button className="bg-white text-black hover:bg-gray-100 rounded-full px-6">
-                                    查看詳情
+                                    {slides[currentIndex].type === 'banner' ? '了解更多' : '查看詳情'}
                                     <ChevronRight className="w-4 h-4 ml-1" />
                                 </Button>
                             </Link>

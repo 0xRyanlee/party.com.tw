@@ -3,7 +3,7 @@ import { Plus, User, Users } from "lucide-react";
 
 export default function QuickActions() {
     return (
-        <div className="bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-[32px] p-6 shadow-xl">
+        <div className="bg-zinc-900/80 backdrop-blur-md border border-zinc-700/50 rounded-3xl p-6 shadow-xl">
             <h3 className="text-lg font-bold mb-4 text-white">快速操作</h3>
             <div className="space-y-3">
                 <Link href="/host/edit" className="block group">

@@ -42,7 +42,7 @@ interface DiscussionItemProps {
 function DiscussionItem({ discussion, onLike, onReply, isReply = false }: DiscussionItemProps) {
     const getDisplayInfo = () => {
         if (discussion.display_mode === 'anonymous') {
-            return { name: 'Anonymous', avatar: null, isAnonymous: true };
+            return { name: '匿名用戶', avatar: null, isAnonymous: true };
         }
         if (discussion.display_mode === 'nickname' && discussion.display_name) {
             return {
@@ -52,7 +52,7 @@ function DiscussionItem({ discussion, onLike, onReply, isReply = false }: Discus
             };
         }
         return {
-            name: discussion.author?.full_name || 'Unknown',
+            name: discussion.author?.full_name || '未知用戶',
             avatar: discussion.author?.avatar_url,
             isAnonymous: false,
         };
@@ -149,8 +149,8 @@ export function DiscussionList({
         return (
             <div className="text-center py-12">
                 <MessageCircle className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
-                <p className="text-zinc-500">No discussions yet</p>
-                <p className="text-sm text-zinc-400">Be the first to start a conversation</p>
+                <p className="text-zinc-500">尚無討論內容</p>
+                <p className="text-sm text-zinc-400">成為第一個發起對話的人吧</p>
             </div>
         );
     }
@@ -188,7 +188,7 @@ interface DiscussionInputProps {
     placeholder?: string;
 }
 
-export function DiscussionInput({ onSubmit, isLoading, placeholder = 'Share your thoughts...' }: DiscussionInputProps) {
+export function DiscussionInput({ onSubmit, isLoading, placeholder = '分享您的想法...' }: DiscussionInputProps) {
     const [content, setContent] = useState('');
     const [displayMode, setDisplayMode] = useState<'real' | 'nickname' | 'anonymous'>('real');
 
@@ -206,19 +206,19 @@ export function DiscussionInput({ onSubmit, isLoading, placeholder = 'Share your
     };
 
     return (
-        <div className="bg-zinc-50 rounded-2xl p-4 space-y-3">
+        <div className="bg-zinc-50 rounded-3xl p-4 space-y-3">
             <Textarea
                 value={content}
                 onChange={(e) => setContent(e.target.value)}
                 onKeyDown={handleKeyDown}
                 placeholder={placeholder}
-                className="min-h-[80px] resize-none border-0 bg-white rounded-xl"
+                className="min-h-[80px] resize-none border-0 bg-white rounded-2xl"
             />
 
             <div className="flex items-center justify-between">
                 {/* Identity Selector */}
                 <div className="flex items-center gap-2">
-                    <span className="text-xs text-zinc-500">Post as:</span>
+                    <span className="text-xs text-zinc-500">以身分發佈：</span>
                     {(['real', 'anonymous'] as const).map((mode) => (
                         <button
                             key={mode}
@@ -228,7 +228,7 @@ export function DiscussionInput({ onSubmit, isLoading, placeholder = 'Share your
                                 : 'bg-zinc-200 text-zinc-600 hover:bg-zinc-300'
                                 }`}
                         >
-                            {mode === 'real' ? 'Real Name' : 'Anonymous'}
+                            {mode === 'real' ? '真實姓名' : '匿名用戶'}
                         </button>
                     ))}
                 </div>
@@ -240,12 +240,12 @@ export function DiscussionInput({ onSubmit, isLoading, placeholder = 'Share your
                     className="rounded-full"
                 >
                     <Send className="w-4 h-4 mr-1" />
-                    Post
+                    發佈
                 </Button>
             </div>
 
             <p className="text-xs text-zinc-400">
-                ⌘+Enter to post quickly
+                ⌘+Enter 快速發佈
             </p>
         </div>
     );

@@ -13,7 +13,7 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Search, Plus, Globe, LogOut, Calendar, Settings, User } from 'lucide-react';
+import { Search, Plus, Globe, LogOut, Calendar, Settings, User, Users } from 'lucide-react';
 import { useUser } from '@/hooks/useUser';
 import AuthModal from '@/components/AuthModal';
 import { useLanguage } from '@/lib/i18n';
@@ -39,6 +39,7 @@ export default function Header() {
         { href: '/', label: '首頁', matchExact: true },
         { href: '/events', label: '活動', matchExact: false },
         { href: '/club', label: '社團', matchExact: false },
+        { href: '/following', label: '追蹤', matchExact: true },
         { href: '/settings', label: '設定', matchExact: true },
     ];
 
@@ -136,6 +137,10 @@ export default function Header() {
                                             <DropdownMenuItem onClick={() => router.push('/user/my-events')}>
                                                 <Calendar className="mr-2 h-4 w-4" />
                                                 <span>我的活動</span>
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem onClick={() => router.push('/following')}>
+                                                <Users className="mr-2 h-4 w-4" />
+                                                <span>關注管理</span>
                                             </DropdownMenuItem>
                                             <DropdownMenuItem onClick={() => router.push('/settings')}>
                                                 <Settings className="mr-2 h-4 w-4" />

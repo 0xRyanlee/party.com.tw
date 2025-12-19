@@ -21,8 +21,25 @@ function formatEventDate(dateStr: string): { date: string; dayOfWeek: string; ti
   };
 }
 
+export interface Banner {
+  id: string;
+  title: string;
+  image_url: string;
+  link_url?: string;
+  display_order: number;
+  is_active: boolean;
+}
+
 export default async function Home() {
   const supabase = await createClient();
+
+  // Fetch active banners
+  const { data: dbBanners } = await supabase
+    .from('banners')
+    .select('*')
+    .eq('is_active', true)
+    .order('display_order', { ascending: true })
+    .limit(5);
 
   // Fetch published events from database
   const { data: dbEvents, error } = await supabase
@@ -91,5 +108,6 @@ export default async function Home() {
     };
   });
 
-  return <HomeClient initialEvents={events} />;
+  return <HomeClient initialEvents={events} initialBanners={dbBanners || []} />;
 }
+

@@ -12,13 +12,16 @@ import { Plus, Pencil, Trash2, ExternalLink } from "lucide-react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
+import ImageUploader from "@/components/host/ImageUploader";
+import StructuredImage from "@/components/common/StructuredImage";
 
 const bannerSchema = z.object({
     title: z.string().min(1, "請輸入標題"),
-    image_url: z.string().url("請輸入有效的圖片網址"),
+    image_url: z.string().min(1, "請上傳圖片"),
     link_url: z.string().url("請輸入有效的連結網址").optional().or(z.literal("")),
     display_order: z.number(),
     is_active: z.boolean(),
+    image_metadata: z.any().optional(),
 });
 
 type BannerFormValues = z.infer<typeof bannerSchema>;
@@ -38,6 +41,7 @@ export default function BannersPage() {
             link_url: "",
             display_order: 0,
             is_active: true,
+            image_metadata: {},
         },
     });
 
@@ -106,6 +110,7 @@ export default function BannersPage() {
             link_url: banner.link_url || "",
             display_order: banner.display_order,
             is_active: banner.is_active,
+            image_metadata: banner.image_metadata || {},
         });
         setIsDialogOpen(true);
     };
@@ -145,9 +150,16 @@ export default function BannersPage() {
                                 )}
                             </div>
 
-                            <div className="space-y-2">
-                                <Label htmlFor="image_url">圖片網址</Label>
-                                <Input id="image_url" {...form.register("image_url")} />
+                            <div className="space-y-4">
+                                <Label>橫幅圖片</Label>
+                                <ImageUploader
+                                    value={form.watch("image_url")}
+                                    onChange={(url) => form.setValue("image_url", url)}
+                                    metadata={form.watch("image_metadata")}
+                                    onMetadataChange={(meta) => form.setValue("image_metadata", meta)}
+                                    pathPrefix="banners"
+                                    showToggle={false}
+                                />
                                 {form.formState.errors.image_url && (
                                     <p className="text-sm text-red-500">{form.formState.errors.image_url.message}</p>
                                 )}
@@ -191,12 +203,13 @@ export default function BannersPage() {
                     {banners.map((banner) => (
                         <Card key={banner.id} className="overflow-hidden">
                             <div className="aspect-video w-full relative bg-gray-100 dark:bg-gray-800">
-                                {/* eslint-disable-next-line @next/next/no-img-element */}
-                                <img
+                                <StructuredImage
                                     src={banner.image_url}
                                     alt={banner.title}
-                                    className="object-cover w-full h-full"
-                                    onError={(e) => (e.currentTarget.src = "https://placehold.co/600x400?text=No+Image")}
+                                    metadata={banner.image_metadata}
+                                    size="card"
+                                    aspectRatio="video"
+                                    className="w-full h-full"
                                 />
                                 {!banner.is_active && (
                                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold">

@@ -18,12 +18,23 @@ import QuickActions from '@/components/QuickActions';
 import CategoryFilter from '@/components/CategoryFilter';
 import { Suspense } from 'react';
 import AttendedEventsWidget from '@/components/AttendedEventsWidget';
+import StructuredImage from '@/components/common/StructuredImage';
+
+export interface Banner {
+    id: string;
+    title: string;
+    image_url: string;
+    link_url?: string;
+    display_order: number;
+    is_active: boolean;
+}
 
 interface HomeClientProps {
     initialEvents: Event[];
+    initialBanners?: Banner[];
 }
 
-function HomeContent({ initialEvents }: HomeClientProps) {
+function HomeContent({ initialEvents, initialBanners = [] }: HomeClientProps) {
     const { t } = useLanguage();
     const searchParams = useSearchParams();
     const [showOnboarding, setShowOnboarding] = useState(false);
@@ -90,7 +101,7 @@ function HomeContent({ initialEvents }: HomeClientProps) {
 
             <PageTransition className="container mx-auto px-4 py-6 md:py-8 max-w-7xl flex-1">
 
-                {/* Hero Carousel */}
+                {/* Hero Carousel - Mixed mode: Admin Banners + Promoted Events */}
                 <HeroCarousel
                     events={activeEvents.slice(0, 3).map(e => ({
                         id: e.id,
@@ -99,6 +110,12 @@ function HomeContent({ initialEvents }: HomeClientProps) {
                         date: e.date,
                         imageUrl: e.image,
                         tags: e.tags.slice(0, 3),
+                    }))}
+                    banners={initialBanners.map(b => ({
+                        id: b.id,
+                        title: b.title,
+                        imageUrl: b.image_url,
+                        linkUrl: b.link_url,
                     }))}
                 />
 
@@ -151,22 +168,17 @@ function HomeContent({ initialEvents }: HomeClientProps) {
                                         <Link
                                             key={event.id}
                                             href={`/events/${event.id}`}
-                                            className="bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer group flex gap-4 active:scale-[0.99]"
+                                            className="bg-white rounded-3xl p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer group flex gap-4 active:scale-[0.99]"
                                         >
                                             {/* Image */}
-                                            <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-xl bg-zinc-200 relative overflow-hidden">
-                                                {event.image ? (
-                                                    <img
-                                                        src={event.image}
-                                                        alt={event.title}
-                                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
-                                                        loading="lazy"
-                                                    />
-                                                ) : (
-                                                    <div className="absolute inset-0 bg-zinc-300 flex items-center justify-center">
-                                                        <span className="text-zinc-500 text-xs">No image</span>
-                                                    </div>
-                                                )}
+                                            <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-2xl bg-zinc-200 relative overflow-hidden">
+                                                <StructuredImage
+                                                    src={event.image}
+                                                    alt={event.title}
+                                                    size="thumb"
+                                                    aspectRatio="square"
+                                                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                />
                                                 <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm z-10">
                                                     {event.date}
                                                 </div>
@@ -209,7 +221,7 @@ function HomeContent({ initialEvents }: HomeClientProps) {
                                     ))}
                                 </div>
                             ) : (
-                                <div className="text-center py-12 bg-white rounded-2xl border border-gray-100">
+                                <div className="text-center py-12 bg-white rounded-3xl border border-gray-100">
                                     <p className="text-gray-500">目前沒有活動</p>
                                     <Link href="/host/edit" className="text-black font-medium mt-2 inline-block">
                                         創建第一個活動
@@ -265,7 +277,7 @@ function HomeContent({ initialEvents }: HomeClientProps) {
                             onClick={() => setIsMapOpen(true)}
                             className="bg-white rounded-2xl p-2 border border-gray-100 shadow-sm h-[250px] relative overflow-hidden group cursor-pointer"
                         >
-                            <div className="absolute inset-2 rounded-xl overflow-hidden bg-neutral-100">
+                            <div className="absolute inset-2 rounded-2xl overflow-hidden bg-neutral-100">
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                                 <div className="absolute bottom-0 left-0 right-0 p-4">
                                     <div className="flex items-center justify-between">
@@ -283,11 +295,11 @@ function HomeContent({ initialEvents }: HomeClientProps) {
                         </motion.div>
 
                         {/* Quick Stats */}
-                        <div className="bg-neutral-900 text-white rounded-2xl p-6">
+                        <div className="bg-neutral-900 text-white rounded-3xl p-6">
                             <h3 className="text-lg font-bold mb-2">{t('home.sidebar.yourVibe')}</h3>
                             <p className="text-gray-400 text-sm mb-4">探索更多符合你風格的活動</p>
                             <div className="space-y-2">
-                                <div className="flex justify-between items-center p-3 bg-white/10 rounded-xl text-sm">
+                                <div className="flex justify-between items-center p-3 bg-white/10 rounded-2xl text-sm">
                                     <span>熱門標籤</span>
                                     <span className="font-bold">Tech, Party</span>
                                 </div>
@@ -316,7 +328,7 @@ function HomeContent({ initialEvents }: HomeClientProps) {
     );
 }
 
-export default function HomeClient({ initialEvents }: HomeClientProps) {
+export default function HomeClient({ initialEvents, initialBanners = [] }: HomeClientProps) {
     return (
         <Suspense fallback={
             <div className="min-h-screen flex items-center justify-center bg-gray-50/50">
@@ -326,7 +338,7 @@ export default function HomeClient({ initialEvents }: HomeClientProps) {
                 </div>
             </div>
         }>
-            <HomeContent initialEvents={initialEvents} />
+            <HomeContent initialEvents={initialEvents} initialBanners={initialBanners} />
         </Suspense>
     );
 }

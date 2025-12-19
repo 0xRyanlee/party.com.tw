@@ -32,6 +32,7 @@ const adminEventSchema = z.object({
         threads: z.string().optional(),
     }),
     sourceTag: z.enum(["external", "public", "curated"]).optional(),
+    imageMetadata: z.any().optional(),
 });
 
 type AdminEventFormValues = z.infer<typeof adminEventSchema>;
@@ -64,6 +65,7 @@ export default function AdminEventsCreate() {
                 threads: "",
             },
             sourceTag: "curated",
+            imageMetadata: {},
         }
     });
 
@@ -93,6 +95,7 @@ export default function AdminEventsCreate() {
                 sourceUrl: data.sourceUrl || null,
                 socialLinks: data.socialLinks,
                 sourceTag: data.sourceTag,
+                imageMetadata: data.imageMetadata,
             };
 
             const response = await fetch('/api/events', {
@@ -225,12 +228,14 @@ export default function AdminEventsCreate() {
                         </div>
                     </div>
 
-                    {/* Media */}
                     <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h2 className="text-lg font-bold">封面圖片</h2>
+                        <h2 className="text-lg font-bold">封面圖片與 SEO</h2>
                         <ImageUploader
                             value={watch("image")}
                             onChange={(val) => setValue("image", val)}
+                            metadata={watch("imageMetadata")}
+                            onMetadataChange={(meta) => setValue("imageMetadata", meta)}
+                            pathPrefix="events"
                         />
                     </div>
                 </div>

@@ -11,6 +11,9 @@ import { useLanguage } from '@/lib/i18n';
 import RegistrationModal from '@/components/RegistrationModal';
 import QuickRegisterButton from '@/components/QuickRegisterButton';
 import AuthModal from '@/components/AuthModal';
+import StructuredImage from '@/components/common/StructuredImage';
+import EventReviews from '@/components/EventReviews';
+import { useEffect } from 'react';
 
 interface EventDetailClientProps {
     event: Event;
@@ -23,6 +26,50 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
     const [showRegistrationModal, setShowRegistrationModal] = useState(false);
     const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
     const [isRegistered, setIsRegistered] = useState(initialIsRegistered);
+    const [isFollowing, setIsFollowing] = useState(false);
+    const [isFollowingLoading, setIsFollowingLoading] = useState(false);
+
+    const handleFollow = async () => {
+        if (!isLoggedIn) {
+            setIsAuthModalOpen(true);
+            return;
+        }
+
+        setIsFollowingLoading(true);
+        try {
+            const response = await fetch('/api/follows', {
+                method: isFollowing ? 'DELETE' : 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ followingId: event.organizer.id }),
+            });
+
+            if (response.ok) {
+                setIsFollowing(!isFollowing);
+            }
+        } catch (error) {
+            console.error('Follow error:', error);
+        } finally {
+            setIsFollowingLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        const checkFollowStatus = async () => {
+            if (isLoggedIn && event.organizer.id) {
+                try {
+                    const response = await fetch(`/api/follows?followingId=${event.organizer.id}`);
+                    if (response.ok) {
+                        const data = await response.json();
+                        setIsFollowing(data.following);
+                    }
+                } catch (error) {
+                    console.error('Check follow status error:', error);
+                }
+            }
+        };
+
+        checkFollowStatus();
+    }, [isLoggedIn, event.organizer.id]);
 
     // Swiss Vibe: Large radii, monochrome palette, high contrast
     return (
@@ -31,9 +78,13 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
 
             {/* Hero Section */}
             <div className="relative h-[50vh] w-full overflow-hidden">
-                <div
-                    className="absolute inset-0 bg-cover bg-center grayscale-[20%]" // Slight desaturation for vibe
-                    style={{ backgroundImage: `url(${event.image})` }}
+                <StructuredImage
+                    src={event.image}
+                    alt={event.title}
+                    size="hero"
+                    aspectRatio="auto"
+                    className="absolute inset-0 w-full h-full grayscale-[20%]"
+                    priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-transparent to-black/60" />
 
@@ -47,7 +98,7 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
             </div>
 
             <div className="container mx-auto px-4 md:px-6 -mt-20 relative z-20">
-                <div className="bg-white rounded-[40px] shadow-xl border border-neutral-100 p-6 md:p-10">
+                <div className="bg-white rounded-3xl shadow-xl border border-neutral-100 p-6 md:p-10">
                     <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
                         <div className="space-y-4 flex-1">
                             <div className="flex flex-wrap gap-2">
@@ -59,18 +110,25 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                                         {attr}
                                     </Badge>
                                 ))}
-                                {/* Source Tag - distinctive gray rounded rectangle */}
-                                {event.sourceName && event.sourceUrl && (
+                            </div>
+
+                            {/* Enhanced Source/Ref Information */}
+                            {event.sourceName && event.sourceUrl && (
+                                <div className="flex items-center gap-2 mb-2 p-2 px-4 bg-orange-50 border border-orange-100 rounded-2xl w-fit">
+                                    <span className="flex h-2 w-2 rounded-full bg-orange-400 animate-pulse" />
+                                    <span className="text-xs font-bold text-orange-800 uppercase tracking-wider">自動化同步來源</span>
+                                    <span className="text-neutral-300">|</span>
                                     <a
                                         href={event.sourceUrl}
                                         target="_blank"
                                         rel="noopener noreferrer"
-                                        className="inline-flex items-center gap-1.5 px-4 py-1.5 bg-neutral-100 hover:bg-neutral-200 text-neutral-500 rounded-xl text-sm font-medium transition-colors"
+                                        className="text-sm font-bold text-orange-600 hover:text-orange-700 underline flex items-center gap-1"
                                     >
-                                        轉自 {event.sourceName} →
+                                        {event.sourceName} 原文鏈接 →
                                     </a>
-                                )}
-                            </div>
+                                </div>
+                            )}
+
                             <h1 className="text-4xl md:text-5xl font-extrabold tracking-tight text-neutral-950 leading-tight">
                                 {event.title}
                             </h1>
@@ -108,7 +166,7 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                     <div className="lg:col-span-8 space-y-8">
                         {/* Info Cards */}
                         <div className="grid sm:grid-cols-2 gap-4">
-                            <div className="bg-neutral-50 p-6 rounded-[32px] border border-neutral-100 flex items-start gap-4 hover:bg-neutral-100 transition-colors">
+                            <div className="bg-neutral-50 p-6 rounded-3xl border border-neutral-100 flex items-start gap-4 hover:bg-neutral-100 transition-colors">
                                 <div className="w-12 h-12 rounded-full bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 shrink-0 shadow-sm">
                                     <Calendar className="w-5 h-5" />
                                 </div>
@@ -118,7 +176,7 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                                     <p className="text-neutral-500">{event.time}</p>
                                 </div>
                             </div>
-                            <div className="bg-neutral-50 p-6 rounded-[32px] border border-neutral-100 flex items-start gap-4 hover:bg-neutral-100 transition-colors">
+                            <div className="bg-neutral-50 p-6 rounded-3xl border border-neutral-100 flex items-start gap-4 hover:bg-neutral-100 transition-colors">
                                 <div className="w-12 h-12 rounded-full bg-white border border-neutral-200 flex items-center justify-center text-neutral-900 shrink-0 shadow-sm">
                                     <MapPin className="w-5 h-5" />
                                 </div>
@@ -131,7 +189,7 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                         </div>
 
                         {/* Description */}
-                        <div className="space-y-6 bg-white p-8 rounded-[32px] border border-neutral-100 shadow-sm">
+                        <div className="space-y-6 bg-white p-8 rounded-3xl border border-neutral-100 shadow-sm">
                             <h2 className="text-2xl font-bold tracking-tight text-neutral-900">關於活動</h2>
                             <div className="prose prose-neutral max-w-none text-neutral-600 whitespace-pre-line leading-relaxed">
                                 {event.description}
@@ -151,29 +209,20 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                             </div>
                         </div>
 
-                        {/* Map Preview */}
-                        <div className="space-y-4">
-                            <h2 className="text-2xl font-bold tracking-tight text-neutral-900 px-2">活動位置</h2>
-                            <div className="h-80 bg-neutral-100 rounded-[32px] overflow-hidden relative border border-neutral-200">
-                                <div className="absolute inset-0 flex items-center justify-center bg-neutral-50">
-                                    <div className="text-center space-y-3">
-                                        <div className="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto shadow-sm border border-neutral-100">
-                                            <MapPin className="w-6 h-6 text-neutral-900" />
-                                        </div>
-                                        <div>
-                                            <p className="text-sm font-bold text-neutral-900">地圖預覽</p>
-                                            <p className="text-xs text-neutral-500 mt-1 max-w-[200px] mx-auto">{event.location}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        {/* Reviews Section */}
+                        <div className="pt-8 border-t border-neutral-100">
+                            <EventReviews
+                                eventId={event.id}
+                                isLoggedIn={isLoggedIn}
+                                canReview={isLoggedIn && isRegistered}
+                            />
                         </div>
                     </div>
 
                     {/* Right Column: Sidebar */}
                     <div className="lg:col-span-4 space-y-6">
                         {/* Organizer Card */}
-                        <div className="bg-white p-6 rounded-[32px] border border-neutral-100 shadow-sm">
+                        <div className="bg-white p-6 rounded-3xl border border-neutral-100 shadow-sm">
                             <h3 className="font-bold mb-6 text-xs uppercase tracking-widest text-neutral-400">HOSTED BY</h3>
                             <div className="flex items-center gap-4 mb-6">
                                 <div
@@ -190,13 +239,32 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                                     <p className="text-sm text-neutral-500 font-medium">已舉辦 5 場活動</p>
                                 </div>
                             </div>
-                            <Button variant="outline" className="w-full rounded-full border-neutral-200 hover:bg-neutral-50 font-bold tracking-tight text-neutral-900">
-                                關注主辦方
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant={isFollowing ? "outline" : "default"}
+                                    onClick={handleFollow}
+                                    disabled={isFollowingLoading}
+                                    className={`flex-1 rounded-full font-bold tracking-tight ${!isFollowing ? 'bg-neutral-900 text-white hover:bg-neutral-800' : 'border-neutral-200 text-neutral-900'
+                                        }`}
+                                >
+                                    {isFollowing ? '已關注' : '關注主辦方'}
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    className="flex-1 rounded-full border-neutral-200 hover:bg-neutral-50 font-bold tracking-tight text-neutral-900"
+                                    onClick={() => {
+                                        if (event.organizer.id) {
+                                            window.location.href = `mailto:contact@party.com?subject=Contact Organizer: ${event.organizer.name}`;
+                                        }
+                                    }}
+                                >
+                                    聯絡
+                                </Button>
+                            </div>
                         </div>
 
                         {/* Ticket Info (Desktop) */}
-                        <div className="hidden lg:block bg-neutral-900 p-8 rounded-[32px] shadow-xl text-white sticky top-24">
+                        <div className="hidden lg:block bg-neutral-900 p-8 rounded-3xl shadow-xl text-white sticky top-24">
                             <div className="flex justify-between items-center mb-8 border-b border-neutral-800 pb-6">
                                 <span className="text-neutral-400 font-medium">目前的票價</span>
                                 <span className="text-3xl font-bold tracking-tight text-white">{event.price}</span>
@@ -253,6 +321,6 @@ export default function EventDetailClient({ event, isLoggedIn, initialIsRegister
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
             />
-        </div>
+        </div >
     );
 }

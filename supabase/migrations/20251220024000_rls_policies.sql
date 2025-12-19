@@ -10,24 +10,28 @@ ALTER TABLE public.events ENABLE ROW LEVEL SECURITY;
 -- 2. Events Policies
 
 -- 所有人可查看已發布的活動
+drop policy if exists "Public events are viewable by everyone" on public.events;
 CREATE POLICY "Public events are viewable by everyone"
 ON public.events
 FOR SELECT
 USING (status = 'published');
 
 -- 創建者可查看自己的所有活動（包括草稿）
+drop policy if exists "Users can view their own events" on public.events;
 CREATE POLICY "Users can view their own events"
 ON public.events
 FOR SELECT
 USING (auth.uid() = organizer_id);
 
 -- 已登入用戶可創建活動
+drop policy if exists "Authenticated users can create events" on public.events;
 CREATE POLICY "Authenticated users can create events"
 ON public.events
 FOR INSERT
 WITH CHECK (auth.uid() = organizer_id);
 
 -- 創建者可更新自己的活動
+drop policy if exists "Users can update their own events" on public.events;
 CREATE POLICY "Users can update their own events"
 ON public.events
 FOR UPDATE
@@ -35,6 +39,7 @@ USING (auth.uid() = organizer_id)
 WITH CHECK (auth.uid() = organizer_id);
 
 -- 創建者可刪除自己的活動
+drop policy if exists "Users can delete their own events" on public.events;
 CREATE POLICY "Users can delete their own events"
 ON public.events
 FOR DELETE
@@ -48,6 +53,7 @@ USING (auth.uid() = organizer_id);
 ALTER TABLE public.event_roles ENABLE ROW LEVEL SECURITY;
 
 -- 所有人可查看角色需求（透過已發布的活動）
+drop policy if exists "Event roles are viewable for published events" on public.event_roles;
 CREATE POLICY "Event roles are viewable for published events"
 ON public.event_roles
 FOR SELECT
@@ -60,6 +66,7 @@ USING (
 );
 
 -- 活動創建者可查看自己活動的所有角色
+drop policy if exists "Event organizers can view their event roles" on public.event_roles;
 CREATE POLICY "Event organizers can view their event roles"
 ON public.event_roles
 FOR SELECT
@@ -72,6 +79,7 @@ USING (
 );
 
 -- 活動創建者可管理角色
+drop policy if exists "Event organizers can manage roles" on public.event_roles;
 CREATE POLICY "Event organizers can manage roles"
 ON public.event_roles
 FOR ALL
@@ -98,6 +106,7 @@ WITH CHECK (
 ALTER TABLE public.event_resources ENABLE ROW LEVEL SECURITY;
 
 -- 所有人可查看資源需求（透過已發布的活動）
+drop policy if exists "Event resources are viewable for published events" on public.event_resources;
 CREATE POLICY "Event resources are viewable for published events"
 ON public.event_resources
 FOR SELECT
@@ -110,6 +119,7 @@ USING (
 );
 
 -- 活動創建者可查看自己活動的所有資源
+drop policy if exists "Event organizers can view their event resources" on public.event_resources;
 CREATE POLICY "Event organizers can view their event resources"
 ON public.event_resources
 FOR SELECT
@@ -122,6 +132,7 @@ USING (
 );
 
 -- 活動創建者可管理資源
+drop policy if exists "Event organizers can manage resources" on public.event_resources;
 CREATE POLICY "Event organizers can manage resources"
 ON public.event_resources
 FOR ALL

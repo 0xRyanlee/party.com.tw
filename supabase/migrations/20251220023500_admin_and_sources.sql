@@ -13,10 +13,12 @@ create table if not exists public.banners (
 -- RLS for Banners
 alter table public.banners enable row level security;
 
+drop policy if exists "Banners are viewable by everyone." on public.banners;
 create policy "Banners are viewable by everyone."
   on public.banners for select
   using ( true );
 
+drop policy if exists "Admins can manage banners." on public.banners;
 create policy "Admins can manage banners."
   on public.banners for all
   using ( 
@@ -41,10 +43,12 @@ create table if not exists public.announcements (
 -- RLS for Announcements
 alter table public.announcements enable row level security;
 
+drop policy if exists "Announcements are viewable by everyone." on public.announcements;
 create policy "Announcements are viewable by everyone."
   on public.announcements for select
   using ( true );
 
+drop policy if exists "Admins can manage announcements." on public.announcements;
 create policy "Admins can manage announcements."
   on public.announcements for all
   using ( 

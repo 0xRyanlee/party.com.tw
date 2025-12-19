@@ -25,9 +25,9 @@ interface ClubCardProps {
 }
 
 const TYPE_STYLES = {
-    public: { bg: 'bg-black', label: 'Public' },
-    private: { bg: 'bg-purple-600', label: 'Private' },
-    vendor: { bg: 'bg-blue-600', label: 'Vendor' },
+    public: { bg: 'bg-black', label: '公開' },
+    private: { bg: 'bg-purple-600', label: '私密' },
+    vendor: { bg: 'bg-blue-600', label: '商戶' },
 };
 
 const TYPE_ICONS = {
@@ -114,7 +114,7 @@ export default function ClubCard({ club, showOwner = false }: ClubCardProps) {
                                     <div className="w-5 h-5 rounded-full bg-zinc-200" />
                                 )}
                                 <span className="text-xs text-zinc-500 truncate max-w-[80px]">
-                                    {club.owner.full_name || 'Unknown'}
+                                    {club.owner.full_name || '未知用戶'}
                                 </span>
                             </div>
                         )}

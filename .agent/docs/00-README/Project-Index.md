@@ -1,104 +1,108 @@
-# Party Documentation Index
+# Party 文檔索引
 
 > 快速找到你需要的文件
+> 版本：v1.6 | 更新：2025-12-20
 
 ---
 
-## 📍 你是誰？從哪開始？
+## 📍 快速開始
 
-| 角色 | 起點文件 |
-|------|----------|
-| 新人 / 接手者 | 本文件 → PRD-Master |
-| 產品經理 | 01-Product/ |
-| 工程師 | 02-Requirements/FRD/ |
-| 增長 / 數據 | 03-Growth-Data/ |
-| 商務 / 財務 | 04-Monetization/ |
-| 投資人 / 合作方 | 07-External/ |
+| 你是誰 | 起點 |
+|--------|------|
+| 新人/交接 | 本文件 → PRD-Master |
+| 產品經理 | `01-Product/` |
+| 工程師 | `02-Requirements/FRD/` |
+| 增長/數據 | `03-Growth-Data/` |
+| 商務/財務 | `04-Monetization/` |
+| 技術架構 | `05-Tech-Reference/` |
 
 ---
 
 ## 📂 目錄結構
 
 ```
-Party/
-├─ 00-README/
-│  └─ Project-Index.md          ← 你在這裡
-│
-├─ 01-Product/                  ← 產品決策層
-│  ├─ PRD-Master.md
-│  ├─ Event-Core-Definition.md
-│  ├─ Feature-PRD/
-│  │  ├─ Chat-Thread-PRD.md
-│  │  ├─ Subscription-Pricing-PRD.md
-│  │  ├─ Club-PRD.md
-│  │  └─ Review-Trust-PRD.md
-│  └─ User-Journey/
-│     ├─ Attendee-Journey.md
-│     ├─ Host-Journey.md
-│     └─ Club-Owner-Journey.md
-│
-├─ 02-Requirements/             ← 工程落地層
-│  ├─ FRD/
-│  │  ├─ FRD-Event.md
-│  │  ├─ FRD-Chat.md
-│  │  ├─ FRD-Ticket.md
-│  │  └─ FRD-Subscription.md
-│  ├─ Permission-Matrix.md
-│  └─ Edge-Case-Rulebook.md
-│
-├─ 03-Growth-Data/              ← 方向盤
-│  ├─ North-Star-Metrics.md
-│  ├─ KPI-Tree.md
-│  ├─ Event-Tracking-Spec.md
-│  └─ Growth-Flywheel.md
-│
-├─ 04-Monetization/             ← 現金邏輯
-│  ├─ Pricing-Packaging.md
-│  ├─ Unit-Economics.md
-│  └─ Promotion-Logic.md
-│
-├─ 05-Tech-Reference/           ← 技術參考
-│  ├─ Data-Model.md
-│  ├─ State-Machine.md
-│  └─ Integration-Map.md
-│
-├─ 06-Delivery/                 ← 實際交付
-│  ├─ Linear-Mapping.md
-│  ├─ Roadmap-V0-V3.md
-│  └─ Release-Notes.md
-│
-└─ 07-External/                 ← 對外
-   ├─ Pitch-Narrative.md
-   ├─ Partner-Playbook.md
-   └─ Public-Product-Story.md
+.agent/
+├── docs/                        # 📚 主文檔庫（本目錄）
+│   ├── 00-README/               # 索引
+│   ├── 01-Product/              # 產品定義
+│   ├── 02-Requirements/         # 功能需求
+│   ├── 03-Growth-Data/          # 成長指標
+│   ├── 04-Monetization/         # 商業化
+│   ├── 05-Tech-Reference/       # 技術參考
+│   ├── 06-Delivery/             # 交付進度 ⭐
+│   └── 07-External/             # 對外文檔
+├── ui/                          # 🎨 設計規範
+│   ├── DESIGN_GRAMMER.md        # 設計語法
+│   ├── COMPONENT_SPEC.md        # 組件規格
+│   └── RULESET.md               # 規則集
+└── workflows/                   # 🔄 工作流程
 ```
 
 ---
 
-## 🚦 文件狀態說明
+## ⭐ 核心文檔
 
-| 狀態 | 含義 |
+| 文檔 | 說明 | 狀態 |
+|------|------|------|
+| [Roadmap-V0-V3](../06-Delivery/Roadmap-V0-V3.md) | 版本規劃 | ✅ 最新 |
+| [Release-Notes](../06-Delivery/Release-Notes.md) | 更新日誌 | ✅ 最新 |
+| [PRD-Master](../01-Product/PRD-Master.md) | 產品總覽 | ✅ |
+| [DESIGN_GRAMMER](../../ui/DESIGN_GRAMMER.md) | 設計語法 | ✅ |
+| [Permission-Matrix](../02-Requirements/Permission-Matrix.md) | 權限矩陣 | ✅ |
+| [Growth-Flywheel](../03-Growth-Data/Growth-Flywheel.md) | 成長飛輪 | ✅ |
+
+---
+
+## 🚀 當前進度（v1.6）
+
+```
+V0 MVP 進度: ████████████████░░░░ 80%
+```
+
+### ✅ 已實裝
+
+- 活動 CRUD + Supabase
+- 認證（Google/Line OAuth）
+- 首頁 + 活動詳情
+- 主辦方儀表板
+- Admin 後台（中文化）
+- 會員定價頁
+
+### 🚧 開發中
+
+- Banner 混合模式
+- 圖片上傳
+
+### 📋 待開發
+
+- QR 簽到
+- 基礎聊天
+- 數據追蹤
+
+---
+
+## 🔗 資源連結
+
+| 服務 | 連結 |
 |------|------|
-| ✅ Complete | 可直接使用 |
-| 🚧 Draft | 有內容但未定稿 |
-| 📋 Template | 僅結構，待填寫 |
-| ⏳ Planned | 尚未開始 |
+| Supabase | [Dashboard](https://supabase.com/dashboard) |
+| Vercel | [Deployments](https://vercel.com) |
+| GitHub | [Repository](https://github.com) |
 
 ---
 
-## 📌 現有文件對照表
+## 📝 文檔規範
 
-| 原始位置 | 新位置 |
-|----------|--------|
-| `.agent/ui/PRD.md` | `01-Product/PRD-Master.md` |
-| `.agent/ui/DESIGN_GRAMMER.md` | `05-Tech-Reference/Design-Grammar.md` |
-| `docs/data_mapping.md` | `05-Tech-Reference/Data-Model.md` |
-| `docs/TASKS.md` | `06-Delivery/Linear-Mapping.md` |
+### 狀態標記
 
----
+- ✅ Complete - 可直接使用
+- 🚧 Draft - 有內容但未定稿
+- 📋 Template - 僅結構
+- ⏳ Planned - 尚未開始
 
-## 🔗 相關資源
+### LLM 優化原則
 
-- [Supabase Dashboard](https://supabase.com/dashboard)
-- [Vercel Deployment](https://vercel.com)
-- [Linear Board](https://linear.app)
+1. **結構化** - 使用表格、列表
+2. **精簡** - 避免冗餘描述
+3. **可搜尋** - 關鍵詞明確
+4. **可執行** - 提供具體步驟

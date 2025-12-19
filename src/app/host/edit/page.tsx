@@ -44,6 +44,7 @@ const eventSchema = z.object({
         price: z.number().min(0, "Price cannot be negative"),
         quantity: z.number().min(1, "Quantity must be at least 1"),
     })),
+    imageMetadata: z.any().optional(),
 });
 
 type EventFormValues = z.infer<typeof eventSchema>;
@@ -92,6 +93,7 @@ export default function HostEdit() {
             locationName: "",
             address: "",
             externalLink: "",
+            imageMetadata: {},
         }
     });
 
@@ -151,6 +153,7 @@ export default function HostEdit() {
                 tags: selectedTags,
                 status: data.isPublic ? 'published' : 'draft',
                 externalLink: data.externalLink || null,
+                imageMetadata: data.imageMetadata,
             };
 
             // 創建活動
@@ -353,9 +356,12 @@ export default function HostEdit() {
                         <ImageUploader
                             value={watch("image")}
                             onChange={(val) => setValue("image", val)}
+                            metadata={watch("imageMetadata")}
+                            onMetadataChange={(meta) => setValue("imageMetadata", meta)}
                             enabled={mediaEnabled}
                             onEnabledChange={setMediaEnabled}
                             showToggle={true}
+                            pathPrefix="events"
                         />
                     </div>
 

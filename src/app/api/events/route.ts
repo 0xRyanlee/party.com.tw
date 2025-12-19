@@ -70,10 +70,10 @@ export async function POST(request: NextRequest) {
             status: body.status || 'draft',
             language: body.language || 'zh',
 
-            // 主辦方資訊（從用戶資料獲取）
             organizer_name: user.user_metadata?.full_name || user.email?.split('@')[0] || 'Anonymous',
             organizer_avatar: user.user_metadata?.avatar_url || null,
             organizer_verified: false,
+            image_metadata: body.imageMetadata || {},
         };
 
         // 創建活動

@@ -14,9 +14,9 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import * as z from "zod";
 
 const bannerSchema = z.object({
-    title: z.string().min(1, "Title is required"),
-    image_url: z.string().url("Must be a valid URL"),
-    link_url: z.string().url("Must be a valid URL").optional().or(z.literal("")),
+    title: z.string().min(1, "請輸入標題"),
+    image_url: z.string().url("請輸入有效的圖片網址"),
+    link_url: z.string().url("請輸入有效的連結網址").optional().or(z.literal("")),
     display_order: z.number(),
     is_active: z.boolean(),
 });
@@ -77,12 +77,12 @@ export default function BannersPage() {
             fetchBanners();
         } catch (error) {
             console.error("Error saving banner:", error);
-            alert("Failed to save banner");
+            alert("儲存失敗");
         }
     };
 
     const handleDelete = async (id: string) => {
-        if (!confirm("Are you sure you want to delete this banner?")) return;
+        if (!confirm("確定要刪除此橫幅？")) return;
 
         try {
             const { error } = await supabase
@@ -94,7 +94,7 @@ export default function BannersPage() {
             fetchBanners();
         } catch (error) {
             console.error("Error deleting banner:", error);
-            alert("Failed to delete banner");
+            alert("刪除失敗");
         }
     };
 
@@ -125,20 +125,20 @@ export default function BannersPage() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold tracking-tight">Banners</h2>
+                <h2 className="text-3xl font-bold tracking-tight">輪播橫幅</h2>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button onClick={openNew}>
-                            <Plus className="mr-2 h-4 w-4" /> Add Banner
+                            <Plus className="mr-2 h-4 w-4" /> 新增橫幅
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>{editingBanner ? "Edit Banner" : "New Banner"}</DialogTitle>
+                            <DialogTitle>{editingBanner ? "編輯橫幅" : "新增橫幅"}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Title</Label>
+                                <Label htmlFor="title">標題</Label>
                                 <Input id="title" {...form.register("title")} />
                                 {form.formState.errors.title && (
                                     <p className="text-sm text-red-500">{form.formState.errors.title.message}</p>
@@ -146,7 +146,7 @@ export default function BannersPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="image_url">Image URL</Label>
+                                <Label htmlFor="image_url">圖片網址</Label>
                                 <Input id="image_url" {...form.register("image_url")} />
                                 {form.formState.errors.image_url && (
                                     <p className="text-sm text-red-500">{form.formState.errors.image_url.message}</p>
@@ -154,7 +154,7 @@ export default function BannersPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="link_url">Link URL (Optional)</Label>
+                                <Label htmlFor="link_url">連結網址（選填）</Label>
                                 <Input id="link_url" {...form.register("link_url")} />
                                 {form.formState.errors.link_url && (
                                     <p className="text-sm text-red-500">{form.formState.errors.link_url.message}</p>
@@ -162,7 +162,7 @@ export default function BannersPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="display_order">Display Order</Label>
+                                <Label htmlFor="display_order">顯示順序</Label>
                                 <Input type="number" id="display_order" {...form.register("display_order", { valueAsNumber: true })} />
                             </div>
 
@@ -172,7 +172,7 @@ export default function BannersPage() {
                                     checked={form.watch("is_active")}
                                     onCheckedChange={(checked) => form.setValue("is_active", checked)}
                                 />
-                                <Label htmlFor="is_active">Active</Label>
+                                <Label htmlFor="is_active">啟用</Label>
                             </div>
 
                             <div className="flex justify-end space-x-2 pt-4">
@@ -200,7 +200,7 @@ export default function BannersPage() {
                                 />
                                 {!banner.is_active && (
                                     <div className="absolute inset-0 bg-black/50 flex items-center justify-center text-white font-bold">
-                                        INACTIVE
+                                        已停用
                                     </div>
                                 )}
                             </div>
@@ -208,7 +208,7 @@ export default function BannersPage() {
                                 <div className="flex justify-between items-start mb-2">
                                     <div>
                                         <h3 className="font-bold truncate">{banner.title}</h3>
-                                        <p className="text-sm text-gray-500">Order: {banner.display_order}</p>
+                                        <p className="text-sm text-gray-500">順序: {banner.display_order}</p>
                                     </div>
                                     <div className="flex space-x-1">
                                         <Button size="icon" variant="ghost" onClick={() => openEdit(banner)}>
@@ -226,7 +226,7 @@ export default function BannersPage() {
                                         rel="noopener noreferrer"
                                         className="text-sm text-blue-500 flex items-center gap-1 hover:underline"
                                     >
-                                        <ExternalLink className="h-3 w-3" /> Link
+                                        <ExternalLink className="h-3 w-3" /> 連結
                                     </a>
                                 )}
                             </CardContent>

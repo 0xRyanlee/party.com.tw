@@ -69,11 +69,11 @@ export default function AdminClientLayout({
     if (!isAdmin) return null;
 
     const navItems = [
-        { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
-        { href: "/admin/reports", label: "Reports", icon: Flag },
-        { href: "/admin/banners", label: "Banners", icon: ImageIcon },
-        { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
-        { href: "/admin/events", label: "Events", icon: Calendar },
+        { href: "/admin", label: "儀表板", icon: LayoutDashboard },
+        { href: "/admin/reports", label: "檢舉管理", icon: Flag },
+        { href: "/admin/banners", label: "輪播橫幅", icon: ImageIcon },
+        { href: "/admin/announcements", label: "系統公告", icon: Megaphone },
+        { href: "/admin/events", label: "活動管理", icon: Calendar },
     ];
 
     return (
@@ -82,7 +82,7 @@ export default function AdminClientLayout({
                 {/* Sidebar */}
                 <aside className="w-64 bg-white dark:bg-gray-800 shadow-md flex flex-col">
                     <div className="p-6 border-b dark:border-gray-700">
-                        <h1 className="text-2xl font-bold text-primary">Admin</h1>
+                        <h1 className="text-2xl font-bold text-primary">管理後台</h1>
                     </div>
                     <nav className="flex-1 p-4 space-y-2">
                         {navItems.map((item) => {
@@ -107,7 +107,7 @@ export default function AdminClientLayout({
                         <Link href="/">
                             <Button variant="outline" className="w-full justify-start gap-2">
                                 <Home className="h-4 w-4" />
-                                Back to Site
+                                返回網站
                             </Button>
                         </Link>
                         <Button
@@ -116,7 +116,7 @@ export default function AdminClientLayout({
                             onClick={handleSignOut}
                         >
                             <LogOut className="h-4 w-4" />
-                            Sign Out
+                            登出
                         </Button>
                     </div>
                 </aside>

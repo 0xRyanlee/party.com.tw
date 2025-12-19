@@ -154,12 +154,20 @@ function HomeContent({ initialEvents }: HomeClientProps) {
                                             className="bg-white rounded-2xl p-4 border border-gray-100 hover:shadow-md transition-all cursor-pointer group flex gap-4 active:scale-[0.99]"
                                         >
                                             {/* Image */}
-                                            <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-xl bg-gray-200 relative overflow-hidden">
-                                                <div
-                                                    className="absolute inset-0 bg-cover bg-center transition-transform duration-500 group-hover:scale-110"
-                                                    style={{ backgroundImage: `url(${event.image})` }}
-                                                />
-                                                <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm">
+                                            <div className="w-20 h-20 md:w-24 md:h-24 shrink-0 rounded-xl bg-zinc-200 relative overflow-hidden">
+                                                {event.image ? (
+                                                    <img
+                                                        src={event.image}
+                                                        alt={event.title}
+                                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                                                        loading="lazy"
+                                                    />
+                                                ) : (
+                                                    <div className="absolute inset-0 bg-zinc-300 flex items-center justify-center">
+                                                        <span className="text-zinc-500 text-xs">No image</span>
+                                                    </div>
+                                                )}
+                                                <div className="absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[10px] font-bold shadow-sm z-10">
                                                     {event.date}
                                                 </div>
                                             </div>

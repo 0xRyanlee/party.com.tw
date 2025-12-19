@@ -37,13 +37,12 @@ export default async function EventDetailPage({ params }: EventDetailPageProps) 
     }
 
     // Access Control Logic
-    // If not active, only organizer can view
+    // Published/active events are visible to all, draft/pending only to organizer
     const isOrganizer = user && user.id === dbEvent.organizer_id;
-    const isDraftOrPending = dbEvent.status !== 'active' && dbEvent.status !== 'expired'; // Expired is visible but read-only usually
+    const isPubliclyVisible = ['active', 'published', 'expired'].includes(dbEvent.status);
 
-    if (isDraftOrPending && !isOrganizer) {
-        // Option: allow registered users to see pending? Maybe not.
-        // Strict: only organizer sees draft/pending
+    if (!isPubliclyVisible && !isOrganizer) {
+        // Only organizer sees draft/pending
         notFound();
     }
 

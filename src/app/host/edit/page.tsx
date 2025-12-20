@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -19,7 +19,7 @@ import CustomTags from "@/components/host/CustomTags";
 import AdvancedTicketManager from "@/components/host/AdvancedTicketManager";
 import LocationPicker from "@/components/host/LocationPicker";
 import ExternalLinks from "@/components/host/ExternalLinks";
-import { Calendar, MapPin, Clock, Info, Tag, Briefcase, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, Clock, Info, Tag, Briefcase, ArrowLeft, Loader2 } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { EventRole, EventResource, TicketType } from "@/types/schema";
 import { toast } from "sonner";
@@ -51,7 +51,7 @@ const eventSchema = z.object({
 
 type EventFormValues = z.infer<typeof eventSchema>;
 
-export default function HostEdit() {
+function EditEventContent() {
     const { t } = useLanguage();
     const router = useRouter();
 
@@ -806,3 +806,17 @@ export default function HostEdit() {
         </form>
     );
 }
+
+export default function EditEventPage() {
+    return (
+        <Suspense fallback={
+            <div className="flex items-center justify-center min-h-screen">
+                <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+            </div>
+        }>
+            <EditEventContent />
+        </Suspense>
+    );
+}
+
+

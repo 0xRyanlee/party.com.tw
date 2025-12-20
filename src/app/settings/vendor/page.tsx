@@ -170,7 +170,7 @@ export default function VendorProfilePage() {
                             <Link href={`/vendor/${user.id}`} target="_blank">
                                 <Button variant="outline" className="rounded-full border-neutral-200">
                                     <ExternalLink className="w-4 h-4 mr-2" />
-                                    查看公開頁面
+                                    {t('vendor.profile.viewPublicPage')}
                                 </Button>
                             </Link>
                         )}
@@ -191,26 +191,26 @@ export default function VendorProfilePage() {
                 <div className="space-y-6">
 
                     {/* Role Explanation Section */}
-                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-[24px] border border-blue-100 p-6">
-                        <h2 className="text-xl font-bold mb-4">成為平台合作夥伴</h2>
+                    <div className="bg-neutral-50 rounded-[24px] border border-neutral-100 p-6">
+                        <h2 className="text-xl font-bold mb-4">{t('vendor.profile.roleExplanationTitle')}</h2>
                         <p className="text-gray-600 mb-6 text-sm">
-                            Party 平台歡迎各類專業服務提供者與資源供應商加入，共同為活動創造更好的體驗。
+                            {t('vendor.profile.roleExplanationDesc')}
                         </p>
 
                         <div className="grid md:grid-cols-2 gap-4">
                             {/* Vendor Card */}
-                            <div className="bg-white rounded-xl p-5 border border-blue-200 hover:shadow-md transition-shadow">
+                            <div className="bg-white rounded-xl p-5 border border-neutral-200 hover:shadow-md transition-shadow">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                        <Briefcase className="w-5 h-5 text-blue-600" />
+                                    <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
+                                        <Briefcase className="w-5 h-5 text-neutral-800" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg">Vendor（服務提供者）</h3>
-                                        <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">專業技術服務</span>
+                                        <h3 className="font-bold text-lg">{t('vendor.profile.vendorTitle')}</h3>
+                                        <span className="text-xs text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-full">{t('vendor.profile.vendorSubtitle')}</span>
                                     </div>
                                 </div>
                                 <p className="text-sm text-gray-600 mb-3">
-                                    提供專業技術和服務的個人或團隊，用自身專長協助活動圓滿進行。
+                                    {t('vendor.profile.vendorDesc')}
                                 </p>
                                 <div className="flex flex-wrap gap-2 text-xs">
                                     <span className="bg-gray-100 px-2 py-1 rounded-full">DJ</span>
@@ -222,18 +222,18 @@ export default function VendorProfilePage() {
                             </div>
 
                             {/* Supplier Card */}
-                            <div className="bg-white rounded-xl p-5 border border-purple-200 hover:shadow-md transition-shadow">
+                            <div className="bg-white rounded-xl p-5 border border-neutral-200 hover:shadow-md transition-shadow">
                                 <div className="flex items-center gap-3 mb-3">
-                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
-                                        <Building className="w-5 h-5 text-purple-600" />
+                                    <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
+                                        <Building className="w-5 h-5 text-neutral-800" />
                                     </div>
                                     <div>
-                                        <h3 className="font-bold text-lg">Supplier（資源供應商）</h3>
-                                        <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">場地設備資源</span>
+                                        <h3 className="font-bold text-lg">{t('vendor.profile.supplierTitle')}</h3>
+                                        <span className="text-xs text-neutral-600 bg-neutral-100 px-2 py-0.5 rounded-full">{t('vendor.profile.supplierSubtitle')}</span>
                                     </div>
                                 </div>
                                 <p className="text-sm text-gray-600 mb-3">
-                                    提供場地、設備、管道通路等其他資源的企業或個人，為活動提供硬體支持。
+                                    {t('vendor.profile.supplierDesc')}
                                 </p>
                                 <div className="flex flex-wrap gap-2 text-xs">
                                     <span className="bg-gray-100 px-2 py-1 rounded-full">Venue</span>
@@ -244,17 +244,13 @@ export default function VendorProfilePage() {
                                 </div>
                             </div>
                         </div>
-
-                        <p className="text-xs text-gray-400 mt-4 text-center">
-                            填寫以下資料建立您的專業檔案，讓活動主辦方更容易找到您
-                        </p>
                     </div>
 
                     {/* Basic Info */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
                         <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
-                                <Briefcase className="w-5 h-5 text-blue-600" />
+                            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center">
+                                <Briefcase className="w-5 h-5 text-neutral-800" />
                             </div>
                             <h2 className="text-xl font-bold">{t('vendor.profile.basicInfo')}</h2>
                         </div>
@@ -307,9 +303,9 @@ export default function VendorProfilePage() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <h2 className="text-xl font-bold flex items-center gap-2">
-                                    <Image className="w-5 h-5" /> 封面圖片
+                                    <Image className="w-5 h-5" /> {t('vendor.profile.coverImages')}
                                 </h2>
-                                <p className="text-sm text-gray-500 mt-1">上傳 3-5 張展示您服務的圖片</p>
+                                <p className="text-sm text-gray-500 mt-1">{t('vendor.profile.coverImagesDesc')}</p>
                             </div>
                         </div>
 
@@ -350,7 +346,7 @@ export default function VendorProfilePage() {
 
                     {/* Social Links */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
-                        <h2 className="text-xl font-bold">社群媒體連結</h2>
+                        <h2 className="text-xl font-bold">{t('vendor.profile.socialLinks')}</h2>
 
                         <div className="space-y-4">
                             <div>
@@ -400,12 +396,12 @@ export default function VendorProfilePage() {
 
                     {/* Interaction Settings (New) */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
-                        <h2 className="text-xl font-bold">互動設定</h2>
+                        <h2 className="text-xl font-bold">{t('vendor.profile.interactionSettings')}</h2>
                         <div className="space-y-4">
                             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div>
-                                    <h3 className="font-bold">開放主辦方邀請</h3>
-                                    <p className="text-sm text-gray-500">允許主辦方在建立活動時直接邀請您加入 (Join Event)</p>
+                                    <h3 className="font-bold">{t('vendor.profile.allowInvites')}</h3>
+                                    <p className="text-sm text-gray-500">{t('vendor.profile.allowInvitesDesc')}</p>
                                 </div>
                                 <div className="space-x-2">
                                     {/* Mock Toggle */}
@@ -416,8 +412,8 @@ export default function VendorProfilePage() {
                             </div>
                             <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                 <div>
-                                    <h3 className="font-bold">私訊聯繫功能</h3>
-                                    <p className="text-sm text-gray-500">允許其他用戶透過平台私訊聯繫您 (Contact)</p>
+                                    <h3 className="font-bold">{t('vendor.profile.allowMessages')}</h3>
+                                    <p className="text-sm text-gray-500">{t('vendor.profile.allowMessagesDesc')}</p>
                                 </div>
                                 <div className="space-x-2">
                                     {/* Mock Toggle */}
@@ -433,8 +429,8 @@ export default function VendorProfilePage() {
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
                         <div className="flex items-center justify-between">
                             <div>
-                                <h2 className="text-xl font-bold">服務/產品項目</h2>
-                                <p className="text-sm text-gray-500">列出您提供的服務（最多 5 項）</p>
+                                <h2 className="text-xl font-bold">{t('vendor.profile.basicInfo')} - Services</h2>
+                                <p className="text-sm text-gray-500">List your services (Max 5)</p>
                             </div>
                             {profile.services.length < 5 && (
                                 <Button
@@ -445,7 +441,7 @@ export default function VendorProfilePage() {
                                     variant="outline"
                                     className="rounded-full"
                                 >
-                                    <Plus className="w-4 h-4 mr-2" /> 新增服務
+                                    <Plus className="w-4 h-4 mr-2" /> Add Service
                                 </Button>
                             )}
                         </div>
@@ -522,8 +518,8 @@ export default function VendorProfilePage() {
 
                     {/* Service Categories */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
-                        <h2 className="text-xl font-bold">服務類別</h2>
-                        <p className="text-sm text-gray-600">選擇您提供的服務（可多選）</p>
+                        <h2 className="text-xl font-bold">{t('vendor.profile.serviceCategories')}</h2>
+                        <p className="text-sm text-gray-600">{t('vendor.profile.serviceCategoriesDesc')}</p>
 
                         <div className="flex flex-wrap gap-3">
                             {serviceCategories.map((cat) => (
@@ -544,14 +540,14 @@ export default function VendorProfilePage() {
                     {/* Portfolio */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
                         <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold">作品集</h2>
+                            <h2 className="text-xl font-bold">{t('vendor.profile.portfolio')}</h2>
                             <Button
                                 onClick={addPortfolioItem}
                                 variant="outline"
                                 className="rounded-full"
                             >
                                 <Plus className="w-4 h-4 mr-2" />
-                                新增作品
+                                {t('vendor.profile.addWork')}
                             </Button>
                         </div>
 
@@ -624,7 +620,7 @@ export default function VendorProfilePage() {
 
                     {/* Contact Info */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
-                        <h2 className="text-xl font-bold">聯絡方式</h2>
+                        <h2 className="text-xl font-bold">{t('vendor.profile.contactInfo')}</h2>
 
                         <div className="space-y-4">
                             <div>
@@ -688,14 +684,14 @@ export default function VendorProfilePage() {
 
                     {/* Pricing */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
-                        <h2 className="text-xl font-bold">收費範圍（可選）</h2>
+                        <h2 className="text-xl font-bold">{t('vendor.profile.pricing')}</h2>
                         <p className="text-sm text-gray-600">
-                            設定您的基本收費範圍，讓主辦方更容易評估
+                            {t('vendor.profile.pricingDesc')}
                         </p>
 
                         <div className="flex items-center gap-4">
                             <div className="flex-1">
-                                <Label>最低收費</Label>
+                                <Label>{t('vendor.profile.minPrice')}</Label>
                                 <Input
                                     type="number"
                                     value={profile.pricing.min}
@@ -711,7 +707,7 @@ export default function VendorProfilePage() {
                             </div>
                             <span className="text-gray-400 mt-8">-</span>
                             <div className="flex-1">
-                                <Label>最高收費</Label>
+                                <Label>{t('vendor.profile.maxPrice')}</Label>
                                 <Input
                                     type="number"
                                     value={profile.pricing.max}
@@ -744,13 +740,13 @@ export default function VendorProfilePage() {
                     </div>
 
                     {/* Info Box */}
-                    <div className="bg-blue-50 border border-blue-200 rounded-[24px] p-6">
-                        <h4 className="font-semibold text-blue-900 mb-2">個人檔案提示</h4>
-                        <ul className="text-sm text-blue-800 space-y-1">
-                            <li>• 完整的個人檔案能提高申請通過率</li>
-                            <li>• 作品集是展示專業能力的最佳方式</li>
-                            <li>• 明確的收費範圍有助於主辦方快速決策</li>
-                            <li>• 確保聯絡方式正確，以免錯過合作機會</li>
+                    <div className="bg-neutral-50 border border-neutral-200 rounded-[24px] p-6">
+                        <h4 className="font-semibold text-neutral-900 mb-2">{t('vendor.profile.profileTips')}</h4>
+                        <ul className="text-sm text-neutral-800 space-y-1">
+                            <li>{t('vendor.profile.tip1')}</li>
+                            <li>{t('vendor.profile.tip2')}</li>
+                            <li>{t('vendor.profile.tip3')}</li>
+                            <li>{t('vendor.profile.tip4')}</li>
                         </ul>
                     </div>
                 </div>

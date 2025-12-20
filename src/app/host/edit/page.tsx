@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
@@ -75,6 +75,37 @@ export default function HostEdit() {
     const eventId = searchParams.get('id');
     const [editMode, setEditMode] = useState<EditMode>(eventId ? 'published' : 'new');
 
+
+    const [isSavingDraft, setIsSavingDraft] = useState(false);
+    const [collaborationEnabled, setCollaborationEnabled] = useState(false); // Collaboration toggle
+    const [contentImages, setContentImages] = useState<string[]>([]); // Max 3 content images
+    const [sendEmailNotifications, setSendEmailNotifications] = useState(true); // Email notification toggle
+
+    const {
+        register,
+        control,
+        handleSubmit,
+        setValue,
+        watch,
+        formState: { errors, isSubmitting }
+    } = useForm<EventFormValues>({
+        resolver: zodResolver(eventSchema),
+        defaultValues: {
+            title: "",
+            description: "",
+            type: "party",
+            status: "draft", // Default to draft
+            isPublic: true,
+            tickets: [],
+            date: "", // 空字串，避免默認今天導致過期判斷
+            time: "18:00",
+            locationName: "",
+            address: "",
+            externalLink: "",
+            imageMetadata: {},
+        }
+    });
+
     // Fetch existing event data
     useEffect(() => {
         if (!eventId) return;
@@ -86,13 +117,15 @@ export default function HostEdit() {
                 .select(`
                     *,
                     ticket_types (*),
-                    event_resources (*)
+                    event_resources (*),
+                    event_roles (*)
                 `)
                 .eq('id', eventId)
                 .single();
 
             if (error || !event) {
-                toast.error("無法載入活動資料");
+                console.error('Error fetching event:', error);
+                toast.error('無法載入活動資料');
                 return;
             }
 
@@ -144,35 +177,6 @@ export default function HostEdit() {
 
         fetchEvent();
     }, [eventId, setValue]);
-    const [isSavingDraft, setIsSavingDraft] = useState(false);
-    const [collaborationEnabled, setCollaborationEnabled] = useState(false); // Collaboration toggle
-    const [contentImages, setContentImages] = useState<string[]>([]); // Max 3 content images
-    const [sendEmailNotifications, setSendEmailNotifications] = useState(true); // Email notification toggle
-
-    const {
-        register,
-        control,
-        handleSubmit,
-        setValue,
-        watch,
-        formState: { errors, isSubmitting }
-    } = useForm<EventFormValues>({
-        resolver: zodResolver(eventSchema),
-        defaultValues: {
-            title: "",
-            description: "",
-            type: "party",
-            status: "draft", // Default to draft
-            isPublic: true,
-            tickets: [],
-            date: "", // 空字串，避免默認今天導致過期判斷
-            time: "18:00",
-            locationName: "",
-            address: "",
-            externalLink: "",
-            imageMetadata: {},
-        }
-    });
 
     const onSubmit = async (data: EventFormValues) => {
         try {

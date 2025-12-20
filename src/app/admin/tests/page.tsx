@@ -16,7 +16,8 @@ import {
     Users,
     Ticket,
     Image as ImageIcon,
-    RefreshCw
+    RefreshCw,
+    Calendar
 } from 'lucide-react';
 
 interface TestResult {
@@ -271,9 +272,220 @@ const createTestCategories = (): TestCategory[] => [
                     return { success: res.ok, data: { status: res.status } };
                 }
             },
+            {
+                id: 'admin-banners',
+                name: 'Admin Banners',
+                description: 'GET /admin/banners',
+                testFn: async () => {
+                    const res = await fetch('/admin/banners');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'admin-announcements',
+                name: 'Admin Announcements',
+                description: 'GET /admin/announcements',
+                testFn: async () => {
+                    const res = await fetch('/admin/announcements');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+        ]
+    },
+    {
+        id: 'host',
+        name: 'Host 主辦方功能',
+        description: '驗證主辦方相關頁面與功能',
+        icon: Zap,
+        tests: [
+            {
+                id: 'host-landing',
+                name: '主辦方介紹頁',
+                description: 'GET /host',
+                testFn: async () => {
+                    const res = await fetch('/host');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'host-edit',
+                name: '活動編輯頁',
+                description: 'GET /host/edit',
+                testFn: async () => {
+                    const res = await fetch('/host/edit');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'host-dashboard',
+                name: '主辦方儀表板',
+                description: 'GET /host/dashboard',
+                testFn: async () => {
+                    const res = await fetch('/host/dashboard');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'host-poster',
+                name: '海報生成器',
+                description: 'GET /host/poster',
+                testFn: async () => {
+                    const res = await fetch('/host/poster');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+        ]
+    },
+    {
+        id: 'events-dynamic',
+        name: '動態活動頁面',
+        description: '隨機抽取活動驗證詳情頁載入',
+        icon: Calendar,
+        tests: [
+            {
+                id: 'event-random-1',
+                name: '隨機活動 #1',
+                description: '從 API 取得隨機活動並驗證詳情頁',
+                testFn: async () => {
+                    try {
+                        const listRes = await fetch('/api/events');
+                        const events = await listRes.json();
+                        if (!Array.isArray(events) || events.length === 0) {
+                            return { success: false, error: '無活動資料' };
+                        }
+                        const randomEvent = events[Math.floor(Math.random() * events.length)];
+                        const detailRes = await fetch(`/events/${randomEvent.id}`);
+                        return {
+                            success: detailRes.ok,
+                            data: {
+                                eventId: randomEvent.id,
+                                title: randomEvent.title,
+                                status: detailRes.status
+                            }
+                        };
+                    } catch (e: any) {
+                        return { success: false, error: e.message };
+                    }
+                }
+            },
+            {
+                id: 'event-random-2',
+                name: '隨機活動 #2',
+                description: '第二個隨機活動驗證',
+                testFn: async () => {
+                    try {
+                        const listRes = await fetch('/api/events');
+                        const events = await listRes.json();
+                        if (!Array.isArray(events) || events.length === 0) {
+                            return { success: false, error: '無活動資料' };
+                        }
+                        const randomEvent = events[Math.floor(Math.random() * events.length)];
+                        const detailRes = await fetch(`/events/${randomEvent.id}`);
+                        return {
+                            success: detailRes.ok,
+                            data: {
+                                eventId: randomEvent.id,
+                                title: randomEvent.title,
+                                status: detailRes.status
+                            }
+                        };
+                    } catch (e: any) {
+                        return { success: false, error: e.message };
+                    }
+                }
+            },
+            {
+                id: 'event-random-3',
+                name: '隨機活動 #3',
+                description: '第三個隨機活動驗證',
+                testFn: async () => {
+                    try {
+                        const listRes = await fetch('/api/events');
+                        const events = await listRes.json();
+                        if (!Array.isArray(events) || events.length === 0) {
+                            return { success: false, error: '無活動資料' };
+                        }
+                        const randomEvent = events[Math.floor(Math.random() * events.length)];
+                        const detailRes = await fetch(`/events/${randomEvent.id}`);
+                        return {
+                            success: detailRes.ok,
+                            data: {
+                                eventId: randomEvent.id,
+                                title: randomEvent.title,
+                                status: detailRes.status
+                            }
+                        };
+                    } catch (e: any) {
+                        return { success: false, error: e.message };
+                    }
+                }
+            },
+        ]
+    },
+    {
+        id: 'navigation',
+        name: '導航連結測試',
+        description: '驗證所有主要導航連結是否正確',
+        icon: Globe,
+        tests: [
+            {
+                id: 'nav-club-create',
+                name: 'Club 創建頁',
+                description: 'GET /club/create',
+                testFn: async () => {
+                    const res = await fetch('/club/create');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'nav-redeem',
+                name: '兌換碼頁',
+                description: 'GET /redeem',
+                testFn: async () => {
+                    const res = await fetch('/redeem');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'nav-help',
+                name: '幫助中心',
+                description: 'GET /help',
+                testFn: async () => {
+                    const res = await fetch('/help');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'nav-contact',
+                name: '聯絡我們',
+                description: 'GET /contact',
+                testFn: async () => {
+                    const res = await fetch('/contact');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'nav-following',
+                name: '追蹤清單',
+                description: 'GET /following',
+                testFn: async () => {
+                    const res = await fetch('/following');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
+            {
+                id: 'nav-settings-vendor',
+                name: 'Vendor 設定',
+                description: 'GET /settings/vendor',
+                testFn: async () => {
+                    const res = await fetch('/settings/vendor');
+                    return { success: res.ok, data: { status: res.status } };
+                }
+            },
         ]
     },
 ];
+
 
 export default function AdminTestDashboard() {
     const [testResults, setTestResults] = useState<Record<string, TestResult>>({});

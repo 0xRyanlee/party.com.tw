@@ -31,6 +31,25 @@ export async function registerForEvent(eventId: string): Promise<RegistrationRes
         return { success: false, message: "You are already registered for this event.", status: existing.status };
     }
 
+    // 2.1 Check Event Status & Capacity
+    const { data: eventData, error: eventError } = await supabase
+        .from('events')
+        .select('status, capacity_remaining')
+        .eq('id', eventId)
+        .single();
+
+    if (eventError || !eventData) {
+        return { success: false, message: "找不到該活動" };
+    }
+
+    if (eventData.status !== 'published') {
+        return { success: false, message: "此活動尚未開放報名" };
+    }
+
+    if (eventData.capacity_remaining !== null && eventData.capacity_remaining <= 0) {
+        return { success: false, message: "活動名額已滿" };
+    }
+
     // 3. Create Registration
     const { error } = await supabase
         .from('registrations')
@@ -143,6 +162,25 @@ export async function registerWithDetails(
 
     if (existing) {
         return { success: false, message: "您已經報名過此活動", status: existing.status };
+    }
+
+    // 2.1 Check Event Status & Capacity
+    const { data: eventData, error: eventError } = await supabase
+        .from('events')
+        .select('status, capacity_remaining, title')
+        .eq('id', eventId)
+        .single();
+
+    if (eventError || !eventData) {
+        return { success: false, message: "找不到該活動" };
+    }
+
+    if (eventData.status !== 'published') {
+        return { success: false, message: "此活動尚未開放報名" };
+    }
+
+    if (eventData.capacity_remaining !== null && eventData.capacity_remaining <= 0) {
+        return { success: false, message: "活動名額已滿" };
     }
 
     // 3. Validate required fields

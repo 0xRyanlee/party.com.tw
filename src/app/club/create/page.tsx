@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { ArrowLeft, Crown, Users, Shield, Zap, X, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
 
 const CLUB_TYPES = [
     { value: 'public', label: 'Public', desc: '任何人可加入', icon: Users },
@@ -159,21 +160,29 @@ export default function CreateClubPage() {
                                             }
                                             setIsUploading(true);
                                             try {
-                                                const formData = new FormData();
-                                                formData.append('file', file);
-                                                formData.append('prefix', 'clubs');
-                                                const res = await fetch('/api/upload', {
-                                                    method: 'POST',
-                                                    body: formData,
-                                                });
-                                                if (res.ok) {
-                                                    const { url } = await res.json();
-                                                    setForm(prev => ({ ...prev, cover_image: url }));
-                                                } else {
-                                                    toast.error('上傳失敗');
-                                                }
-                                            } catch (err) {
-                                                toast.error('上傳失敗');
+                                                const supabase = createClient();
+                                                const timestamp = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 14);
+                                                const cleanName = file.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
+                                                const fileName = `clubs/${timestamp}-${cleanName}`;
+
+                                                const { data, error } = await supabase.storage
+                                                    .from('images')
+                                                    .upload(fileName, file, {
+                                                        cacheControl: '3600',
+                                                        upsert: true
+                                                    });
+
+                                                if (error) throw error;
+
+                                                const { data: { publicUrl } } = supabase.storage
+                                                    .from('images')
+                                                    .getPublicUrl(data.path);
+
+                                                setForm(prev => ({ ...prev, cover_image: publicUrl }));
+                                                toast.success('上傳成功');
+                                            } catch (err: any) {
+                                                console.error('Upload error:', err);
+                                                toast.error('上傳失敗: ' + (err.message || '未知錯誤'));
                                             } finally {
                                                 setIsUploading(false);
                                             }

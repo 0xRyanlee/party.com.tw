@@ -32,6 +32,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import GoogleAnalytics from "@/components/GoogleAnalytics";
 import GoogleOneTap from "@/components/GoogleOneTap";
 import PWAInstallPrompt from "@/components/PWAInstallPrompt";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export default function RootLayout({
   children,
@@ -52,17 +53,19 @@ export default function RootLayout({
       >
         <QueryProvider>
           <I18nProvider>
-            <Header />
-            <div className="pb-[60px] md:pb-0">
-              {children}
-            </div>
-            <Footer />
-            <MobileNav />
-            <Analytics />
-            <SpeedInsights />
-            <GoogleAnalytics />
-            <GoogleOneTap />
-            <PWAInstallPrompt />
+            <AuthProvider>
+              <Header />
+              <div className="pb-[60px] md:pb-0">
+                {children}
+              </div>
+              <Footer />
+              <MobileNav />
+              <Analytics />
+              <SpeedInsights />
+              <GoogleAnalytics />
+              <GoogleOneTap />
+              <PWAInstallPrompt />
+            </AuthProvider>
           </I18nProvider>
         </QueryProvider>
       </body>

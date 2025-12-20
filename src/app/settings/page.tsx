@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ChevronRight, FileText, Briefcase, Users, Bell, Shield, LogOut, ArrowLeft, MessageSquare, Sparkles } from "lucide-react";
 import Link from "next/link";
@@ -8,14 +7,14 @@ import { useRouter } from "next/navigation";
 import { useLanguage } from "@/lib/i18n";
 import { useUser } from "@/hooks/useUser";
 import { createClient } from "@/lib/supabase/client";
-import AuthModal from "@/components/AuthModal";
+import { useAuth } from "@/contexts/AuthContext";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function SettingsPage() {
     const router = useRouter();
     const { t } = useLanguage();
     const { user, loading } = useUser();
-    const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+    const { requireAuth } = useAuth();
     const supabase = createClient();
 
     const handleLogout = async () => {
@@ -226,7 +225,7 @@ export default function SettingsPage() {
 
             </div>
 
-            <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
         </main>
     );
 }

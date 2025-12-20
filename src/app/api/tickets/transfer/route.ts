@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
 
         // 4. Find or create recipient user
         const { data: recipientUser, error: recipientError } = await supabase
-            .from('users')
+            .from('profiles')
             .select('id, email')
             .eq('email', recipientEmail)
             .single();
@@ -140,7 +140,25 @@ export async function POST(request: NextRequest) {
         }
 
         // 8. TODO: Send notification email to recipient
-        // await sendTransferNotification(recipientEmail, ticket);
+        try {
+            // Fetch sender details
+            const { data: senderProfile } = await supabase
+                .from('profiles')
+                .select('full_name') // Assuming 'profiles' table has 'full_name'
+                .eq('id', currentUserId)
+                .single();
+
+            const senderName = senderProfile?.full_name || '一位使用者';
+
+            await sendTemplateEmail(recipientEmail, 'ticket_transfer_received', {
+                ticketName: '專屬票券', // 簡化：不額外查詢票種名稱
+                eventTitle: ticket.events?.title || '活動',
+                senderName: senderName,
+            });
+        } catch (emailError) {
+            console.error('Failed to send transfer email:', emailError);
+            // Don't fail the request if email fails, just log it
+        }
 
         return NextResponse.json({
             success: true,
@@ -156,6 +174,8 @@ export async function POST(request: NextRequest) {
         );
     }
 }
+
+import { sendTemplateEmail } from '@/lib/email';
 
 // Generate a unique check-in code
 function generateCheckinCode(): string {

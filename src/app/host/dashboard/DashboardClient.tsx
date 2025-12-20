@@ -7,6 +7,8 @@ import { Button } from "@/components/ui/button";
 import { AreaChart, Area, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, Cell } from 'recharts';
 import { Event } from '@/lib/mock-data';
 
+import Link from "next/link";
+
 // Mock Data for Charts (Monochrome-ish)
 const salesData = [
     { name: 'Mon', value: 4000 },
@@ -246,6 +248,10 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                                     <span>{event.date}</span>
                                                     <span>•</span>
                                                     <span>{event.attendees} 位報名</span>
+                                                    <span>•</span>
+                                                    <Link href={`/host/edit?id=${event.id}`} className="text-neutral-900 font-semibold hover:underline">
+                                                        編輯
+                                                    </Link>
                                                 </div>
                                             </div>
                                         </div>

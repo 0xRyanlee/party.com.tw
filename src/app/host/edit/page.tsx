@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLanguage } from "@/lib/i18n";
 import { Button } from "@/components/ui/button";
 import LoadingButton from "@/components/LoadingButton";
@@ -71,7 +71,79 @@ export default function HostEdit() {
     const [duration, setDuration] = useState(2); // 活動時長（小時）
     const [location, setLocation] = useState<{ name: string; address: string; lat?: number; lng?: number }>({ name: '', address: '' });
     const [externalLinks, setExternalLinks] = useState<string[]>([]);
-    const [editMode] = useState<EditMode>('new'); // TODO: set based on URL params
+    const searchParams = useSearchParams();
+    const eventId = searchParams.get('id');
+    const [editMode, setEditMode] = useState<EditMode>(eventId ? 'published' : 'new');
+
+    // Fetch existing event data
+    useEffect(() => {
+        if (!eventId) return;
+
+        const fetchEvent = async () => {
+            const supabase = createClient();
+            const { data: event, error } = await supabase
+                .from('events')
+                .select(`
+                    *,
+                    ticket_types (*),
+                    event_resources (*)
+                `)
+                .eq('id', eventId)
+                .single();
+
+            if (error || !event) {
+                toast.error("無法載入活動資料");
+                return;
+            }
+
+            // Populate Form
+            setValue('title', event.title);
+            setValue('description', event.description_long || event.description_short || "");
+            setValue('type', event.category || "party");
+            setValue('status', event.status === 'draft' ? 'draft' : 'active');
+            setValue('date', event.date);
+            setValue('time', event.start_time ? event.start_time.split('T')[1].substring(0, 5) : "18:00");
+            setValue('locationName', event.location_name || "");
+            setValue('address', event.location_address || "");
+            setValue('image', event.cover_image || "");
+            setValue('isPublic', !event.is_private);
+
+            // Populate State
+            setCapacity(event.capacity_total || 50);
+            setLocation({
+                name: event.location_name || "",
+                address: event.location_address || "",
+                lat: event.gps_lat,
+                lng: event.gps_lng
+            });
+            setDuration(2); // Hardcoded for now or derive from end_time
+            if (event.ticket_types) {
+                setAdvancedTickets(event.ticket_types.map((t: any) => ({
+                    id: t.id,
+                    name: t.name,
+                    price: t.price,
+                    quantity: t.quantity,
+                    description: t.description,
+                    currency: 'TWD'
+                })));
+            }
+            if (event.event_resources) {
+                setResources(event.event_resources.map((r: any) => ({
+                    type: r.resource_type,
+                    description: r.description,
+                    quantity: r.quantity_needed,
+                    status: 'open'
+                })));
+            }
+            // Tags
+            if (event.mood_tags) setSelectedTags(event.mood_tags);
+            if (event.send_email_notifications !== undefined) setSendEmailNotifications(event.send_email_notifications);
+
+            setEditMode(event.status === 'draft' ? 'draft' : 'published');
+        };
+
+        fetchEvent();
+    }, [eventId, setValue]);
     const [isSavingDraft, setIsSavingDraft] = useState(false);
     const [collaborationEnabled, setCollaborationEnabled] = useState(false); // Collaboration toggle
     const [contentImages, setContentImages] = useState<string[]>([]); // Max 3 content images
@@ -162,24 +234,37 @@ export default function HostEdit() {
                 sendEmailNotifications,
             };
 
-            // 創建活動
-            const eventResponse = await fetch('/api/events', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(eventPayload),
-            });
+            let eventResponse;
+            let currentEventId = eventId;
+
+            if (eventId) {
+                // UPDATE existing event
+                eventResponse = await fetch(`/api/events/${eventId}`, {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(eventPayload),
+                });
+            } else {
+                // CREATE new event
+                eventResponse = await fetch('/api/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(eventPayload),
+                });
+            }
 
             if (!eventResponse.ok) {
                 const errorData = await eventResponse.json();
-                throw new Error(errorData.error || 'Failed to create event');
+                throw new Error(errorData.error || 'Failed to save event');
             }
 
             const { event } = await eventResponse.json();
-            console.log('Event created:', event);
+            console.log('Event saved:', event);
+            if (!currentEventId) currentEventId = event.id;
 
             // 保存角色需求
             if (roles.length > 0) {
-                const rolesResponse = await fetch(`/api/events/${event.id}/roles`, {
+                const rolesResponse = await fetch(`/api/events/${currentEventId}/roles`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ roles }),
@@ -192,7 +277,7 @@ export default function HostEdit() {
 
             // 保存資源需求
             if (resources.length > 0) {
-                const resourcesResponse = await fetch(`/api/events/${event.id}/resources`, {
+                const resourcesResponse = await fetch(`/api/events/${currentEventId}/resources`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ resources }),
@@ -203,7 +288,7 @@ export default function HostEdit() {
                 }
             }
 
-            alert("活動已成功建立！");
+            alert(eventId ? "活動已更新！" : "活動已成功建立！");
             // 導航到主辦方儀表板
             router.push('/host/dashboard');
         } catch (error: any) {

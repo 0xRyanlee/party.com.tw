@@ -29,7 +29,8 @@ export type EmailTemplate =
     | 'application_approved'
     | 'application_rejected'
     | 'event_reminder'
-    | 'test_email';
+    | 'test_email'
+    | 'ticket_transfer_received';
 
 // 模板生成函數
 export function generateEmailTemplate(
@@ -99,6 +100,20 @@ export function generateEmailTemplate(
                     <h1 style="color: #000;">🎉 郵件測試成功！</h1>
                     <p>這是一封來自 Party 平台的測試郵件。</p>
                     <p>時間：${data.timestamp}</p>
+                    <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
+                    <p style="color: #666; font-size: 14px;">Party - 城市活動行事曆</p>
+                </div>
+            `,
+        },
+        ticket_transfer_received: {
+            subject: `您收到了一張票券：${data.ticketName}`,
+            html: `
+                <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto;">
+                    <h1 style="color: #000;">🎟️ 您收到了一張票券</h1>
+                    <p><strong>${data.senderName}</strong> 轉讓了一張「${data.ticketName}」票券給您。</p>
+                    <p><strong>活動：</strong>${data.eventTitle}</p>
+                    <p>請登入 Party 平台查看您的票夾。</p>
+                    <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/wallet" style="display: inline-block; background: #000; color: #fff; padding: 12px 24px; border-radius: 99px; text-decoration: none; font-weight: bold; margin-top: 16px;">前往票夾</a>
                     <hr style="margin: 24px 0; border: none; border-top: 1px solid #eee;" />
                     <p style="color: #666; font-size: 14px;">Party - 城市活動行事曆</p>
                 </div>

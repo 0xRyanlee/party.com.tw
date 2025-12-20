@@ -204,7 +204,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
             <div className="min-h-screen bg-background pt-16 pb-24">
                 <div className="container mx-auto px-4 md:px-6">
                     {/* Tab Navigation */}
-                    <div className="flex gap-1 p-1 bg-gray-100 rounded-full max-w-xs mb-4">
+                    <div className="flex gap-1 p-1 bg-gray-100 rounded-full max-w-xs mb-2">
                         <button
                             onClick={() => setActiveTab('explore')}
                             className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all ${activeTab === 'explore'

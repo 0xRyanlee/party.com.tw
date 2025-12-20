@@ -16,7 +16,7 @@
 
 ---
 
-## 🗓️ V0 Milestone（當前版本 v1.6）
+## 🗓️ V0 Milestone（當前版本 v1.9）
 
 ### ✅ 已完成
 
@@ -24,23 +24,34 @@
 - [x] Supabase 認證（Google/Line OAuth）
 - [x] 首頁活動列表 + 真實數據
 - [x] 活動詳情頁 + 報名流程
-- [x] 主辦方儀表板
-- [x] Admin 後台（中文化）
-- [x] 會員定價頁面
+- [x] 主辦方儀表板 + 活動編輯器
+- [x] Admin 後台（用戶/活動/公告管理）
+- [x] 會員等級系統 + 定價頁面
 - [x] UI 規範（Nine Unities）
-- [x] QuickActions 深色主題
-- [x] 圖片優化（lazy load）
+- [x] Club 系統完整實裝
+- [x] 票券轉送（QR/Link/Email）
+- [x] 聊天室 + 安全機制
+- [x] Email 通知系統
+- [x] 圖片上傳（Supabase Storage）
+- [x] Skeleton 骨架屏（18 種變體）
 
 ### 🚧 進行中
 
 - [ ] Banner 混合模式（Admin + Events）
-- [ ] 圖片上傳功能
 - [ ] 活動發布流程確認
+- [ ] QR Code 簽到完善
 
-### 📋 待開發
+### 📋 待開發（UX P0）
 
-- [ ] QR Code 簽到
-- [ ] 基礎聊天室
+- [ ] 首頁「之前參加過的活動」
+- [ ] 一鍵報名（已登入用戶）
+- [ ] 活動結束後評價邀請
+- [ ] 複製上次活動模板
+
+### 📋 待開發（UX P1）
+
+- [ ] 推薦引擎
+- [ ] 邀請裂變
 - [ ] Amplitude 追蹤
 
 ---

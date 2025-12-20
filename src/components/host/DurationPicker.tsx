@@ -11,10 +11,10 @@ interface DurationPickerProps {
     className?: string;
 }
 
-// 預設選項
+// 預設選項（簡化為 1h, 2h）
 const PRESET_DURATIONS = [
-    { value: 60, label: '1 小時' },
-    { value: 180, label: '3 小時' },
+    { value: 60, label: '1h' },
+    { value: 120, label: '2h' },
 ];
 
 // 滾輪選項
@@ -84,8 +84,8 @@ export default function DurationPicker({
                         type="button"
                         onClick={() => handlePresetClick(preset.value)}
                         className={`flex-1 px-4 py-3 rounded-full font-medium transition-all ${duration === preset.value && !showCustomPicker
-                                ? 'bg-black text-white'
-                                : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                            ? 'bg-black text-white'
+                            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
                             }`}
                     >
                         {preset.label}
@@ -95,8 +95,8 @@ export default function DurationPicker({
                     type="button"
                     onClick={handleCustomClick}
                     className={`flex-1 px-4 py-3 rounded-full font-medium transition-all ${showCustomPicker || isCustom
-                            ? 'bg-black text-white'
-                            : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
+                        ? 'bg-black text-white'
+                        : 'bg-zinc-100 text-zinc-700 hover:bg-zinc-200'
                         }`}
                 >
                     自訂
@@ -120,8 +120,8 @@ export default function DurationPicker({
                                             {({ selected }) => (
                                                 <div
                                                     className={`text-center py-2 ${selected
-                                                            ? 'text-black font-semibold text-xl'
-                                                            : 'text-zinc-400 text-lg'
+                                                        ? 'text-black font-semibold text-xl'
+                                                        : 'text-zinc-400 text-lg'
                                                         }`}
                                                 >
                                                     {hour}
@@ -145,8 +145,8 @@ export default function DurationPicker({
                                             {({ selected }) => (
                                                 <div
                                                     className={`text-center py-2 ${selected
-                                                            ? 'text-black font-semibold text-xl'
-                                                            : 'text-zinc-400 text-lg'
+                                                        ? 'text-black font-semibold text-xl'
+                                                        : 'text-zinc-400 text-lg'
                                                         }`}
                                                 >
                                                     {minute}

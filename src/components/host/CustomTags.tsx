@@ -79,8 +79,8 @@ export default function CustomTags({
             <div className="flex items-center gap-2">
                 <Tag className="w-5 h-5 text-zinc-700" />
                 <div>
-                    <Label className="text-base font-semibold">Event Tags</Label>
-                    <p className="text-sm text-zinc-500">Select or add tags to help attendees understand your event</p>
+                    <Label className="text-base font-semibold">活動標籤</Label>
+                    <p className="text-sm text-zinc-500">選擇或新增標籤幫助參與者了解您的活動</p>
                 </div>
             </div>
 

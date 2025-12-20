@@ -120,13 +120,13 @@ export default function ImageUploader({
                         <Label className="text-base font-semibold">媒體素材與 SEO</Label>
                     </div>
                     <div className="flex items-center gap-2">
-                        <span className="text-sm text-zinc-500">
-                            {enabled ? "已有效" : "未啟用"}
-                        </span>
                         <Switch
                             checked={enabled}
                             onCheckedChange={handleToggle}
                         />
+                        <span className="text-sm text-zinc-500 min-w-[50px]">
+                            {enabled ? "已啟用" : "已關閉"}
+                        </span>
                     </div>
                 </div>
             )}

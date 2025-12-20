@@ -13,6 +13,7 @@ import QuickRegisterButton from '@/components/QuickRegisterButton';
 import AuthModal from '@/components/AuthModal';
 import StructuredImage from '@/components/common/StructuredImage';
 import EventReviews from '@/components/EventReviews';
+import ReviewPromptModal from '@/components/ReviewPromptModal';
 import { useEffect } from 'react';
 import { useBrowsingHistory } from '@/hooks/useBrowsingHistory';
 import ChatRoom from '@/components/ChatRoom';
@@ -41,6 +42,7 @@ export default function EventDetailClient({
     const [isRegistered, setIsRegistered] = useState(initialIsRegistered);
     const [isFollowing, setIsFollowing] = useState(false);
     const [isFollowingLoading, setIsFollowingLoading] = useState(false);
+    const [showReviewPrompt, setShowReviewPrompt] = useState(false);
 
     const handleFollow = async () => {
         if (!isLoggedIn) {
@@ -103,6 +105,25 @@ export default function EventDetailClient({
             });
         }
     }, [isLoggedIn, event.organizer.id, event, addToHistory]);
+
+    // 活動結束後評價提示
+    const isEventEnded = now > endTime;
+    useEffect(() => {
+        // 檢查是否應該顯示評價提示：活動已結束、用戶已登入、已報名、未評價過、未跳過過
+        if (isEventEnded && isLoggedIn && isRegistered) {
+            const hasSkipped = localStorage.getItem(`review_skipped_${event.id}`);
+            const hasReviewed = localStorage.getItem(`review_submitted_${event.id}`);
+            if (!hasSkipped && !hasReviewed) {
+                // 延遲 1 秒顯示，避免頁面載入時立即彈出
+                const timer = setTimeout(() => setShowReviewPrompt(true), 1000);
+                return () => clearTimeout(timer);
+            }
+        }
+    }, [isEventEnded, isLoggedIn, isRegistered, event.id]);
+
+    const handleReviewSubmitted = () => {
+        localStorage.setItem(`review_submitted_${event.id}`, 'true');
+    };
 
     // Swiss Vibe: Large radii, monochrome palette, high contrast
     return (
@@ -471,6 +492,16 @@ export default function EventDetailClient({
             <AuthModal
                 isOpen={isAuthModalOpen}
                 onClose={() => setIsAuthModalOpen(false)}
+            />
+
+            {/* Review Prompt Modal - 活動結束後邀請評價 */}
+            <ReviewPromptModal
+                isOpen={showReviewPrompt}
+                onClose={() => setShowReviewPrompt(false)}
+                eventId={event.id}
+                eventTitle={event.title}
+                eventImage={event.image}
+                onReviewSubmitted={handleReviewSubmitted}
             />
         </div >
     );

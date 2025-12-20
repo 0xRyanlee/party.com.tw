@@ -73,6 +73,7 @@ function EditEventContent() {
     const [externalLinks, setExternalLinks] = useState<string[]>([]);
     const searchParams = useSearchParams();
     const eventId = searchParams.get('id');
+    const copyFromId = searchParams.get('copyFrom'); // 複製模式
     const [editMode, setEditMode] = useState<EditMode>(eventId ? 'published' : 'new');
 
 
@@ -106,7 +107,7 @@ function EditEventContent() {
         }
     });
 
-    // Fetch existing event data
+    // Fetch existing event data (for edit mode)
     useEffect(() => {
         if (!eventId) return;
 
@@ -178,6 +179,77 @@ function EditEventContent() {
         fetchEvent();
     }, [eventId, setValue]);
 
+    // 複製活動模板 (copyFrom 模式)
+    useEffect(() => {
+        if (!copyFromId || eventId) return; // 若同時有 id 則優先編輯模式
+
+        const fetchTemplate = async () => {
+            const supabase = createClient();
+            const { data: event, error } = await supabase
+                .from('events')
+                .select(`
+                    *,
+                    ticket_types (*),
+                    event_resources (*)
+                `)
+                .eq('id', copyFromId)
+                .single();
+
+            if (error || !event) {
+                console.error('Error fetching template:', error);
+                toast.error('無法載入模板資料');
+                return;
+            }
+
+            // 複製表單資料（標題加上「副本」）
+            setValue('title', `${event.title} (副本)`);
+            setValue('description', event.description_long || event.description_short || "");
+            setValue('type', event.category || "party");
+            setValue('status', 'draft'); // 複製默認為草稿
+            setValue('date', ''); // 清空日期，強制用戶重新選擇
+            setValue('time', event.start_time ? event.start_time.split('T')[1].substring(0, 5) : "18:00");
+            setValue('locationName', event.location_name || "");
+            setValue('address', event.location_address || "");
+            setValue('image', event.cover_image || "");
+            setValue('isPublic', !event.is_private);
+
+            // 複製狀態
+            setCapacity(event.capacity_total || 50);
+            setLocation({
+                name: event.location_name || "",
+                address: event.location_address || "",
+                lat: event.gps_lat,
+                lng: event.gps_lng
+            });
+            setDuration(2);
+            if (event.ticket_types) {
+                // 複製票務（移除 id，讓它們被視為新建）
+                setAdvancedTickets(event.ticket_types.map((t: any) => ({
+                    name: t.name,
+                    price: t.price,
+                    quantity: t.quantity,
+                    description: t.description,
+                    currency: 'TWD'
+                })));
+            }
+            if (event.event_resources) {
+                setResources(event.event_resources.map((r: any) => ({
+                    type: r.resource_type,
+                    description: r.description,
+                    quantity: r.quantity_needed,
+                    status: 'open'
+                })));
+            }
+            if (event.mood_tags) setSelectedTags(event.mood_tags);
+
+            // 複製模式始終是新建
+            setEditMode('new');
+            toast.success('模板已載入，請修改日期後發布');
+        };
+
+        fetchTemplate();
+    }, [copyFromId, eventId, setValue]);
+
     const onSubmit = async (data: EventFormValues) => {
         try {
 
@@ -210,6 +282,12 @@ function EditEventContent() {
             } catch (dateError: any) {
                 console.error("Date parsing error:", dateError);
                 alert(`日期時間錯誤: ${dateError.message}`);
+                return;
+            }
+
+            // 驗證地點資訊
+            if (!location.name || !location.address) {
+                alert('請選擇活動地點');
                 return;
             }
 
@@ -624,7 +702,7 @@ function EditEventContent() {
                             />
                         ) : (
                             <p className="text-sm text-gray-400 text-center py-4">
-                                開啟此功能即可設定合作報名需求與資源徠换。
+                                開啟此功能即可設定合作報名需求與資源交換。
                             </p>
                         )}
                     </div>

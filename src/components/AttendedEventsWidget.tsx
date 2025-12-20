@@ -47,7 +47,7 @@ export default function AttendedEventsWidget({ limit = 3 }: AttendedEventsWidget
                     // 未登入，不顯示錯誤
                     setEvents([]);
                 } else {
-                    setError('Failed to load');
+                    setError('載入失敗');
                 }
             } catch (err) {
                 console.error('Error:', err);
@@ -74,13 +74,13 @@ export default function AttendedEventsWidget({ limit = 3 }: AttendedEventsWidget
             <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2 text-zinc-700">
                     <CalendarCheck className="w-5 h-5" />
-                    <h3 className="font-bold">Events You've Attended</h3>
+                    <h3 className="font-bold">你參加過的活動</h3>
                 </div>
                 <Link
                     href="/user/my-events?tab=past"
                     className="text-xs text-zinc-500 hover:text-black flex items-center gap-1"
                 >
-                    View All
+                    查看全部
                     <ChevronRight className="w-4 h-4" />
                 </Link>
             </div>
@@ -134,7 +134,7 @@ export default function AttendedEventsWidget({ limit = 3 }: AttendedEventsWidget
                                 {item.checked_in && (
                                     <span className="inline-flex items-center gap-1 text-[10px] text-emerald-600 mt-1">
                                         <span className="w-1.5 h-1.5 bg-emerald-500 rounded-full" />
-                                        Checked In
+                                        已簽到
                                     </span>
                                 )}
                             </div>
@@ -147,10 +147,11 @@ export default function AttendedEventsWidget({ limit = 3 }: AttendedEventsWidget
             {!loading && events.length === 0 && (
                 <div className="text-center py-6">
                     <History className="w-10 h-10 text-zinc-200 mx-auto mb-2" />
-                    <p className="text-sm text-zinc-400">No past events yet</p>
-                    <p className="text-xs text-zinc-300">Events you attend will appear here</p>
+                    <p className="text-sm text-zinc-400">尚無參加記錄</p>
+                    <p className="text-xs text-zinc-300">你參加的活動會顯示在這裡</p>
                 </div>
             )}
         </motion.div>
     );
 }
+

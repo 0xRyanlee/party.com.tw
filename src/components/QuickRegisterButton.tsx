@@ -58,12 +58,12 @@ export default function QuickRegisterButton({
                 setState('success');
                 const successMsg = result.checkin_code
                     ? `報名成功！簽到碼：${result.checkin_code}`
-                    : result.message || 'Successfully registered!';
+                    : result.message || '報名成功！';
                 toast.success(successMsg);
                 onSuccess?.();
             } else {
                 setState('error');
-                setErrorMessage(result.message || 'Registration failed');
+                setErrorMessage(result.message || '報名失敗');
                 toast.error(result.message);
                 // 2秒後恢復 idle 狀態
                 setTimeout(() => setState('idle'), 2000);
@@ -71,8 +71,8 @@ export default function QuickRegisterButton({
         } catch (error) {
             console.error('Registration error:', error);
             setState('error');
-            setErrorMessage('Network error. Please try again.');
-            toast.error('Network error. Please try again.');
+            setErrorMessage('網路錯誤，請稍後再試');
+            toast.error('網路錯誤，請稍後再試');
             setTimeout(() => setState('idle'), 2000);
         }
     };
@@ -113,7 +113,7 @@ export default function QuickRegisterButton({
                         className="flex items-center gap-2"
                     >
                         <UserPlus className="w-4 h-4" />
-                        {isLoggedIn ? 'Quick Register' : 'Login to Register'}
+                        {isLoggedIn ? '一鍵報名' : '登入報名'}
                     </motion.span>
                 )}
 
@@ -126,7 +126,7 @@ export default function QuickRegisterButton({
                         className="flex items-center gap-2"
                     >
                         <Loader2 className="w-4 h-4 animate-spin" />
-                        Registering...
+                        報名中...
                     </motion.span>
                 )}
 
@@ -139,7 +139,7 @@ export default function QuickRegisterButton({
                         className="flex items-center gap-2"
                     >
                         <Check className="w-4 h-4" />
-                        Registered!
+                        已報名
                     </motion.span>
                 )}
 
@@ -152,10 +152,11 @@ export default function QuickRegisterButton({
                         className="flex items-center gap-2"
                     >
                         <AlertCircle className="w-4 h-4" />
-                        Try Again
+                        重試
                     </motion.span>
                 )}
             </AnimatePresence>
         </Button>
     );
 }
+

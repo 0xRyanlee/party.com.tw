@@ -5,6 +5,28 @@
 
 ---
 
+## [v1.10] - 2025-12-20
+
+**Phase 1 & 2 開發 - UX 優化與功能完善**
+
+- **「之前參加過的活動」組件中文化**
+  - `AttendedEventsWidget.tsx` 全面中文化
+- **「一鍵報名」組件中文化**
+  - `QuickRegisterButton.tsx` 全面中文化
+- **活動結束後評價邀請 (NEW)**
+  - 新增 `ReviewPromptModal.tsx` 兩步式評價彈窗
+  - 活動結束後自動彈出，支援跳過記憶
+  - 整合至 `EventDetailClient.tsx`
+- **複製活動模板 (NEW)**
+  - Host Dashboard 添加「複製」按鈕
+  - 支援 `copyFrom` 參數，載入模板數據
+  - 標題自動添加「(副本)」，日期強制重選
+- **構建驗證**
+  - TypeScript 類型檢查通過
+  - 無編譯錯誤
+
+---
+
 ## [v1.9] - 2025-12-21
 
 **系統健康檢查與修復 (Health Check)**

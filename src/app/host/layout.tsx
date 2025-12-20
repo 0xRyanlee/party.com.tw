@@ -31,12 +31,7 @@ export default function HostLayout({
                         <ArrowLeft className="w-5 h-5" />
                     </Button>
 
-                    {/* H Icon */}
-                    <div className="w-8 h-8 bg-black text-white rounded-lg flex items-center justify-center font-bold shrink-0">
-                        H
-                    </div>
-
-                    {/* Tabs - 直接在 H icon 旁邊 */}
+                    {/* Tabs - 直接在返回按鈕旁邊 */}
                     <nav className="flex items-center gap-1 overflow-x-auto scrollbar-hide flex-1">
                         {tabs.map((tab) => {
                             const isActive = pathname === tab.href;

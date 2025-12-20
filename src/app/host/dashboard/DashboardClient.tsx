@@ -252,6 +252,10 @@ export default function DashboardClient({ events }: DashboardClientProps) {
                                                     <Link href={`/host/edit?id=${event.id}`} className="text-neutral-900 font-semibold hover:underline">
                                                         編輯
                                                     </Link>
+                                                    <span>•</span>
+                                                    <Link href={`/host/edit?copyFrom=${event.id}`} className="text-neutral-600 font-semibold hover:underline hover:text-neutral-900">
+                                                        複製
+                                                    </Link>
                                                 </div>
                                             </div>
                                         </div>

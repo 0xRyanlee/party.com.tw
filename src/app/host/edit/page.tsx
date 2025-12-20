@@ -75,6 +75,7 @@ export default function HostEdit() {
     const [isSavingDraft, setIsSavingDraft] = useState(false);
     const [collaborationEnabled, setCollaborationEnabled] = useState(false); // Collaboration toggle
     const [contentImages, setContentImages] = useState<string[]>([]); // Max 3 content images
+    const [sendEmailNotifications, setSendEmailNotifications] = useState(true); // Email notification toggle
 
     const {
         register,
@@ -158,6 +159,7 @@ export default function HostEdit() {
                 status: data.isPublic ? 'published' : 'draft',
                 externalLink: data.externalLink || null,
                 imageMetadata: data.imageMetadata,
+                sendEmailNotifications,
             };
 
             // 創建活動
@@ -636,6 +638,17 @@ export default function HostEdit() {
                                 <Switch
                                     checked={watch("isPublic")}
                                     onCheckedChange={(val) => setValue("isPublic", val)}
+                                />
+                            </div>
+
+                            <div className="flex items-center justify-between pt-2 border-t border-gray-50">
+                                <div className="space-y-0.5">
+                                    <Label className="text-base">發送郵件通知</Label>
+                                    <p className="text-xs text-gray-500">向報名者發送報名確認和活動提醒</p>
+                                </div>
+                                <Switch
+                                    checked={sendEmailNotifications}
+                                    onCheckedChange={setSendEmailNotifications}
                                 />
                             </div>
                         </div>

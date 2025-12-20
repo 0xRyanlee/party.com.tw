@@ -74,6 +74,7 @@ export async function POST(request: NextRequest) {
             organizer_avatar: user.user_metadata?.avatar_url || null,
             organizer_verified: false,
             image_metadata: body.imageMetadata || {},
+            send_email_notifications: body.sendEmailNotifications ?? true,
         };
 
         // 創建活動

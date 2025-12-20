@@ -42,6 +42,7 @@ export default function RegistrationModal({
         attendee_email: '',
         attendee_phone: '',
         ticket_type_id: ticketTypes[0]?.name || '',
+        receive_notifications: true,
     });
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -56,6 +57,7 @@ export default function RegistrationModal({
                 attendee_email: formData.attendee_email,
                 attendee_phone: formData.attendee_phone || undefined,
                 ticket_type_id: formData.ticket_type_id || undefined,
+                receive_notifications: formData.receive_notifications,
             });
 
             if (!result.success) {
@@ -194,6 +196,23 @@ export default function RegistrationModal({
                                 </select>
                             </div>
                         )}
+
+                        {/* Email notification preference */}
+                        <div className="flex items-start gap-3 p-3 bg-gray-50 rounded-xl">
+                            <input
+                                type="checkbox"
+                                id="receive_notifications"
+                                name="receive_notifications"
+                                checked={formData.receive_notifications}
+                                onChange={(e) => setFormData(prev => ({ ...prev, receive_notifications: e.target.checked }))}
+                                className="mt-0.5 w-4 h-4 rounded border-gray-300 text-gray-900 focus:ring-gray-900"
+                            />
+                            <label htmlFor="receive_notifications" className="text-sm text-gray-600 leading-tight">
+                                接收活動提醒和更新通知
+                                <span className="block text-xs text-gray-400 mt-0.5">包含報名確認、活動變更、活動前提醒</span>
+                            </label>
+                        </div>
+
 
                         {error && (
                             <div className="flex items-center gap-2 p-3 bg-red-50 border border-red-200 rounded-xl text-red-800 text-sm">

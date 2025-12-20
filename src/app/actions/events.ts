@@ -118,6 +118,7 @@ export type RegistrationFormData = {
     attendee_email: string;
     attendee_phone?: string;
     ticket_type_id?: string;
+    receive_notifications?: boolean;
 };
 
 export async function registerWithDetails(
@@ -161,6 +162,7 @@ export async function registerWithDetails(
             attendee_phone: formData.attendee_phone || null,
             ticket_type_id: formData.ticket_type_id || null,
             registration_source: 'web',
+            receive_notifications: formData.receive_notifications ?? true,
         });
 
     if (error) {

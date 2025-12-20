@@ -1,332 +1,389 @@
 "use client";
 
-import { useState } from 'react';
+import { useEffect, useState, useMemo } from "react";
+import { createClient } from "@/lib/supabase/client";
+import {
+    Table, TableBody, TableCell, TableHead,
+    TableHeader, TableRow
+} from "@/components/ui/table";
+import {
+    Card, CardContent, CardHeader, CardTitle,
+    CardDescription
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import LoadingButton from "@/components/LoadingButton";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
-import { Label } from "@/components/ui/label";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import * as z from "zod";
-import ImageUploader from "@/components/host/ImageUploader";
-import LocationPicker from "@/components/host/LocationPicker";
-import { Calendar, MapPin, Link as LinkIcon, User, Tag, ExternalLink } from "lucide-react";
-import { Switch } from "@/components/ui/switch";
+import { Badge } from "@/components/ui/badge";
+import {
+    Search, Filter, Plus, MoreHorizontal,
+    Trash2, Eye, Edit3, CheckCircle,
+    XCircle, Calendar, Users, MapPin,
+    AlertCircle, RefreshCw
+} from "lucide-react";
+import Link from "next/link";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+} from "@/components/ui/dialog";
+import { toast } from "sonner";
 
-// Admin Event Schema - includes custom organizer fields
-const adminEventSchema = z.object({
-    title: z.string().min(3, "標題至少 3 個字元"),
-    description: z.string().min(10, "描述至少 10 個字元"),
-    type: z.string().min(1, "請選擇活動類型"),
-    date: z.string().min(1, "請選擇日期"),
-    time: z.string().min(1, "請選擇時間"),
-    image: z.string().optional(),
-    isPublic: z.boolean(),
-    // Admin-specific fields
-    customOrganizerName: z.string().min(1, "請填寫主辦方名稱"),
-    sourceUrl: z.string().url().optional().or(z.literal("")),
-    socialLinks: z.object({
-        instagram: z.string().optional(),
-        linkedin: z.string().optional(),
-        threads: z.string().optional(),
-    }),
-    sourceTag: z.enum(["external", "public", "curated"]).optional(),
-    imageMetadata: z.any().optional(),
-});
+interface Event {
+    id: string;
+    title: string;
+    status: string;
+    start_time: string;
+    category: string;
+    cover_image: string | null;
+    capacity_total: number | null;
+    capacity_remaining: number | null;
+    organizer_name: string;
+    venue_name: string;
+    created_at: string;
+}
 
-type AdminEventFormValues = z.infer<typeof adminEventSchema>;
+export default function AdminEventsManagement() {
+    const [events, setEvents] = useState<Event[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState<string>("all");
+    const [deleteId, setDeleteId] = useState<string | null>(null);
+    const [isDeleting, setIsDeleting] = useState(false);
 
-export default function AdminEventsCreate() {
-    const [location, setLocation] = useState<{ name: string; address: string; lat?: number; lng?: number }>({ name: '', address: '' });
-    const [duration, setDuration] = useState(2);
-    const [selectedTags, setSelectedTags] = useState<string[]>([]);
+    const supabase = createClient();
 
-    const {
-        register,
-        handleSubmit,
-        setValue,
-        watch,
-        formState: { errors, isSubmitting }
-    } = useForm<AdminEventFormValues>({
-        resolver: zodResolver(adminEventSchema),
-        defaultValues: {
-            title: "",
-            description: "",
-            type: "event",
-            isPublic: true,
-            date: new Date().toISOString().split('T')[0],
-            time: "18:00",
-            customOrganizerName: "",
-            sourceUrl: "",
-            socialLinks: {
-                instagram: "",
-                linkedin: "",
-                threads: "",
-            },
-            sourceTag: "curated",
-            imageMetadata: {},
-        }
-    });
-
-    const onSubmit = async (data: AdminEventFormValues) => {
+    const fetchEvents = async () => {
+        setIsLoading(true);
         try {
-            // Prepare datetime
-            const timeWithSeconds = data.time.length === 5 ? `${data.time}:00` : data.time;
-            const startDate = new Date(`${data.date}T${timeWithSeconds}`);
-            const endDate = new Date(startDate.getTime() + duration * 60 * 60 * 1000);
+            const { data, error } = await supabase
+                .from("events")
+                .select("*")
+                .order("created_at", { ascending: false });
 
-            const eventPayload = {
-                title: data.title,
-                descriptionLong: data.description,
-                descriptionShort: data.description.substring(0, 200),
-                category: data.type,
-                coverImage: data.image,
-                venueName: location.name,
-                address: location.address,
-                gpsLat: location.lat,
-                gpsLng: location.lng,
-                startTime: startDate.toISOString(),
-                endTime: endDate.toISOString(),
-                tags: selectedTags,
-                status: data.isPublic ? 'published' : 'draft',
-                // Admin-specific fields
-                customOrganizerName: data.customOrganizerName,
-                sourceUrl: data.sourceUrl || null,
-                socialLinks: data.socialLinks,
-                sourceTag: data.sourceTag,
-                imageMetadata: data.imageMetadata,
-            };
-
-            const response = await fetch('/api/events', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(eventPayload),
-            });
-
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.error || '建立活動失敗');
-            }
-
-            alert("活動已成功建立！");
+            if (error) throw error;
+            setEvents(data || []);
         } catch (error: any) {
-            alert(error.message || '儲存活動失敗');
+            console.error("Error fetching events:", error);
+            toast.error("載入活動失敗");
+        } finally {
+            setIsLoading(false);
         }
     };
 
-    const availableTags = ['Tech', 'Music', 'Art', 'Sports', 'Food', 'Business', 'Social', 'Lifestyle'];
+    useEffect(() => {
+        fetchEvents();
+    }, []);
+
+    const filteredEvents = useMemo(() => {
+        return events.filter(event => {
+            const matchesSearch = event.title.toLowerCase().includes(searchQuery.toLowerCase());
+            const matchesStatus = statusFilter === "all" || event.status === statusFilter;
+            return matchesSearch && matchesStatus;
+        });
+    }, [events, searchQuery, statusFilter]);
+
+    const stats = useMemo(() => {
+        return {
+            total: events.length,
+            published: events.filter(e => e.status === "published").length,
+            draft: events.filter(e => e.status === "draft").length,
+            upcoming: events.filter(e => new Date(e.start_time) > new Date()).length
+        };
+    }, [events]);
+
+    const handleDelete = async () => {
+        if (!deleteId) return;
+        setIsDeleting(true);
+        try {
+            const { error } = await supabase
+                .from("events")
+                .delete()
+                .eq("id", deleteId);
+
+            if (error) throw error;
+
+            setEvents(prev => prev.filter(e => e.id !== deleteId));
+            toast.success("活動已刪除");
+        } catch (error: any) {
+            console.error("Error deleting event:", error);
+            toast.error("刪除失敗");
+        } finally {
+            setIsDeleting(false);
+            setDeleteId(null);
+        }
+    };
+
+    const toggleStatus = async (id: string, currentStatus: string) => {
+        const newStatus = currentStatus === "published" ? "draft" : "published";
+        try {
+            const { error } = await supabase
+                .from("events")
+                .update({ status: newStatus })
+                .eq("id", id);
+
+            if (error) throw error;
+
+            setEvents(prev => prev.map(e => e.id === id ? { ...e, status: newStatus } : e));
+            toast.success(`狀態已變更為 ${newStatus === "published" ? "已發布" : "草稿"}`);
+        } catch (error: any) {
+            console.error("Error updating status:", error);
+            toast.error("更新狀態失敗");
+        }
+    };
+
+    const formatDate = (dateStr: string) => {
+        return new Date(dateStr).toLocaleDateString("zh-TW", {
+            month: "short",
+            day: "numeric",
+            hour: "2-digit",
+            minute: "2-digit"
+        });
+    };
+
+    const getStatusBadge = (status: string) => {
+        switch (status) {
+            case "published":
+                return <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-green-200">已發布</Badge>;
+            case "draft":
+                return <Badge variant="outline" className="text-gray-500">草稿</Badge>;
+            case "archived":
+                return <Badge variant="secondary" className="text-gray-400">已封存</Badge>;
+            default:
+                return <Badge variant="outline">{status}</Badge>;
+        }
+    };
 
     return (
-        <div className="max-w-4xl mx-auto p-6 space-y-8">
-            <div className="flex items-center justify-between">
+        <div className="space-y-6">
+            {/* Header */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <div>
-                    <h1 className="text-2xl font-bold">Admin 活動發布</h1>
-                    <p className="text-sm text-gray-500">建立外部活動或公共活動</p>
+                    <h2 className="text-3xl font-bold tracking-tight">活動管理</h2>
+                    <p className="text-gray-500 mt-1">管理平台上的所有活動內容</p>
                 </div>
-                <LoadingButton
-                    onClick={handleSubmit(onSubmit)}
-                    isLoading={isSubmitting}
-                    loadingText="發布中..."
-                    className="bg-black text-white rounded-full"
-                >
-                    發布活動
-                </LoadingButton>
+                <div className="flex gap-2">
+                    <Button variant="outline" size="sm" onClick={fetchEvents} disabled={isLoading}>
+                        <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? "animate-spin" : ""}`} />
+                        刷新
+                    </Button>
+                    <Button size="sm" asChild className="bg-black text-white rounded-full">
+                        <Link href="/admin/events/new">
+                            <Plus className="w-4 h-4 mr-2" />
+                            發布活動
+                        </Link>
+                    </Button>
+                </div>
             </div>
 
-            <form className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                {/* Left Column */}
-                <div className="lg:col-span-2 space-y-6">
-                    {/* Basic Info */}
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h2 className="text-lg font-bold">基本資訊</h2>
+            {/* Stats Cards */}
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                <Card className="rounded-[24px] border-gray-100 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">總活動數</CardTitle>
+                        <Calendar className="h-4 w-4 text-gray-400" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold">{stats.total}</div>
+                    </CardContent>
+                </Card>
+                <Card className="rounded-[24px] border-gray-100 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">已發布</CardTitle>
+                        <CheckCircle className="h-4 w-4 text-green-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-green-600">{stats.published}</div>
+                    </CardContent>
+                </Card>
+                <Card className="rounded-[24px] border-gray-100 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">草稿</CardTitle>
+                        <Edit3 className="h-4 w-4 text-gray-400" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-gray-500">{stats.draft}</div>
+                    </CardContent>
+                </Card>
+                <Card className="rounded-[24px] border-gray-100 shadow-sm">
+                    <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                        <CardTitle className="text-sm font-medium">即將開始</CardTitle>
+                        <Users className="h-4 w-4 text-blue-500" />
+                    </CardHeader>
+                    <CardContent>
+                        <div className="text-2xl font-bold text-blue-600">{stats.upcoming}</div>
+                    </CardContent>
+                </Card>
+            </div>
 
-                        <div className="space-y-2">
-                            <Label>活動標題 *</Label>
-                            <Input {...register("title")} placeholder="活動名稱" />
-                            {errors.title && <p className="text-xs text-red-500">{errors.title.message}</p>}
+            {/* Filters & List */}
+            <Card className="rounded-[24px] border-gray-100 shadow-sm">
+                <CardHeader className="pb-3 border-b border-gray-50">
+                    <div className="flex flex-col md:flex-row md:items-center gap-4">
+                        <div className="relative flex-1">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-gray-400" />
+                            <Input
+                                placeholder="搜尋活動標題..."
+                                className="pl-10 rounded-xl"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
-
-                        <div className="space-y-2">
-                            <Label>活動描述 *</Label>
-                            <Textarea {...register("description")} className="h-32" placeholder="活動詳情..." />
-                            {errors.description && <p className="text-xs text-red-500">{errors.description.message}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>活動類型</Label>
+                        <div className="flex items-center gap-2">
+                            <Filter className="h-4 w-4 text-gray-400" />
                             <select
-                                {...register("type")}
-                                className="w-full h-10 px-3 rounded-md border bg-background text-sm"
+                                className="h-10 rounded-xl border border-gray-200 bg-white px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-black"
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
                             >
-                                <option value="event">活動</option>
-                                <option value="party">派對</option>
-                                <option value="meetup">聚會</option>
-                                <option value="workshop">工作坊</option>
-                                <option value="conference">研討會</option>
-                                <option value="exhibition">展覽</option>
+                                <option value="all">所有狀態</option>
+                                <option value="published">已發布</option>
+                                <option value="draft">草稿</option>
+                                <option value="archived">已封存</option>
                             </select>
                         </div>
                     </div>
-
-                    {/* Custom Organizer */}
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h2 className="text-lg font-bold flex items-center gap-2">
-                            <User className="w-5 h-5" /> 主辦方資訊
-                        </h2>
-
-                        <div className="space-y-2">
-                            <Label>主辦方名稱 *</Label>
-                            <Input {...register("customOrganizerName")} placeholder="例如：TechCrunch" />
-                            {errors.customOrganizerName && <p className="text-xs text-red-500">{errors.customOrganizerName.message}</p>}
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>來源網址</Label>
-                            <Input {...register("sourceUrl")} placeholder="https://..." />
-                        </div>
-
-                        <div className="space-y-2">
-                            <Label>來源標籤</Label>
-                            <div className="flex gap-2">
-                                {['external', 'public', 'curated'].map((tag) => (
-                                    <button
-                                        key={tag}
-                                        type="button"
-                                        onClick={() => setValue("sourceTag", tag as any)}
-                                        className={`px-4 py-2 rounded-full text-sm border transition-all ${watch("sourceTag") === tag
-                                            ? "bg-black text-white"
-                                            : "bg-white hover:bg-gray-50"
-                                            }`}
-                                    >
-                                        {tag === 'external' ? '外部來源' : tag === 'public' ? '公共活動' : '精選活動'}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
+                </CardHeader>
+                <CardContent className="p-0">
+                    <div className="overflow-x-auto">
+                        <Table>
+                            <TableHeader>
+                                <TableRow className="hover:bg-transparent">
+                                    <TableHead className="w-[80px]">圖片</TableHead>
+                                    <TableHead>活動標題</TableHead>
+                                    <TableHead>主辦方</TableHead>
+                                    <TableHead>日期時間</TableHead>
+                                    <TableHead>狀態</TableHead>
+                                    <TableHead className="text-right">操作</TableHead>
+                                </TableRow>
+                            </TableHeader>
+                            <TableBody>
+                                {isLoading ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                                            載入中...
+                                        </TableCell>
+                                    </TableRow>
+                                ) : filteredEvents.length === 0 ? (
+                                    <TableRow>
+                                        <TableCell colSpan={6} className="h-32 text-center text-gray-500">
+                                            找不到相關活動
+                                        </TableCell>
+                                    </TableRow>
+                                ) : (
+                                    filteredEvents.map((event) => (
+                                        <TableRow key={event.id} className="group">
+                                            <TableCell>
+                                                <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden relative">
+                                                    {event.cover_image ? (
+                                                        <img
+                                                            src={event.cover_image}
+                                                            alt=""
+                                                            className="w-full h-full object-cover"
+                                                        />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-gray-300">
+                                                            <Calendar className="w-6 h-6" />
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="font-medium max-w-[250px]">
+                                                <div className="truncate" title={event.title}>{event.title}</div>
+                                                <div className="text-xs text-gray-400 mt-1 flex items-center gap-1">
+                                                    <MapPin className="w-3 h-3" /> {event.venue_name || "未設定"}
+                                                </div>
+                                            </TableCell>
+                                            <TableCell className="text-sm text-gray-600">
+                                                {event.organizer_name}
+                                            </TableCell>
+                                            <TableCell className="text-sm text-gray-600">
+                                                {formatDate(event.start_time)}
+                                            </TableCell>
+                                            <TableCell>
+                                                {getStatusBadge(event.status)}
+                                            </TableCell>
+                                            <TableCell className="text-right">
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button variant="ghost" className="h-8 w-8 p-0">
+                                                            <MoreHorizontal className="h-4 w-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent align="end" className="rounded-xl w-40">
+                                                        <DropdownMenuLabel>操作</DropdownMenuLabel>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/events/${event.id}`} target="_blank">
+                                                                <Eye className="w-4 h-4 mr-2" /> 預覽
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem asChild>
+                                                            <Link href={`/host/edit?id=${event.id}`}>
+                                                                <Edit3 className="w-4 h-4 mr-2" /> 編輯
+                                                            </Link>
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuItem onClick={() => toggleStatus(event.id, event.status)}>
+                                                            {event.status === "published" ? (
+                                                                <>
+                                                                    <XCircle className="w-4 h-4 mr-2 text-amber-500" /> 下架活動
+                                                                </>
+                                                            ) : (
+                                                                <>
+                                                                    <CheckCircle className="w-4 h-4 mr-2 text-green-500" /> 發布活動
+                                                                </>
+                                                            )}
+                                                        </DropdownMenuItem>
+                                                        <DropdownMenuSeparator />
+                                                        <DropdownMenuItem
+                                                            className="text-red-600 focus:text-red-600"
+                                                            onClick={() => setDeleteId(event.id)}
+                                                        >
+                                                            <Trash2 className="w-4 h-4 mr-2" /> 刪除
+                                                        </DropdownMenuItem>
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
+                                            </TableCell>
+                                        </TableRow>
+                                    ))
+                                )}
+                            </TableBody>
+                        </Table>
                     </div>
+                </CardContent>
+            </Card>
 
-                    {/* Social Links */}
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h2 className="text-lg font-bold flex items-center gap-2">
-                            <ExternalLink className="w-5 h-5" /> 社群連結
-                        </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div className="space-y-2">
-                                <Label>Instagram</Label>
-                                <Input {...register("socialLinks.instagram")} placeholder="@username" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>LinkedIn</Label>
-                                <Input {...register("socialLinks.linkedin")} placeholder="profile URL" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Threads</Label>
-                                <Input {...register("socialLinks.threads")} placeholder="@username" />
-                            </div>
-                        </div>
-                    </div>
-
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h2 className="text-lg font-bold">封面圖片與 SEO</h2>
-                        <ImageUploader
-                            value={watch("image")}
-                            onChange={(val) => setValue("image", val)}
-                            metadata={watch("imageMetadata")}
-                            onMetadataChange={(meta) => setValue("imageMetadata", meta)}
-                            pathPrefix="events"
-                        />
-                    </div>
-                </div>
-
-                {/* Right Column */}
-                <div className="space-y-6">
-                    {/* Date & Time */}
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h3 className="font-bold flex items-center gap-2">
-                            <Calendar className="w-4 h-4" /> 日期時間
-                        </h3>
-                        <div className="space-y-3">
-                            <div className="space-y-1">
-                                <Label className="text-xs">日期</Label>
-                                <Input type="date" {...register("date")} />
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-xs">時間</Label>
-                                <Input type="time" {...register("time")} />
-                            </div>
-                            <div className="space-y-1">
-                                <Label className="text-xs">時長</Label>
-                                <div className="flex gap-2 flex-wrap">
-                                    {[1, 2, 3, 4].map((h) => (
-                                        <button
-                                            key={h}
-                                            type="button"
-                                            onClick={() => setDuration(h)}
-                                            className={`px-3 py-1 rounded-full text-sm border ${duration === h ? "bg-black text-white" : ""
-                                                }`}
-                                        >
-                                            {h}h
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* Location */}
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h3 className="font-bold flex items-center gap-2">
-                            <MapPin className="w-4 h-4" /> 地點
-                        </h3>
-                        <LocationPicker value={location} onChange={setLocation} />
-                    </div>
-
-                    {/* Tags */}
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h3 className="font-bold flex items-center gap-2">
-                            <Tag className="w-4 h-4" /> 標籤
-                        </h3>
-                        <div className="flex flex-wrap gap-2">
-                            {availableTags.map((tag) => (
-                                <button
-                                    key={tag}
-                                    type="button"
-                                    onClick={() => {
-                                        setSelectedTags(prev =>
-                                            prev.includes(tag)
-                                                ? prev.filter(t => t !== tag)
-                                                : [...prev, tag]
-                                        );
-                                    }}
-                                    className={`px-3 py-1 rounded-full text-sm border transition-all ${selectedTags.includes(tag)
-                                        ? "bg-black text-white"
-                                        : "bg-white hover:bg-gray-50"
-                                        }`}
-                                >
-                                    {tag}
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {/* Settings */}
-                    <div className="bg-white p-6 rounded-[24px] border space-y-4">
-                        <h3 className="font-bold">設定</h3>
-                        <div className="flex items-center justify-between">
-                            <div>
-                                <Label>公開活動</Label>
-                                <p className="text-xs text-gray-500">所有人可見</p>
-                            </div>
-                            <Switch
-                                checked={watch("isPublic")}
-                                onCheckedChange={(val) => setValue("isPublic", val)}
-                            />
-                        </div>
-                    </div>
-                </div>
-            </form>
+            {/* Delete Confirmation Dialog */}
+            <Dialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
+                <DialogContent className="rounded-[32px]">
+                    <DialogHeader>
+                        <DialogTitle>確定要刪除此活動嗎？</DialogTitle>
+                        <DialogDescription>
+                            此操作無法撤銷。這將永久刪除活動及其所有相關數據（如報名記錄）。
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <Button variant="outline" onClick={() => setDeleteId(null)} className="rounded-xl">
+                            取消
+                        </Button>
+                        <Button
+                            className="bg-red-600 hover:bg-red-700 rounded-xl"
+                            onClick={handleDelete}
+                            disabled={isDeleting}
+                        >
+                            {isDeleting ? "刪除中..." : "確定刪除"}
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

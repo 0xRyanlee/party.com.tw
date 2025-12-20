@@ -155,13 +155,25 @@ export default function ManagementClient({ isAuthenticated: initialAuth }: Manag
                     </Link>
 
                     {/* Events Card */}
-                    <Link href="/admin">
+                    <Link href="/admin/events">
                         <Card className="rounded-[24px] border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
                             <CardHeader>
                                 <CardTitle className="text-lg">活動管理</CardTitle>
                             </CardHeader>
                             <CardContent>
                                 <p className="text-sm text-gray-500">查看和管理所有活動</p>
+                            </CardContent>
+                        </Card>
+                    </Link>
+
+                    {/* Users Card */}
+                    <Link href="/admin/users">
+                        <Card className="rounded-[24px] border-gray-100 shadow-sm hover:shadow-md transition-all cursor-pointer">
+                            <CardHeader>
+                                <CardTitle className="text-lg">用戶管理</CardTitle>
+                            </CardHeader>
+                            <CardContent>
+                                <p className="text-sm text-gray-500">管理用戶權限與會員等級</p>
                             </CardContent>
                         </Card>
                     </Link>

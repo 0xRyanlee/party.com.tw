@@ -27,6 +27,7 @@ import {
     Mail
 } from 'lucide-react';
 import QRCodeGenerator from '@/components/QRCodeGenerator';
+import UserQRScanner from '@/components/UserQRScanner';
 import { createClient } from '@/lib/supabase/client';
 import Link from 'next/link';
 
@@ -71,6 +72,7 @@ function WalletContent() {
     const [transferSuccess, setTransferSuccess] = useState(false);
     const [transferLink, setTransferLink] = useState('');
     const [linkCopied, setLinkCopied] = useState(false);
+    const [showQRScanner, setShowQRScanner] = useState(false);
 
     // Check for auto-redeem code in URL
     useEffect(() => {
@@ -600,8 +602,8 @@ function WalletContent() {
                                 variant="outline"
                                 className="w-full h-12 rounded-full gap-2"
                                 onClick={() => {
-                                    // TODO: Open QR scanner
-                                    alert('掃碼功能開發中');
+                                    setShowRedeemModal(false);
+                                    setShowQRScanner(true);
                                 }}
                             >
                                 <ScanLine className="w-5 h-5" />
@@ -614,6 +616,29 @@ function WalletContent() {
                         </p>
                     </div>
                 </div>
+            )}
+
+            {/* QR Scanner */}
+            {showQRScanner && (
+                <UserQRScanner
+                    onClose={() => setShowQRScanner(false)}
+                    onScanSuccess={(code, type) => {
+                        setShowQRScanner(false);
+                        if (type === 'event') {
+                            // Navigate to event page
+                            router.push(`/events/${code}`);
+                        } else {
+                            // Treat as redeem code
+                            setRedeemCode(code);
+                            setShowRedeemModal(true);
+                            // Auto-trigger redeem
+                            setTimeout(() => {
+                                const redeemBtn = document.querySelector('[data-redeem-btn]') as HTMLButtonElement;
+                                if (redeemBtn) redeemBtn.click();
+                            }, 100);
+                        }
+                    }}
+                />
             )}
 
             {/* Transfer Modal */}

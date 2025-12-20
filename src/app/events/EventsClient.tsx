@@ -41,6 +41,8 @@ interface MyEventItem {
     };
 }
 
+type SortOrder = 'upcoming' | 'latest' | 'popular';
+
 export default function EventsClient({ initialEvents }: EventsClientProps) {
     const [activeTab, setActiveTab] = useState<TabType>('explore');
     const [selectedTags, setSelectedTags] = useState<string[]>([]);
@@ -48,6 +50,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
     const [dateFilter, setDateFilter] = useState('全部');
     const [priceFilter, setPriceFilter] = useState('全部');
     const [customTagInput, setCustomTagInput] = useState('');
+    const [sortOrder, setSortOrder] = useState<SortOrder>('upcoming');
 
     // My Events state
     const [myEvents, setMyEvents] = useState<MyEventItem[]>([]);
@@ -146,6 +149,27 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
             return matchesFilter && matchesSearch && matchesDate && matchesPrice;
         });
     }, [initialEvents, selectedTags, searchQuery, dateFilter, priceFilter]);
+
+    // Sort filtered events
+    const sortedEvents = useMemo(() => {
+        const events = [...filteredEvents];
+        switch (sortOrder) {
+            case 'upcoming':
+                return events.sort((a, b) => {
+                    const dateA = new Date(a.fullDate + ' ' + a.time);
+                    const dateB = new Date(b.fullDate + ' ' + b.time);
+                    return dateA.getTime() - dateB.getTime();
+                });
+            case 'latest':
+                // Sort by id (assuming newer events have higher ids) or use fullDate as proxy
+                return events.sort((a, b) => b.id.localeCompare(a.id));
+            case 'popular':
+                // Sort by engagement (attendees/capacity ratio, or just capacity as proxy)
+                return events.sort((a, b) => (b.attendees || 0) - (a.attendees || 0));
+            default:
+                return events;
+        }
+    }, [filteredEvents, sortOrder]);
 
     const clearAllFilters = () => {
         setSelectedTags([]);
@@ -332,13 +356,35 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                                             ))}
                                         </div>
                                     </div>
+
+                                    {/* Sort Order */}
+                                    <div>
+                                        <h3 className="text-sm font-medium text-gray-700 mb-2">排序</h3>
+                                        <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-hide">
+                                            {[
+                                                { value: 'upcoming', label: '即將開始' },
+                                                { value: 'latest', label: '最新發布' },
+                                                { value: 'popular', label: '最熱門' },
+                                            ].map((option) => (
+                                                <Button
+                                                    key={option.value}
+                                                    variant={sortOrder === option.value ? 'default' : 'outline'}
+                                                    size="sm"
+                                                    onClick={() => setSortOrder(option.value as SortOrder)}
+                                                    className={`rounded-full whitespace-nowrap ${sortOrder === option.value ? 'bg-gray-900 text-white hover:bg-gray-800' : 'bg-white'}`}
+                                                >
+                                                    {option.label}
+                                                </Button>
+                                            ))}
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
 
                             {/* Events Grid */}
-                            {filteredEvents.length > 0 ? (
+                            {sortedEvents.length > 0 ? (
                                 <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
-                                    {filteredEvents.map((event) => (
+                                    {sortedEvents.map((event) => (
                                         <EventCard key={event.id} event={event} />
                                     ))}
                                 </div>

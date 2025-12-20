@@ -112,7 +112,7 @@ export default function AdminDashboard() {
             icon: Users,
             color: "text-emerald-500",
             bgColor: "bg-emerald-50",
-            href: "#"
+            href: "/admin/users"
         },
         {
             label: "報名人次",

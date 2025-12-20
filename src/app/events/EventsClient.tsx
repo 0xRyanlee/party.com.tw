@@ -177,15 +177,15 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
         <>
             <FloatingActionButton />
 
-            <div className="min-h-screen bg-background pt-20 pb-24">
+            <div className="min-h-screen bg-background pt-16 pb-24">
                 <div className="container mx-auto px-4 md:px-6">
                     {/* Tab Navigation */}
-                    <div className="flex gap-1 p-1 bg-gray-100 rounded-full max-w-xs mb-6">
+                    <div className="flex gap-1 p-1 bg-gray-100 rounded-full max-w-xs mb-4">
                         <button
                             onClick={() => setActiveTab('explore')}
                             className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all ${activeTab === 'explore'
-                                    ? 'bg-white text-black shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-white text-black shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             探索
@@ -193,8 +193,8 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                         <button
                             onClick={() => setActiveTab('my-events')}
                             className={`flex-1 py-2 px-4 rounded-full text-sm font-medium transition-all ${activeTab === 'my-events'
-                                    ? 'bg-white text-black shadow-sm'
-                                    : 'text-gray-500 hover:text-gray-700'
+                                ? 'bg-white text-black shadow-sm'
+                                : 'text-gray-500 hover:text-gray-700'
                                 }`}
                         >
                             活動管理
@@ -204,9 +204,9 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                     {activeTab === 'explore' ? (
                         <>
                             {/* Explore Tab Content */}
-                            <div className="mb-6 space-y-4">
+                            <div className="mb-4 space-y-3">
                                 <div>
-                                    <h1 className="text-2xl font-bold text-text-primary mb-1">探索活動</h1>
+                                    <h1 className="text-2xl font-bold text-text-primary mb-0.5">探索活動</h1>
                                     <p className="text-sm text-text-secondary">發現身邊的精彩聚會</p>
                                 </div>
 
@@ -228,7 +228,7 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                             </div>
 
                             {/* Filters */}
-                            <div className="space-y-4 mb-6">
+                            <div className="space-y-3 mb-4">
                                 {/* Type Filters */}
                                 <div>
                                     <div className="flex items-center justify-between mb-2">
@@ -420,10 +420,10 @@ export default function EventsClient({ initialEvents }: EventsClientProps) {
                                                                 )}
                                                                 <div className="mt-2">
                                                                     <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-medium ${item.checked_in
-                                                                            ? 'bg-green-100 text-green-700'
-                                                                            : item.status === 'confirmed'
-                                                                                ? 'bg-neutral-100 text-neutral-700'
-                                                                                : 'bg-yellow-100 text-yellow-700'
+                                                                        ? 'bg-green-100 text-green-700'
+                                                                        : item.status === 'confirmed'
+                                                                            ? 'bg-neutral-100 text-neutral-700'
+                                                                            : 'bg-yellow-100 text-yellow-700'
                                                                         }`}>
                                                                         {item.checked_in ? '已簽到' : item.status === 'confirmed' ? '已確認' : '待確認'}
                                                                     </span>

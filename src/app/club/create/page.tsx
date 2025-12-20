@@ -6,13 +6,20 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Crown, Users, Shield, Zap, X } from "lucide-react";
+import { ArrowLeft, Crown, Users, Shield, Zap, X, Upload, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
 const CLUB_TYPES = [
     { value: 'public', label: 'Public', desc: '任何人可加入', icon: Users },
     { value: 'private', label: 'Private', desc: '僅限邀請', icon: Shield },
     { value: 'vendor', label: 'Vendor', desc: '服務提供者專用', icon: Zap },
+];
+
+// Preset tags for clubs
+const PRESET_TAGS = [
+    'technology', 'startup', 'design', 'music', 'sports',
+    'outdoor', 'food', 'travel', 'photography', 'gaming',
+    'art', 'reading', 'networking', 'fitness', 'language'
 ];
 
 export default function CreateClubPage() {
@@ -26,6 +33,7 @@ export default function CreateClubPage() {
         tags: [] as string[],
     });
     const [tagInput, setTagInput] = useState('');
+    const [isUploading, setIsUploading] = useState(false);
 
     const handleAddTag = () => {
         const tag = tagInput.trim().toLowerCase();
@@ -117,29 +125,72 @@ export default function CreateClubPage() {
                         />
                     </div>
 
-                    {/* Cover Image URL */}
+                    {/* Cover Image */}
                     <div className="space-y-2">
-                        <Label htmlFor="cover_image">Cover Image URL</Label>
-                        <Input
-                            id="cover_image"
-                            type="url"
-                            value={form.cover_image}
-                            onChange={(e) => setForm(prev => ({ ...prev, cover_image: e.target.value }))}
-                            placeholder="https://..."
-                            className="rounded-full"
-                        />
-                        {form.cover_image && (
-                            <div className="h-32 rounded-xl overflow-hidden bg-zinc-100">
-                                <img
-                                    src={form.cover_image}
-                                    alt="Preview"
-                                    className="w-full h-full object-cover"
-                                    onError={(e) => {
-                                        (e.target as HTMLImageElement).style.display = 'none';
-                                    }}
-                                />
-                            </div>
-                        )}
+                        <Label>封面圖片</Label>
+                        <div className="relative">
+                            {form.cover_image ? (
+                                <div className="relative h-40 rounded-xl overflow-hidden bg-zinc-100">
+                                    <img
+                                        src={form.cover_image}
+                                        alt="Preview"
+                                        className="w-full h-full object-cover"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={() => setForm(prev => ({ ...prev, cover_image: '' }))}
+                                        className="absolute top-2 right-2 w-8 h-8 bg-black/50 rounded-full flex items-center justify-center text-white hover:bg-black/70"
+                                    >
+                                        <X className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            ) : (
+                                <label className="flex flex-col items-center justify-center h-40 border-2 border-dashed border-zinc-300 rounded-xl cursor-pointer hover:border-zinc-400 transition-colors bg-zinc-50">
+                                    <input
+                                        type="file"
+                                        accept="image/*"
+                                        className="hidden"
+                                        onChange={async (e) => {
+                                            const file = e.target.files?.[0];
+                                            if (!file) return;
+                                            if (file.size > 5 * 1024 * 1024) {
+                                                toast.error('圖片大小不可超過 5MB');
+                                                return;
+                                            }
+                                            setIsUploading(true);
+                                            try {
+                                                const formData = new FormData();
+                                                formData.append('file', file);
+                                                formData.append('prefix', 'clubs');
+                                                const res = await fetch('/api/upload', {
+                                                    method: 'POST',
+                                                    body: formData,
+                                                });
+                                                if (res.ok) {
+                                                    const { url } = await res.json();
+                                                    setForm(prev => ({ ...prev, cover_image: url }));
+                                                } else {
+                                                    toast.error('上傳失敗');
+                                                }
+                                            } catch (err) {
+                                                toast.error('上傳失敗');
+                                            } finally {
+                                                setIsUploading(false);
+                                            }
+                                        }}
+                                    />
+                                    {isUploading ? (
+                                        <Loader2 className="w-8 h-8 text-zinc-400 animate-spin" />
+                                    ) : (
+                                        <>
+                                            <Upload className="w-8 h-8 text-zinc-400 mb-2" />
+                                            <span className="text-sm text-zinc-500">點擊上傳圖片</span>
+                                            <span className="text-xs text-zinc-400 mt-1">最大 5MB</span>
+                                        </>
+                                    )}
+                                </label>
+                            )}
+                        </div>
                     </div>
 
                     {/* Club Type */}
@@ -172,7 +223,26 @@ export default function CreateClubPage() {
 
                     {/* Tags */}
                     <div className="space-y-2">
-                        <Label>Tags (up to 5)</Label>
+                        <Label>標籤（最多 5 個）</Label>
+                        {/* Preset tag suggestions */}
+                        <div className="flex flex-wrap gap-2">
+                            {PRESET_TAGS.filter(t => !form.tags.includes(t)).slice(0, 10).map((tag) => (
+                                <button
+                                    key={tag}
+                                    type="button"
+                                    onClick={() => {
+                                        if (form.tags.length < 5) {
+                                            setForm(prev => ({ ...prev, tags: [...prev.tags, tag] }));
+                                        }
+                                    }}
+                                    disabled={form.tags.length >= 5}
+                                    className="px-3 py-1 text-sm rounded-full border border-zinc-200 bg-white hover:border-zinc-400 hover:bg-zinc-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    {tag}
+                                </button>
+                            ))}
+                        </div>
+                        {/* Custom tag input */}
                         <div className="flex gap-2">
                             <Input
                                 value={tagInput}
@@ -183,7 +253,7 @@ export default function CreateClubPage() {
                                         handleAddTag();
                                     }
                                 }}
-                                placeholder="Add a tag"
+                                placeholder="自定義標籤..."
                                 className="rounded-full flex-1"
                                 maxLength={20}
                             />
@@ -191,23 +261,25 @@ export default function CreateClubPage() {
                                 type="button"
                                 variant="outline"
                                 onClick={handleAddTag}
+                                disabled={form.tags.length >= 5}
                                 className="rounded-full"
                             >
-                                Add
+                                新增
                             </Button>
                         </div>
+                        {/* Selected tags */}
                         {form.tags.length > 0 && (
                             <div className="flex flex-wrap gap-2 mt-2">
                                 {form.tags.map((tag) => (
                                     <span
                                         key={tag}
-                                        className="inline-flex items-center gap-1 px-3 py-1 bg-zinc-100 rounded-full text-sm"
+                                        className="inline-flex items-center gap-1 px-3 py-1 bg-black text-white rounded-full text-sm"
                                     >
                                         {tag}
                                         <button
                                             type="button"
                                             onClick={() => handleRemoveTag(tag)}
-                                            className="text-zinc-400 hover:text-zinc-600"
+                                            className="text-zinc-300 hover:text-white"
                                         >
                                             <X className="w-3 h-3" />
                                         </button>

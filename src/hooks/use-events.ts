@@ -31,7 +31,9 @@ export function useEvents(filters?: EventFilters) {
             }
 
             if (filters?.search) {
-                query = query.ilike('title', `%${filters.search}%`);
+                // Enhanced full-text search across multiple fields
+                const searchTerm = `%${filters.search}%`;
+                query = query.or(`title.ilike.${searchTerm},description_short.ilike.${searchTerm},venue_name.ilike.${searchTerm}`);
             }
 
             if (filters?.limit) {

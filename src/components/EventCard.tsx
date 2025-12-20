@@ -39,9 +39,10 @@ export default function EventCard({ event, variant = 'grid', onClick, className 
         />
 
         {/* Type Badge */}
-        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20 flex flex-wrap gap-1 sm:gap-2">\n          <Badge className="backdrop-blur-md border-none bg-white/20 text-white hover:bg-white/30 text-[10px] sm:text-xs px-2 py-0.5">
-          {t(`types.${event.type}` as any)}
-        </Badge>
+        <div className="absolute top-2 sm:top-4 left-2 sm:left-4 z-20 flex flex-wrap gap-1 sm:gap-2">
+          <Badge className="backdrop-blur-md border-none bg-white/20 text-white hover:bg-white/30 text-[10px] sm:text-xs px-2 py-0.5">
+            {t(`types.${event.type}` as any)}
+          </Badge>
           {/* Format Badge */}
           <Badge className="backdrop-blur-md border-none bg-black/40 text-white hover:bg-black/50 flex items-center gap-1 text-[10px] sm:text-xs px-2 py-0.5">
             <FormatIcon className="w-2.5 h-2.5 sm:w-3 sm:h-3" />

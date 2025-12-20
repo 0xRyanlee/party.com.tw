@@ -7,7 +7,7 @@
 
 ## [v1.8] - 2025-12-20
 
-### 新增
+**新增功能**
 
 - 結構化圖片資產架構 (`StructuredImage` + `ImageUploader`)
 - Supabase Storage 整合（直接上傳與自動命名）
@@ -32,8 +32,23 @@
 - **聊天室安全機制**
   - Rate Limiting（1 訊息/2 秒）
   - Message Retention（500 條或 30 天）
+- **體驗優化 (P2)**
+  - Skeleton 骨架屏全站優化（18 種變體）
+  - 動態 OG Image 產生器 `/api/og`
+  - 多欄位關鍵字搜尋（title, description, venue）
+- **Analytics 統一 Hook**
+  - GA4 + Amplitude 雙軌整合
+  - 預設事件：auth, events, tickets, clubs, social, chat
+- **品質保證 (P3)**
+  - Playwright E2E 測試框架設定
+  - 全站鏈接正確性檢查腳本
+  - Admin 測試儀表板 `/admin/tests`（一鍵複製報告）
+  - QR 掃碼核銷功能（即時偵測、震動回饋）
+  - 聊天室票券轉讓（30 分鐘限時邀請）
+  - 海報模板生成器（6 種漸層模板 + PNG 下載）
+  - 系統公告欄（AnnouncementBar）
 
-### 變更
+**變更**
 
 - 全站樣式統一 (Nine Unities: `rounded-3xl`)
 - **全面中文化與 Emoji 清理**
@@ -45,23 +60,18 @@
 
 ## [v1.7] - 2025-12-19
 
-## [v1.5] - 2025-12-19
-
-### 新增
+活動數據整合與 Seed API。
 
 - 真實活動數據錄入（5場 Accupass/Meetup 活動）
 - Seed API 端點 `/api/seed`
 - Service Role Key 支援
-
-### 修復
-
 - Supabase API Key 更新
 
 ---
 
-## [v1.4] - 2025-12-18
+## [v1.6] - 2025-12-18
 
-### 新增
+會員定價與 UI 優化。
 
 - 會員定價頁面
 - Plus 功能規劃
@@ -69,9 +79,9 @@
 
 ---
 
-## [v1.3] - 2025-12-17
+## [v1.5] - 2025-12-17
 
-### 新增
+首頁真實數據。
 
 - 首頁真實數據整合
 - HeroCarousel 組件
@@ -79,9 +89,9 @@
 
 ---
 
-## [v1.2] - 2025-12-16
+## [v1.4] - 2025-12-16
 
-### 新增
+主辦方工具。
 
 - 活動編輯器
 - 主辦方儀表板
@@ -89,9 +99,9 @@
 
 ---
 
-## [v1.1] - 2025-12-15
+## [v1.3] - 2025-12-15
 
-### 新增
+Admin 功能。
 
 - Admin Reports 界面
 - Vendor Profile 表
@@ -100,7 +110,7 @@
 
 ## [v1.0] - 2025-12-01
 
-### 初始版本
+初始版本。
 
 - 基礎框架建立
 - Supabase 認證整合

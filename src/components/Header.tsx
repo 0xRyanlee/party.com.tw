@@ -19,6 +19,7 @@ import AuthModal from '@/components/AuthModal';
 import { useLanguage } from '@/lib/i18n';
 import { createClient } from '@/lib/supabase/client';
 import { useRouter, usePathname } from 'next/navigation';
+import AnnouncementBar from '@/components/AnnouncementBar';
 
 export default function Header() {
     const { user, loading } = useUser();
@@ -52,12 +53,16 @@ export default function Header() {
 
     return (
         <>
+            {/* System Announcements */}
+            <AnnouncementBar />
+
             <header className="sticky top-0 z-50 bg-white border-b border-gray-100">
                 <div className="container mx-auto px-4">
                     <div className="flex items-center h-16 gap-6">
                         {/* Logo + Tagline */}
                         <div className="flex flex-col">
                             <div className="flex items-center gap-2">
+
                                 <Logo />
                                 <span className="text-xs text-gray-400 border border-gray-200 px-2 py-0.5 rounded-full">
                                     TAIWAN

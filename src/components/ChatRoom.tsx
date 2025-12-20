@@ -9,11 +9,13 @@ import { format } from 'date-fns';
 import { motion, AnimatePresence } from 'framer-motion';
 import StructuredImage from './common/StructuredImage';
 import { Skeleton } from './Skeleton';
+import { TicketTransferButton, TicketOfferMessage } from './TicketTransferChat';
 
 interface Message {
     id: string;
     content: string;
-    content_type: 'text' | 'image' | 'system';
+    content_type: 'text' | 'image' | 'system' | 'ticket_transfer';
+    metadata?: Record<string, any>;
     user_id: string;
     created_at: string;
     profiles?: {
@@ -216,7 +218,26 @@ export default function ChatRoom({
                                         ? 'bg-neutral-900 text-white rounded-tr-none'
                                         : 'bg-neutral-100 text-neutral-900 rounded-tl-none'
                                         }`}>
-                                        {msg.content}
+                                        {msg.content_type === 'ticket_transfer' ? (
+                                            (() => {
+                                                try {
+                                                    const data = JSON.parse(msg.content);
+                                                    return (
+                                                        <TicketOfferMessage
+                                                            offerId={data.offer_id}
+                                                            fromUserId={msg.user_id}
+                                                            fromUserName={msg.profiles?.full_name || '參與者'}
+                                                            expiresAt={data.expires_at}
+                                                            currentUserId={currentUserId}
+                                                        />
+                                                    );
+                                                } catch {
+                                                    return msg.content;
+                                                }
+                                            })()
+                                        ) : (
+                                            msg.content
+                                        )}
                                     </div>
                                     <span className="text-[9px] text-neutral-400 mt-1 px-1">
                                         {format(new Date(msg.created_at), 'HH:mm')}
@@ -231,6 +252,10 @@ export default function ChatRoom({
             {/* Input Area */}
             {isWithinWindow ? (
                 <form onSubmit={handleSendMessage} className="p-4 bg-neutral-50 border-t border-neutral-100 flex gap-2">
+                    <TicketTransferButton
+                        eventId={eventId}
+                        currentUserId={currentUserId}
+                    />
                     <Input
                         value={newMessage}
                         onChange={(e) => setNewMessage(e.target.value)}

@@ -130,20 +130,20 @@ export default function AnnouncementsPage() {
     return (
         <div className="space-y-6">
             <div className="flex justify-between items-center">
-                <h2 className="text-3xl font-bold tracking-tight">Announcements</h2>
+                <h2 className="text-3xl font-bold tracking-tight">系統公告</h2>
                 <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                     <DialogTrigger asChild>
                         <Button onClick={openNew}>
-                            <Plus className="mr-2 h-4 w-4" /> Add Announcement
+                            <Plus className="mr-2 h-4 w-4" /> 新增公告
                         </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>{editingItem ? "Edit Announcement" : "New Announcement"}</DialogTitle>
+                            <DialogTitle>{editingItem ? "編輯公告" : "新增公告"}</DialogTitle>
                         </DialogHeader>
                         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
                             <div className="space-y-2">
-                                <Label htmlFor="title">Title</Label>
+                                <Label htmlFor="title">標題</Label>
                                 <Input id="title" {...form.register("title")} />
                                 {form.formState.errors.title && (
                                     <p className="text-sm text-red-500">{form.formState.errors.title.message}</p>
@@ -151,20 +151,20 @@ export default function AnnouncementsPage() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="content">Content</Label>
+                                <Label htmlFor="content">內容</Label>
                                 <Textarea id="content" {...form.register("content")} />
                             </div>
 
                             <div className="space-y-2">
-                                <Label htmlFor="type">Type</Label>
+                                <Label htmlFor="type">類型</Label>
                                 <select
                                     id="type"
                                     {...form.register("type")}
                                     className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
                                 >
-                                    <option value="info">Info</option>
-                                    <option value="warning">Warning</option>
-                                    <option value="alert">Alert</option>
+                                    <option value="info">資訊</option>
+                                    <option value="warning">警告</option>
+                                    <option value="alert">緊急</option>
                                 </select>
                             </div>
 
@@ -174,7 +174,7 @@ export default function AnnouncementsPage() {
                                     checked={form.watch("is_active")}
                                     onCheckedChange={(checked) => form.setValue("is_active", checked)}
                                 />
-                                <Label htmlFor="is_active">Active</Label>
+                                <Label htmlFor="is_active">啟用</Label>
                             </div>
 
                             <div className="flex justify-end space-x-2 pt-4">
@@ -215,7 +215,7 @@ export default function AnnouncementsPage() {
                                         </span>
                                         {!item.is_active && (
                                             <span className="px-2 py-0.5 rounded bg-red-100 text-red-800 border border-red-200">
-                                                Inactive
+                                                未啟用
                                             </span>
                                         )}
                                         <span>{new Date(item.created_at).toLocaleDateString()}</span>

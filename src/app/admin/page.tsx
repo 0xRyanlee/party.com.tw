@@ -194,19 +194,21 @@ export default function AdminDashboard() {
                     const Icon = stat.icon;
                     return (
                         <Link key={stat.label} href={stat.href}>
-                            <Card className="hover:shadow-md transition-shadow cursor-pointer group">
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                                    <CardTitle className="text-sm font-medium text-gray-600">
+                            <Card className="hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden bg-white/80 backdrop-blur-sm border-neutral-200">
+                                {/* Subtle texture overlay */}
+                                <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 relative">
+                                    <CardTitle className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
                                         {stat.label}
                                     </CardTitle>
-                                    <div className={`p-2 rounded-lg ${stat.bgColor}`}>
+                                    <div className={`p-1.5 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform`}>
                                         <Icon className={`h-4 w-4 ${stat.color}`} />
                                     </div>
                                 </CardHeader>
-                                <CardContent>
-                                    <div className="text-3xl font-bold">{stat.value.toLocaleString()}</div>
+                                <CardContent className="relative">
+                                    <div className="text-4xl font-black tracking-tight text-neutral-900">{stat.value.toLocaleString()}</div>
                                     {stat.subValue && (
-                                        <p className="text-xs text-gray-500 mt-1">{stat.subValue}</p>
+                                        <p className="text-[11px] text-neutral-400 mt-0.5 font-medium">{stat.subValue}</p>
                                     )}
                                 </CardContent>
                             </Card>
@@ -237,13 +239,13 @@ export default function AdminDashboard() {
                     );
                 })}
                 <Link href="/admin/management">
-                    <Card className="hover:shadow-md transition-shadow cursor-pointer bg-gradient-to-r from-violet-50 to-purple-50 border-violet-100">
+                    <Card className="hover:shadow-lg transition-all cursor-pointer bg-neutral-900 text-white border-neutral-800">
                         <CardContent className="flex items-center justify-between py-4">
                             <div className="flex items-center gap-3">
-                                <BarChart3 className="h-5 w-5 text-violet-500" />
-                                <span className="text-sm font-medium text-violet-700">管理中心</span>
+                                <BarChart3 className="h-5 w-5 text-neutral-300" />
+                                <span className="text-sm font-bold">管理中心</span>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-violet-400" />
+                            <ArrowRight className="w-4 h-4 text-neutral-400" />
                         </CardContent>
                     </Card>
                 </Link>
@@ -252,8 +254,9 @@ export default function AdminDashboard() {
             {/* 最近活動 + 最近回報 */}
             <div className="grid gap-6 lg:grid-cols-2">
                 {/* 最近活動 */}
-                <Card>
-                    <CardHeader className="pb-3">
+                <Card className="bg-white/80 backdrop-blur-sm border-neutral-200 overflow-hidden relative">
+                    <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
+                    <CardHeader className="pb-3 relative">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-lg">最近活動</CardTitle>
                             <Button variant="ghost" size="sm" asChild>
@@ -286,8 +289,9 @@ export default function AdminDashboard() {
                 </Card>
 
                 {/* 最近回報 */}
-                <Card>
-                    <CardHeader className="pb-3">
+                <Card className="bg-white/80 backdrop-blur-sm border-neutral-200 overflow-hidden relative">
+                    <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
+                    <CardHeader className="pb-3 relative">
                         <div className="flex items-center justify-between">
                             <CardTitle className="text-lg">最近回報</CardTitle>
                             <Button variant="ghost" size="sm" asChild>

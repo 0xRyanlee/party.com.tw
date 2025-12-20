@@ -1,14 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Crown, Users, Shield, Zap, X, Upload, Loader2 } from "lucide-react";
+import { ArrowLeft, Crown, Users, Shield, Zap, X, Upload, Loader2, Check, AlertCircle } from "lucide-react";
 import { toast } from "sonner";
 import { createClient } from "@/lib/supabase/client";
+import confetti from "canvas-confetti";
 
 const CLUB_TYPES = [
     { value: 'public', label: 'Public', desc: '任何人可加入', icon: Users },
@@ -23,9 +24,41 @@ const PRESET_TAGS = [
     'art', 'reading', 'networking', 'fitness', 'language'
 ];
 
+// Duolingo 風格禮花效果
+const fireConfetti = () => {
+    // 第一波
+    confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#000000', '#333333', '#666666', '#FFD700', '#FFA500']
+    });
+
+    // 第二波（稍微延遲）
+    setTimeout(() => {
+        confetti({
+            particleCount: 50,
+            angle: 60,
+            spread: 55,
+            origin: { x: 0 },
+            colors: ['#000000', '#333333', '#666666']
+        });
+        confetti({
+            particleCount: 50,
+            angle: 120,
+            spread: 55,
+            origin: { x: 1 },
+            colors: ['#000000', '#333333', '#666666']
+        });
+    }, 200);
+};
+
 export default function CreateClubPage() {
     const router = useRouter();
     const [isLoading, setIsLoading] = useState(false);
+    const [progress, setProgress] = useState(0); // 讀條進度
+    const [isSuccess, setIsSuccess] = useState(false); // 成功狀態
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // 登入狀態
     const [form, setForm] = useState({
         name: '',
         description: '',
@@ -35,6 +68,21 @@ export default function CreateClubPage() {
     });
     const [tagInput, setTagInput] = useState('');
     const [isUploading, setIsUploading] = useState(false);
+    const progressInterval = useRef<NodeJS.Timeout | null>(null);
+
+    // 檢查登入狀態
+    useEffect(() => {
+        const checkAuth = async () => {
+            const supabase = createClient();
+            const { data: { user } } = await supabase.auth.getUser();
+            setIsAuthenticated(!!user);
+
+            if (!user) {
+                toast.error('請先登入才能創建俱樂部');
+            }
+        };
+        checkAuth();
+    }, []);
 
     const handleAddTag = () => {
         const tag = tagInput.trim().toLowerCase();
@@ -48,8 +96,37 @@ export default function CreateClubPage() {
         setForm(prev => ({ ...prev, tags: prev.tags.filter(t => t !== tag) }));
     };
 
+    // Duolingo 風格讀條動效
+    const startProgressAnimation = () => {
+        setProgress(0);
+        progressInterval.current = setInterval(() => {
+            setProgress(prev => {
+                if (prev >= 90) {
+                    // 在 90% 暫停，等待實際完成
+                    return prev;
+                }
+                // 快速增長到 90%
+                return prev + Math.random() * 15;
+            });
+        }, 100);
+    };
+
+    const completeProgress = () => {
+        if (progressInterval.current) {
+            clearInterval(progressInterval.current);
+        }
+        // 快速完成到 100%
+        setProgress(100);
+    };
+
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+
+        if (!isAuthenticated) {
+            toast.error('請先登入');
+            router.push('/');
+            return;
+        }
 
         if (!form.name.trim()) {
             toast.error('請輸入俱樂部名稱');
@@ -57,6 +134,8 @@ export default function CreateClubPage() {
         }
 
         setIsLoading(true);
+        startProgressAnimation();
+
         try {
             const response = await fetch('/api/clubs', {
                 method: 'POST',
@@ -64,21 +143,86 @@ export default function CreateClubPage() {
                 body: JSON.stringify(form),
             });
 
+            const data = await response.json();
+
             if (response.ok) {
-                const club = await response.json();
-                toast.success('俱樂部創建成功！');
-                router.push(`/club/${club.id}`);
+                completeProgress();
+                setIsSuccess(true);
+
+                // 禮花效果
+                setTimeout(() => {
+                    fireConfetti();
+                }, 300);
+
+                toast.success('俱樂部創建成功！🎉');
+
+                // 延遲跳轉，讓用戶看到成功效果
+                setTimeout(() => {
+                    router.push(`/club/${data.id}`);
+                }, 1500);
             } else {
-                const data = await response.json();
-                toast.error(data.error || '創建失敗');
+                completeProgress();
+                const errorMsg = data.error || `創建失敗 (HTTP ${response.status})`;
+                console.error('API Error:', response.status, data);
+
+                // 根據狀態碼顯示不同錯誤信息
+                if (response.status === 401) {
+                    toast.error('請先登入');
+                    setIsAuthenticated(false);
+                } else if (response.status === 500) {
+                    toast.error('伺服器錯誤：' + errorMsg);
+                } else {
+                    toast.error(errorMsg);
+                }
+
+                setIsLoading(false);
+                setProgress(0);
             }
         } catch (error) {
             console.error('Error creating club:', error);
-            toast.error('創建失敗');
-        } finally {
+            completeProgress();
+            toast.error('創建失敗，請檢查網路連線');
             setIsLoading(false);
+            setProgress(0);
         }
     };
+
+    // 清理 interval
+    useEffect(() => {
+        return () => {
+            if (progressInterval.current) {
+                clearInterval(progressInterval.current);
+            }
+        };
+    }, []);
+
+    // 未登入提示
+    if (isAuthenticated === false) {
+        return (
+            <main className="min-h-screen bg-zinc-50 flex items-center justify-center pb-20">
+                <div className="text-center p-8">
+                    <AlertCircle className="w-16 h-16 text-zinc-400 mx-auto mb-4" />
+                    <h1 className="text-xl font-bold mb-2">需要登入</h1>
+                    <p className="text-zinc-500 mb-6">請先登入才能創建俱樂部</p>
+                    <Button
+                        onClick={() => router.push('/')}
+                        className="rounded-full bg-black text-white hover:bg-zinc-800"
+                    >
+                        返回首頁登入
+                    </Button>
+                </div>
+            </main>
+        );
+    }
+
+    // 載入中
+    if (isAuthenticated === null) {
+        return (
+            <main className="min-h-screen bg-zinc-50 flex items-center justify-center">
+                <Loader2 className="w-8 h-8 animate-spin text-zinc-400" />
+            </main>
+        );
+    }
 
     return (
         <main className="min-h-screen bg-zinc-50 pb-20">
@@ -298,14 +442,46 @@ export default function CreateClubPage() {
                         )}
                     </div>
 
-                    {/* Submit */}
-                    <Button
-                        type="submit"
-                        disabled={isLoading || !form.name.trim()}
-                        className="w-full h-12 rounded-full bg-black text-white hover:bg-zinc-800"
-                    >
-                        {isLoading ? '創建中...' : '創建俱樂部'}
-                    </Button>
+                    {/* Submit Button with Duolingo-style Progress */}
+                    <div className="relative">
+                        <Button
+                            type="submit"
+                            disabled={isLoading || !form.name.trim()}
+                            className={`w-full h-14 rounded-full text-lg font-bold transition-all overflow-hidden ${isSuccess
+                                ? 'bg-green-500 hover:bg-green-500'
+                                : 'bg-black hover:bg-zinc-800'
+                                } text-white relative`}
+                        >
+                            {/* Progress bar background */}
+                            {isLoading && !isSuccess && (
+                                <div
+                                    className="absolute inset-0 bg-zinc-600 transition-all duration-100 ease-out"
+                                    style={{
+                                        width: `${100 - progress}%`,
+                                        right: 0,
+                                        left: 'auto'
+                                    }}
+                                />
+                            )}
+
+                            {/* Button content */}
+                            <span className="relative z-10 flex items-center justify-center gap-2">
+                                {isSuccess ? (
+                                    <>
+                                        <Check className="w-6 h-6" />
+                                        創建成功！
+                                    </>
+                                ) : isLoading ? (
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        創建中... {Math.round(progress)}%
+                                    </>
+                                ) : (
+                                    '創建俱樂部'
+                                )}
+                            </span>
+                        </Button>
+                    </div>
                 </form>
             </div>
         </main>

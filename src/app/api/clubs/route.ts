@@ -87,6 +87,7 @@ export async function POST(request: NextRequest) {
         .single();
 
     if (clubError) {
+        console.error('Club creation error:', clubError);
         return NextResponse.json({ error: clubError.message }, { status: 500 });
     }
 

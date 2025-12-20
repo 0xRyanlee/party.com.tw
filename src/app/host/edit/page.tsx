@@ -22,6 +22,8 @@ import ExternalLinks from "@/components/host/ExternalLinks";
 import { Calendar, MapPin, Clock, Info, Tag, Briefcase, ArrowLeft } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { EventRole, EventResource, TicketType } from "@/types/schema";
+import { toast } from "sonner";
+import { createClient } from "@/lib/supabase/client";
 
 // Edit mode type
 type EditMode = 'new' | 'draft' | 'published';
@@ -72,6 +74,7 @@ export default function HostEdit() {
     const [editMode] = useState<EditMode>('new'); // TODO: set based on URL params
     const [isSavingDraft, setIsSavingDraft] = useState(false);
     const [collaborationEnabled, setCollaborationEnabled] = useState(false); // Collaboration toggle
+    const [contentImages, setContentImages] = useState<string[]>([]); // Max 3 content images
 
     const {
         register,
@@ -415,6 +418,83 @@ export default function HostEdit() {
                             showToggle={true}
                             pathPrefix="events"
                         />
+
+                        {/* Content Images (Max 3) */}
+                        {mediaEnabled && (
+                            <div className="pt-4 border-t border-gray-100 space-y-3">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <Label className="font-medium">活動內容照片</Label>
+                                        <p className="text-xs text-gray-500">上傳最多 3 張活動照片（加上主圖共 4 張）</p>
+                                    </div>
+                                    <span className="text-sm text-gray-400">{contentImages.length}/3</span>
+                                </div>
+                                <div className="grid grid-cols-3 gap-3">
+                                    {contentImages.map((img, idx) => (
+                                        <div key={idx} className="aspect-video rounded-xl overflow-hidden bg-gray-100 relative group">
+                                            <img src={img} alt={`Content ${idx + 1}`} className="w-full h-full object-cover" />
+                                            <button
+                                                type="button"
+                                                onClick={() => setContentImages(prev => prev.filter((_, i) => i !== idx))}
+                                                className="absolute top-1 right-1 w-6 h-6 bg-black/50 text-white rounded-full flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                ×
+                                            </button>
+                                        </div>
+                                    ))}
+                                    {contentImages.length < 3 && (
+                                        <label className="aspect-video rounded-xl border-2 border-dashed border-gray-200 hover:border-gray-300 flex flex-col items-center justify-center gap-1 cursor-pointer transition-colors">
+                                            <span className="text-2xl text-gray-300">+</span>
+                                            <span className="text-xs text-gray-400">新增照片</span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={async (e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (!file || contentImages.length >= 3) return;
+
+                                                    // 5MB size validation
+                                                    if (file.size > 5 * 1024 * 1024) {
+                                                        toast.error('檔案太大（最大 5MB）');
+                                                        return;
+                                                    }
+
+                                                    // File type validation
+                                                    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
+                                                    if (!allowedTypes.includes(file.type)) {
+                                                        toast.error('不支援的圖片格式（僅支援 JPG、PNG、WebP、GIF）');
+                                                        return;
+                                                    }
+
+                                                    try {
+                                                        const supabase = createClient();
+                                                        const timestamp = new Date().toISOString().replace(/[-:.]/g, '').slice(0, 14);
+                                                        const cleanName = file.name.toLowerCase().replace(/[^a-z0-9.]/g, '-');
+                                                        const fileName = `events/content/${timestamp}-${cleanName}`;
+
+                                                        const { data, error } = await supabase.storage
+                                                            .from('images')
+                                                            .upload(fileName, file, { cacheControl: '3600', upsert: true });
+
+                                                        if (error) throw error;
+
+                                                        const { data: { publicUrl } } = supabase.storage
+                                                            .from('images')
+                                                            .getPublicUrl(data.path);
+
+                                                        setContentImages(prev => [...prev, publicUrl]);
+                                                        toast.success('照片上傳成功');
+                                                    } catch (error: any) {
+                                                        toast.error('上傳失敗：' + error.message);
+                                                    }
+                                                }}
+                                            />
+                                        </label>
+                                    )}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Advanced Tickets Card */}

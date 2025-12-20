@@ -14,30 +14,30 @@ interface VibeAttributesProps {
 }
 
 const vibeOptions = [
-    { value: 'relax', label: '放鬆休閒', icon: '🧘', color: 'bg-green-100 text-green-700 border-green-200' },
-    { value: 'networking', label: '社交拓展', icon: '🤝', color: 'bg-blue-100 text-blue-700 border-blue-200' },
-    { value: 'dating', label: '交友聯誼', icon: '💕', color: 'bg-pink-100 text-pink-700 border-pink-200' },
-    { value: 'hobby', label: '興趣愛好', icon: '🎨', color: 'bg-purple-100 text-purple-700 border-purple-200' },
-    { value: 'nightlife', label: '夜生活', icon: '🌙', color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
-    { value: 'music', label: '音樂表演', icon: '🎵', color: 'bg-red-100 text-red-700 border-red-200' },
-    { value: 'sport', label: '運動健身', icon: '⚽', color: 'bg-orange-100 text-orange-700 border-orange-200' },
+    { value: 'relax', label: 'Relax', icon: null, color: 'bg-green-100 text-green-700 border-green-200' },
+    { value: 'networking', label: 'Networking', icon: null, color: 'bg-blue-100 text-blue-700 border-blue-200' },
+    { value: 'dating', label: 'Dating', icon: null, color: 'bg-pink-100 text-pink-700 border-pink-200' },
+    { value: 'hobby', label: 'Hobby', icon: null, color: 'bg-purple-100 text-purple-700 border-purple-200' },
+    { value: 'nightlife', label: 'Nightlife', icon: null, color: 'bg-indigo-100 text-indigo-700 border-indigo-200' },
+    { value: 'music', label: 'Music', icon: null, color: 'bg-red-100 text-red-700 border-red-200' },
+    { value: 'sport', label: 'Sport', icon: null, color: 'bg-orange-100 text-orange-700 border-orange-200' },
 ];
 
 const moodTagOptions = [
-    '熱鬧', '安靜', '浪漫', '活力', '專業',
-    '創意', '輕鬆', '高雅', '親密', '自由',
-    '刺激', '溫馨', '文青', '潮流', '復古',
+    'Lively', 'Quiet', 'Romantic', 'Energetic', 'Professional',
+    'Creative', 'Relaxed', 'Elegant', 'Intimate', 'Free',
+    'Exciting', 'Cozy', 'Artsy', 'Trendy', 'Vintage',
 ];
 
 const themePresets = [
-    '萬聖節 🎃',
-    '聖誕節 🎄',
-    '情人節 💝',
-    '春節 🧧',
-    '畢業季 🎓',
-    '夏日派對 🏖️',
-    '復古風 📻',
-    '未來感 🚀',
+    'Halloween',
+    'Christmas',
+    'Valentine',
+    'New Year',
+    'Graduation',
+    'Summer Party',
+    'Retro',
+    'Futuristic',
 ];
 
 export default function VibeAttributes({
@@ -80,12 +80,11 @@ export default function VibeAttributes({
                             type="button"
                             onClick={() => onVibeTypeChange?.(option.value as any)}
                             className={`p-4 rounded-xl border-2 transition-all ${vibeType === option.value
-                                    ? `${option.color} border-current font-semibold`
-                                    : 'border-gray-200 bg-white hover:border-gray-300'
+                                ? `${option.color} border-current font-semibold`
+                                : 'border-gray-200 bg-white hover:border-gray-300'
                                 }`}
                         >
-                            <div className="text-2xl mb-1">{option.icon}</div>
-                            <div className="text-sm">{option.label}</div>
+                            <div className="text-sm font-medium">{option.label}</div>
                         </button>
                     ))}
                 </div>
@@ -104,8 +103,8 @@ export default function VibeAttributes({
                                 onThemeChange?.(preset);
                             }}
                             className={`px-4 py-2 rounded-full text-sm transition-all ${customTheme === preset
-                                    ? 'bg-black text-white'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                ? 'bg-black text-white'
+                                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }`}
                         >
                             {preset}
@@ -141,10 +140,10 @@ export default function VibeAttributes({
                                 onClick={() => !isDisabled && toggleMoodTag(tag)}
                                 disabled={isDisabled}
                                 className={`px-4 py-2 rounded-full text-sm transition-all ${isSelected
-                                        ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
-                                        : isDisabled
-                                            ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                    ? 'bg-gradient-to-r from-purple-500 to-pink-500 text-white'
+                                    : isDisabled
+                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                     }`}
                             >
                                 {tag}
@@ -162,18 +161,17 @@ export default function VibeAttributes({
             {/* Preview */}
             {vibeType && (
                 <div className="bg-gradient-to-r from-purple-50 to-pink-50 border border-purple-200 rounded-xl p-4">
-                    <h4 className="font-semibold mb-2 text-purple-900">🎨 氛圍預覽</h4>
+                    <h4 className="font-semibold mb-2 text-purple-900">Vibe Preview</h4>
                     <div className="flex flex-wrap items-center gap-2">
                         {vibeOptions.find((o) => o.value === vibeType) && (
                             <span className={`px-3 py-1 rounded-full text-sm font-medium ${vibeOptions.find((o) => o.value === vibeType)!.color
                                 }`}>
-                                {vibeOptions.find((o) => o.value === vibeType)!.icon}{' '}
                                 {vibeOptions.find((o) => o.value === vibeType)!.label}
                             </span>
                         )}
                         {theme && (
                             <span className="px-3 py-1 rounded-full text-sm bg-white border border-purple-200 text-purple-700">
-                                🎭 {theme}
+                                {theme}
                             </span>
                         )}
                         {moodTags.map((tag) => (

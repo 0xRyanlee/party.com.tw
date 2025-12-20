@@ -36,10 +36,10 @@ export default function ClubManagePage({ params }: { params: { id: string } }) {
     ]);
 
     const [permissions, setPermissions] = useState([
-        { id: "create_event", label: "Create Events", admin: true, mod: true, member: false },
-        { id: "approve_member", label: "Approve New Members", admin: true, mod: true, member: false },
-        { id: "post_announcement", label: "Post Announcements", admin: true, mod: false, member: false },
-        { id: "manage_roles", label: "Manage Roles", admin: true, mod: false, member: false },
+        { id: "create_event", label: "創建活動", admin: true, mod: true, member: false },
+        { id: "approve_member", label: "審核新成員", admin: true, mod: true, member: false },
+        { id: "post_announcement", label: "發佈公告", admin: true, mod: false, member: false },
+        { id: "manage_roles", label: "管理角色", admin: true, mod: false, member: false },
     ]);
 
     return (
@@ -50,32 +50,32 @@ export default function ClubManagePage({ params }: { params: { id: string } }) {
                     <Button variant="ghost" size="icon" onClick={() => router.back()} className="-ml-2">
                         <ArrowLeft className="w-6 h-6" />
                     </Button>
-                    <h1 className="text-xl font-bold">Manage Club</h1>
+                    <h1 className="text-xl font-bold">管理俱樂部</h1>
                 </div>
                 <Button className="rounded-full bg-black text-white hover:bg-gray-800">
                     <Save className="w-4 h-4 mr-2" />
-                    Save Changes
+                    儲存變更
                 </Button>
             </header>
 
             <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <Tabs defaultValue="settings" value={activeTab} onValueChange={setActiveTab} className="space-y-8">
                     <TabsList className="grid w-full grid-cols-3 bg-gray-100 p-1 rounded-full h-12">
-                        <TabsTrigger value="settings" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Settings</TabsTrigger>
-                        <TabsTrigger value="members" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Members</TabsTrigger>
-                        <TabsTrigger value="permissions" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">Permissions</TabsTrigger>
+                        <TabsTrigger value="settings" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">設定</TabsTrigger>
+                        <TabsTrigger value="members" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">成員</TabsTrigger>
+                        <TabsTrigger value="permissions" className="rounded-full data-[state=active]:bg-white data-[state=active]:shadow-sm">權限</TabsTrigger>
                     </TabsList>
 
                     {/* Settings Tab */}
                     <TabsContent value="settings" className="space-y-6">
                         <Card className="border-none shadow-sm">
                             <CardHeader>
-                                <CardTitle>General Information</CardTitle>
-                                <CardDescription>Update your club's public profile.</CardDescription>
+                                <CardTitle>基本資訊</CardTitle>
+                                <CardDescription>更新俱樂部的公開資訊。</CardDescription>
                             </CardHeader>
                             <CardContent className="space-y-6">
                                 <div className="space-y-2">
-                                    <Label htmlFor="name">Club Name</Label>
+                                    <Label htmlFor="name">俱樂部名稱</Label>
                                     <Input
                                         id="name"
                                         value={club.name}
@@ -84,7 +84,7 @@ export default function ClubManagePage({ params }: { params: { id: string } }) {
                                     />
                                 </div>
                                 <div className="space-y-2">
-                                    <Label htmlFor="desc">Description</Label>
+                                    <Label htmlFor="desc">俱樂部簡介</Label>
                                     <Textarea
                                         id="desc"
                                         value={club.description}
@@ -94,8 +94,8 @@ export default function ClubManagePage({ params }: { params: { id: string } }) {
                                 </div>
                                 <div className="flex items-center justify-between p-4 bg-gray-50 rounded-xl">
                                     <div className="space-y-0.5">
-                                        <Label className="text-base">Private Club</Label>
-                                        <p className="text-sm text-gray-500">Only approved members can see content.</p>
+                                        <Label className="text-base">私密俱樂部</Label>
+                                        <p className="text-sm text-gray-500">只有審核通過的成員才能查看內容。</p>
                                     </div>
                                     <Switch
                                         checked={club.isPrivate}
@@ -111,11 +111,11 @@ export default function ClubManagePage({ params }: { params: { id: string } }) {
                         <div className="flex items-center gap-4 mb-6">
                             <div className="relative flex-1">
                                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-4 h-4" />
-                                <Input placeholder="Search members..." className="pl-10 bg-white border-gray-200 rounded-full" />
+                                <Input placeholder="搜尋成員..." className="pl-10 bg-white border-gray-200 rounded-full" />
                             </div>
                             <Button variant="outline" className="rounded-full">
                                 <UserCog className="w-4 h-4 mr-2" />
-                                Invite
+                                邀請
                             </Button>
                         </div>
 
@@ -139,7 +139,7 @@ export default function ClubManagePage({ params }: { params: { id: string } }) {
                                                 </Badge>
                                             </div>
                                             <div className="flex items-center gap-1 text-sm text-gray-500 mt-0.5">
-                                                <span>aka</span>
+                                                <span>昵稱</span>
                                                 <span className="font-medium text-gray-700">{member.nickname}</span>
                                                 <Button variant="ghost" size="icon" className="h-4 w-4 ml-1 text-gray-400 hover:text-black">
                                                     <Edit2 className="w-3 h-3" />
@@ -159,17 +159,17 @@ export default function ClubManagePage({ params }: { params: { id: string } }) {
                     <TabsContent value="permissions" className="space-y-6">
                         <Card className="border-none shadow-sm">
                             <CardHeader>
-                                <CardTitle>Role Permissions</CardTitle>
-                                <CardDescription>Control what each role can do in the club.</CardDescription>
+                                <CardTitle>角色權限</CardTitle>
+                                <CardDescription>控制每個角色在俱樂部中可以做什麼。</CardDescription>
                             </CardHeader>
                             <CardContent>
                                 <div className="space-y-6">
                                     {/* Header Row */}
                                     <div className="grid grid-cols-4 gap-4 pb-4 border-b border-gray-100 font-medium text-sm text-gray-500">
-                                        <div className="col-span-1">Permission</div>
-                                        <div className="text-center">Admin</div>
-                                        <div className="text-center">Moderator</div>
-                                        <div className="text-center">Member</div>
+                                        <div className="col-span-1">權限</div>
+                                        <div className="text-center">管理員</div>
+                                        <div className="text-center">版主</div>
+                                        <div className="text-center">成員</div>
                                     </div>
 
                                     {/* Permission Rows */}

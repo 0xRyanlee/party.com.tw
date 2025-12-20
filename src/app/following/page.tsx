@@ -138,9 +138,9 @@ export default function FollowingPage() {
                 )}
 
                 <div className="mt-8 p-6 bg-neutral-900 rounded-3xl text-white">
-                    <h4 className="font-bold mb-2">💡 追蹤小撇步</h4>
+                    <h4 className="font-bold mb-2">Following Tips</h4>
                     <p className="text-sm text-neutral-400 leading-relaxed">
-                        關注主辦方後，不論是由 LLM 自動更新同步的外部活動，還是主辦方親自發布的內容，您都能在「追蹤名單」中第一時間掌握動態。
+                        After following a host, you'll be notified of their events in your Following list, whether auto-synced from external sources or directly published by the host.
                     </p>
                 </div>
             </div>

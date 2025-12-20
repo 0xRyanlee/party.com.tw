@@ -58,10 +58,10 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             });
 
             if (error) throw error;
-            setMessage('✅ 已發送 Magic Link 到您的信箱！請查收郵件。');
+            setMessage('Magic Link 已發送到您的信箱！請查收郵件。');
             setEmail('');
         } catch (error: any) {
-            setMessage(`❌ ${error.message}`);
+            setMessage(`Error: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -79,11 +79,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             });
 
             if (error) throw error;
-            setMessage('✅ 登入成功！');
+            setMessage('登入成功！');
             router.refresh();
             onClose();
         } catch (error: any) {
-            setMessage(`❌ ${error.message}`);
+            setMessage(`Error: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -104,11 +104,11 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
             });
 
             if (error) throw error;
-            setMessage('✅ 註冊成功！請查收驗證郵件。');
+            setMessage('註冊成功！請查收驗證郵件。');
             setEmail('');
             setPassword('');
         } catch (error: any) {
-            setMessage(`❌ ${error.message}`);
+            setMessage(`Error: ${error.message}`);
         } finally {
             setLoading(false);
         }
@@ -276,7 +276,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
                     </Tabs>
 
                     {message && (
-                        <p className={`text-sm text-center ${message.includes('❌') ? 'text-red-500' : 'text-emerald-600'}`}>
+                        <p className={`text-sm text-center ${message.startsWith('Error') ? 'text-red-500' : 'text-emerald-600'}`}>
                             {message}
                         </p>
                     )}

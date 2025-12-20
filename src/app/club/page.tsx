@@ -95,7 +95,7 @@ export default function ClubPage() {
                     <Button variant="ghost" size="icon" onClick={() => router.back()} className="-ml-2">
                         <ArrowLeft className="w-6 h-6" />
                     </Button>
-                    <h1 className="text-xl font-bold">Clubs & Communities</h1>
+                    <h1 className="text-xl font-bold">俱樂部</h1>
                 </div>
                 <Button
                     size="icon"
@@ -113,7 +113,7 @@ export default function ClubPage() {
                     <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-400 w-4 h-4" />
                     <Input
                         type="text"
-                        placeholder="Search clubs..."
+                        placeholder="搜尋俱樂部..."
                         value={search}
                         onChange={(e) => setSearch(e.target.value)}
                         className="w-full h-12 pl-10 pr-4 bg-white rounded-full border border-zinc-100 shadow-sm"
@@ -124,7 +124,7 @@ export default function ClubPage() {
                 {currentUserId && myClubs.length > 0 && (
                     <section>
                         <div className="flex items-center justify-between mb-4 px-1">
-                            <h2 className="text-lg font-bold">My Clubs</h2>
+                            <h2 className="text-lg font-bold">我的俱樂部</h2>
                         </div>
                         <div className="grid gap-4">
                             {myClubs.map((club) => (
@@ -150,8 +150,8 @@ export default function ClubPage() {
                                         </div>
                                         <p className="text-sm text-zinc-500">
                                             <Users className="w-3 h-3 inline mr-1" />
-                                            {club.member_count} members •
-                                            <span className="text-black font-medium ml-1">{club.role}</span>
+                                            {club.member_count} 人 ·
+                                            <span className="text-black font-medium ml-1">{club.role === 'Owner' ? '社長' : club.role === 'Member' ? '成員' : club.role}</span>
                                         </p>
                                     </div>
                                     <Button
@@ -170,7 +170,7 @@ export default function ClubPage() {
 
                 {/* Explore */}
                 <section>
-                    <h2 className="text-lg font-bold mb-4 px-1">Explore Communities</h2>
+                    <h2 className="text-lg font-bold mb-4 px-1">探索社群</h2>
                     {loading ? (
                         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                             {[1, 2, 3].map((i) => (
@@ -200,8 +200,8 @@ export default function ClubPage() {
                     ) : (
                         <div className="text-center py-12">
                             <Crown className="w-12 h-12 text-zinc-300 mx-auto mb-3" />
-                            <p className="text-zinc-500">No clubs found</p>
-                            <p className="text-sm text-zinc-400">Be the first to create one!</p>
+                            <p className="text-zinc-500">尚無俱樂部</p>
+                            <p className="text-sm text-zinc-400">成為第一個創建者！</p>
                         </div>
                     )}
                 </section>
@@ -211,15 +211,15 @@ export default function ClubPage() {
                     <div className="absolute top-0 left-0 w-full h-full bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20" />
                     <div className="relative z-10">
                         <Crown className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
-                        <h2 className="text-2xl font-bold mb-2">Start Your Own Club</h2>
+                        <h2 className="text-2xl font-bold mb-2">創建您的俱樂部</h2>
                         <p className="text-zinc-400 mb-6 max-w-xs mx-auto">
-                            Create a space for your community, manage events, and grow your tribe.
+                            為您的社群創建專屬空間，管理活動並擴大影響力。
                         </p>
                         <Button
                             className="rounded-full bg-white text-black hover:bg-zinc-200 px-8 h-12 font-bold"
                             onClick={() => router.push('/club/create')}
                         >
-                            Create Club
+                            創建俱樂部
                         </Button>
                     </div>
                 </section>

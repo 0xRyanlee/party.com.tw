@@ -18,7 +18,9 @@ import {
     ChevronRight,
     Star,
     Award,
-    Users
+    Users,
+    UserPlus,
+    Briefcase
 } from 'lucide-react';
 import Link from 'next/link';
 
@@ -150,23 +152,23 @@ export default function VendorDetailClient({ vendor, initialIsFollowing, isLogge
                             </p>
 
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 pt-6">
-                                <div className="bg-neutral-50 p-6 rounded-[24px]">
+                                <div className="bg-neutral-50 p-6 rounded-3xl">
                                     <div className="text-neutral-400 mb-2">服務類別</div>
                                     <div className="font-bold text-neutral-900">
                                         {vendor.categories?.length > 0 ? vendor.categories.join(', ') : '通用類'}
                                     </div>
                                 </div>
-                                <div className="bg-neutral-50 p-6 rounded-[24px]">
+                                <div className="bg-neutral-50 p-6 rounded-3xl">
                                     <div className="text-neutral-400 mb-2">滿意度</div>
                                     <div className="font-bold text-neutral-900 flex items-center gap-1">
                                         {avgRating > 0 ? avgRating.toFixed(1) : '新進'} <Star className="w-4 h-4 text-orange-400 fill-orange-400" />
                                     </div>
                                 </div>
-                                <div className="bg-neutral-50 p-6 rounded-[24px]">
+                                <div className="bg-neutral-50 p-6 rounded-3xl">
                                     <div className="text-neutral-400 mb-2">評論數</div>
                                     <div className="font-bold text-neutral-900">{totalReviews}</div>
                                 </div>
-                                <div className="bg-neutral-50 p-6 rounded-[24px]">
+                                <div className="bg-neutral-50 p-6 rounded-3xl">
                                     <div className="text-neutral-400 mb-2">成功合作</div>
                                     <div className="font-bold text-neutral-900">{eventCount}</div>
                                 </div>
@@ -186,7 +188,7 @@ export default function VendorDetailClient({ vendor, initialIsFollowing, isLogge
                             </div>
                             <div className="grid gap-6">
                                 {/* Sample Review */}
-                                <div className="bg-neutral-50 p-8 rounded-[32px] space-y-4">
+                                <div className="bg-neutral-50 p-8 rounded-3xl space-y-4">
                                     <div className="flex justify-between items-start">
                                         <div className="flex items-center gap-3">
                                             <div className="w-10 h-10 rounded-full bg-neutral-200" />
@@ -211,7 +213,7 @@ export default function VendorDetailClient({ vendor, initialIsFollowing, isLogge
                     <div className="lg:col-span-4">
                         <div className="sticky top-24 space-y-6">
                             {/* Service Pricing Card */}
-                            <div className="bg-neutral-900 text-white p-8 rounded-[40px] shadow-2xl space-y-8">
+                            <div className="bg-neutral-900 text-white p-8 rounded-3xl shadow-2xl space-y-8">
                                 <div className="space-y-2">
                                     <div className="text-neutral-400 text-sm font-bold uppercase tracking-widest">Pricing Model</div>
                                     <div className="text-4xl font-extrabold tracking-tighter">
@@ -244,7 +246,7 @@ export default function VendorDetailClient({ vendor, initialIsFollowing, isLogge
                             </div>
 
                             {/* Contact Links */}
-                            <div className="bg-white border border-neutral-100 p-8 rounded-[32px] shadow-sm space-y-6">
+                            <div className="bg-white border border-neutral-100 p-8 rounded-3xl shadow-sm space-y-6">
                                 <h4 className="font-bold text-neutral-900">官方連結</h4>
                                 <div className="space-y-4">
                                     {vendor.contact_website && (
@@ -265,6 +267,26 @@ export default function VendorDetailClient({ vendor, initialIsFollowing, isLogge
                                             <span className="font-medium">LinkedIn</span>
                                         </a>
                                     )}
+                                </div>
+                            </div>
+
+                            {/* Become Vendor/Supplier CTA */}
+                            <div className="bg-gradient-to-br from-blue-50 to-purple-50 border border-blue-100 p-6 rounded-3xl space-y-4">
+                                <h4 className="font-bold text-neutral-900">想成為合作夥伴？</h4>
+                                <p className="text-sm text-neutral-600">加入我們的服務提供者網絡，拓展您的業務。</p>
+                                <div className="flex flex-col gap-3">
+                                    <Link href="/settings/vendor">
+                                        <Button className="w-full rounded-full bg-blue-600 hover:bg-blue-700">
+                                            <Briefcase className="w-4 h-4 mr-2" />
+                                            成為 Vendor
+                                        </Button>
+                                    </Link>
+                                    <Link href="/settings/vendor">
+                                        <Button variant="outline" className="w-full rounded-full border-purple-300 text-purple-700 hover:bg-purple-50">
+                                            <UserPlus className="w-4 h-4 mr-2" />
+                                            成為 Supplier
+                                        </Button>
+                                    </Link>
                                 </div>
                             </div>
                         </div>

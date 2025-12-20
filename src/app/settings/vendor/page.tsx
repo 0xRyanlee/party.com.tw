@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
-import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe, Instagram, Linkedin, ChevronLeft, ChevronRight, Image, MapPin, ExternalLink } from 'lucide-react';
+import { Camera, Plus, X, Save, Briefcase, Mail, Phone, Globe, Instagram, Linkedin, ChevronLeft, ChevronRight, Image, MapPin, ExternalLink, Building } from 'lucide-react';
 import LocationPicker from "@/components/host/LocationPicker";
 import { useEffect } from 'react';
 import { useUser } from '@/hooks/useUser';
@@ -189,6 +189,67 @@ export default function VendorProfilePage() {
             {/* Content */}
             <div className="container mx-auto px-4 py-8 max-w-4xl">
                 <div className="space-y-6">
+
+                    {/* Role Explanation Section */}
+                    <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-[24px] border border-blue-100 p-6">
+                        <h2 className="text-xl font-bold mb-4">成為平台合作夥伴</h2>
+                        <p className="text-gray-600 mb-6 text-sm">
+                            Party 平台歡迎各類專業服務提供者與資源供應商加入，共同為活動創造更好的體驗。
+                        </p>
+
+                        <div className="grid md:grid-cols-2 gap-4">
+                            {/* Vendor Card */}
+                            <div className="bg-white rounded-xl p-5 border border-blue-200 hover:shadow-md transition-shadow">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center">
+                                        <Briefcase className="w-5 h-5 text-blue-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg">Vendor（服務提供者）</h3>
+                                        <span className="text-xs text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">專業技術服務</span>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-3">
+                                    提供專業技術和服務的個人或團隊，用自身專長協助活動圓滿進行。
+                                </p>
+                                <div className="flex flex-wrap gap-2 text-xs">
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">DJ</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Photographer</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">MC</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Bartender</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Performer</span>
+                                </div>
+                            </div>
+
+                            {/* Supplier Card */}
+                            <div className="bg-white rounded-xl p-5 border border-purple-200 hover:shadow-md transition-shadow">
+                                <div className="flex items-center gap-3 mb-3">
+                                    <div className="w-10 h-10 rounded-full bg-purple-100 flex items-center justify-center">
+                                        <Building className="w-5 h-5 text-purple-600" />
+                                    </div>
+                                    <div>
+                                        <h3 className="font-bold text-lg">Supplier（資源供應商）</h3>
+                                        <span className="text-xs text-purple-600 bg-purple-50 px-2 py-0.5 rounded-full">場地設備資源</span>
+                                    </div>
+                                </div>
+                                <p className="text-sm text-gray-600 mb-3">
+                                    提供場地、設備、管道通路等其他資源的企業或個人，為活動提供硬體支持。
+                                </p>
+                                <div className="flex flex-wrap gap-2 text-xs">
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Venue</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Equipment</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Catering</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Audio</span>
+                                    <span className="bg-gray-100 px-2 py-1 rounded-full">Lighting</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="text-xs text-gray-400 mt-4 text-center">
+                            填寫以下資料建立您的專業檔案，讓活動主辦方更容易找到您
+                        </p>
+                    </div>
+
                     {/* Basic Info */}
                     <div className="bg-white rounded-[24px] border border-gray-100 p-6 space-y-6">
                         <div className="flex items-center gap-3">

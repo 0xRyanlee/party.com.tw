@@ -21,7 +21,10 @@ import {
     Send,
     ExternalLink,
     Star,
-    Loader2
+    Loader2,
+    Link2,
+    Copy,
+    Mail
 } from 'lucide-react';
 import QRCodeGenerator from '@/components/QRCodeGenerator';
 import { createClient } from '@/lib/supabase/client';
@@ -58,6 +61,16 @@ function WalletContent() {
     const [redeemLoading, setRedeemLoading] = useState(false);
     const [redeemError, setRedeemError] = useState('');
     const [showReviewPrompt, setShowReviewPrompt] = useState<string | null>(null);
+
+    // Transfer state
+    const [showTransferModal, setShowTransferModal] = useState(false);
+    const [transferMode, setTransferMode] = useState<'qr' | 'link' | 'email'>('qr');
+    const [transferEmail, setTransferEmail] = useState('');
+    const [transferLoading, setTransferLoading] = useState(false);
+    const [transferError, setTransferError] = useState('');
+    const [transferSuccess, setTransferSuccess] = useState(false);
+    const [transferLink, setTransferLink] = useState('');
+    const [linkCopied, setLinkCopied] = useState(false);
 
     // Check for auto-redeem code in URL
     useEffect(() => {
@@ -175,6 +188,100 @@ function WalletContent() {
             setRedeemError(error.message || '兌換失敗');
         } finally {
             setRedeemLoading(false);
+        }
+    };
+
+    // Handle ticket transfer
+    const handleTransfer = async () => {
+        if (!selectedTicket || !transferEmail) return;
+
+        // Basic email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(transferEmail)) {
+            setTransferError('請輸入有效的 Email 地址');
+            return;
+        }
+
+        setTransferLoading(true);
+        setTransferError('');
+
+        try {
+            const response = await fetch('/api/tickets/transfer', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ticketId: selectedTicket.id,
+                    recipientEmail: transferEmail,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || '轉送失敗');
+            }
+
+            setTransferSuccess(true);
+            // Refresh tickets after transfer
+            setTimeout(() => {
+                setShowTransferModal(false);
+                setSelectedTicket(null);
+                setTransferEmail('');
+                setTransferSuccess(false);
+                fetchTickets();
+            }, 2000);
+        } catch (error: any) {
+            setTransferError(error.message || '轉送失敗，請稍後重試');
+        } finally {
+            setTransferLoading(false);
+        }
+    };
+
+    // Generate transfer link
+    const generateTransferLink = async () => {
+        if (!selectedTicket) return;
+
+        setTransferLoading(true);
+        setTransferError('');
+
+        try {
+            const response = await fetch('/api/tickets/transfer-link', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ticketId: selectedTicket.id,
+                }),
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || '生成連結失敗');
+            }
+
+            setTransferLink(data.transferUrl);
+        } catch (error: any) {
+            setTransferError(error.message || '生成連結失敗，請稍後重試');
+        } finally {
+            setTransferLoading(false);
+        }
+    };
+
+    // Get transfer URL for QR display
+    const getTransferUrl = (ticket: UserTicket) => {
+        if (typeof window === 'undefined') return '';
+        return `${window.location.origin}/wallet/claim?ticket=${ticket.id}`;
+    };
+
+    // Copy transfer link to clipboard
+    const handleCopyLink = async () => {
+        if (!transferLink) return;
+        try {
+            await navigator.clipboard.writeText(transferLink);
+            setLinkCopied(true);
+            setTimeout(() => setLinkCopied(false), 2000);
+        } catch (error) {
+            console.error('Failed to copy:', error);
         }
     };
 
@@ -407,7 +514,11 @@ function WalletContent() {
 
                                 {selectedTicket.status === 'upcoming' && (
                                     <>
-                                        <Button variant="outline" className="w-full rounded-full gap-2">
+                                        <Button
+                                            variant="outline"
+                                            className="w-full rounded-full gap-2"
+                                            onClick={() => setShowTransferModal(true)}
+                                        >
                                             <Send className="w-4 h-4" />
                                             轉送票券
                                         </Button>
@@ -501,6 +612,189 @@ function WalletContent() {
                         <p className="text-xs text-gray-400 text-center">
                             兌換碼通常由活動主辦方提供，成功兌換後票券會自動加入您的票夾
                         </p>
+                    </div>
+                </div>
+            )}
+
+            {/* Transfer Modal */}
+            {showTransferModal && selectedTicket && (
+                <div className="fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4" onClick={() => !transferLoading && setShowTransferModal(false)}>
+                    <div className="bg-white rounded-3xl max-w-md w-full p-6 space-y-6" onClick={(e) => e.stopPropagation()}>
+                        <div className="flex items-center justify-between">
+                            <h2 className="font-bold text-lg">轉送票券</h2>
+                            <Button variant="ghost" size="icon" onClick={() => setShowTransferModal(false)} disabled={transferLoading}>
+                                <X className="w-5 h-5" />
+                            </Button>
+                        </div>
+
+                        {transferSuccess ? (
+                            <div className="py-8 text-center space-y-4">
+                                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto">
+                                    <CheckCircle className="w-8 h-8 text-green-600" />
+                                </div>
+                                <div>
+                                    <h3 className="font-bold text-lg">轉送成功！</h3>
+                                    <p className="text-sm text-gray-500 mt-1">
+                                        {transferMode === 'email'
+                                            ? `票券已發送至 ${transferEmail}`
+                                            : '對方領取後會自動轉移'}
+                                    </p>
+                                </div>
+                            </div>
+                        ) : (
+                            <>
+                                <div className="bg-gray-50 rounded-xl p-4">
+                                    <p className="text-sm font-medium">{selectedTicket.eventTitle}</p>
+                                    <p className="text-xs text-gray-500 mt-1">{selectedTicket.eventDate} · {selectedTicket.eventTime}</p>
+                                </div>
+
+                                {/* Transfer Mode Tabs */}
+                                <div className="flex gap-2 p-1 bg-gray-100 rounded-full">
+                                    <button
+                                        onClick={() => setTransferMode('qr')}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-sm font-medium transition-all ${transferMode === 'qr' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                            }`}
+                                    >
+                                        <QrCode className="w-4 h-4" />
+                                        QR 碼
+                                    </button>
+                                    <button
+                                        onClick={() => { setTransferMode('link'); if (!transferLink) generateTransferLink(); }}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-sm font-medium transition-all ${transferMode === 'link' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                            }`}
+                                    >
+                                        <Link2 className="w-4 h-4" />
+                                        連結
+                                    </button>
+                                    <button
+                                        onClick={() => setTransferMode('email')}
+                                        className={`flex-1 flex items-center justify-center gap-2 py-2.5 px-3 rounded-full text-sm font-medium transition-all ${transferMode === 'email' ? 'bg-white shadow-sm' : 'text-gray-500 hover:text-gray-700'
+                                            }`}
+                                    >
+                                        <Mail className="w-4 h-4" />
+                                        Email
+                                    </button>
+                                </div>
+
+                                {/* QR Mode */}
+                                {transferMode === 'qr' && (
+                                    <div className="space-y-4">
+                                        <div className="flex justify-center">
+                                            <QRCodeGenerator
+                                                value={getTransferUrl(selectedTicket)}
+                                                size={200}
+                                                type="promotion"
+                                                label="掃碼領取票券"
+                                                showDownload={true}
+                                                showCopy={false}
+                                            />
+                                        </div>
+                                        <p className="text-xs text-gray-500 text-center">
+                                            請讓對方掃描此 QR 碼來領取票券
+                                        </p>
+                                    </div>
+                                )}
+
+                                {/* Link Mode */}
+                                {transferMode === 'link' && (
+                                    <div className="space-y-4">
+                                        {transferLoading ? (
+                                            <div className="flex justify-center py-8">
+                                                <Loader2 className="w-8 h-8 animate-spin text-gray-400" />
+                                            </div>
+                                        ) : transferLink ? (
+                                            <>
+                                                <div className="flex gap-2">
+                                                    <Input
+                                                        value={transferLink}
+                                                        readOnly
+                                                        className="h-12 text-sm bg-gray-50"
+                                                    />
+                                                    <Button
+                                                        onClick={handleCopyLink}
+                                                        className="h-12 px-4 rounded-full"
+                                                        variant={linkCopied ? 'default' : 'outline'}
+                                                    >
+                                                        {linkCopied ? (
+                                                            <CheckCircle className="w-5 h-5 text-green-600" />
+                                                        ) : (
+                                                            <Copy className="w-5 h-5" />
+                                                        )}
+                                                    </Button>
+                                                </div>
+                                                <p className="text-xs text-gray-500 text-center">
+                                                    複製連結並分享給對方，連結 24 小時內有效
+                                                </p>
+                                            </>
+                                        ) : (
+                                            <div className="text-center py-4">
+                                                <Button onClick={generateTransferLink} className="rounded-full">
+                                                    生成轉送連結
+                                                </Button>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
+                                {/* Email Mode */}
+                                {transferMode === 'email' && (
+                                    <div className="space-y-3">
+                                        <div className="space-y-2">
+                                            <label className="text-sm font-medium">接收者 Email</label>
+                                            <Input
+                                                type="email"
+                                                value={transferEmail}
+                                                onChange={(e) => {
+                                                    setTransferEmail(e.target.value);
+                                                    setTransferError('');
+                                                }}
+                                                placeholder="recipient@example.com"
+                                                className="h-12"
+                                                disabled={transferLoading}
+                                            />
+                                        </div>
+
+                                        <div className="flex gap-3">
+                                            <Button
+                                                variant="outline"
+                                                className="flex-1 h-12 rounded-full"
+                                                onClick={() => setShowTransferModal(false)}
+                                                disabled={transferLoading}
+                                            >
+                                                取消
+                                            </Button>
+                                            <Button
+                                                onClick={handleTransfer}
+                                                disabled={transferLoading || !transferEmail}
+                                                className="flex-1 h-12 rounded-full bg-black text-white"
+                                            >
+                                                {transferLoading ? (
+                                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                                ) : (
+                                                    <>
+                                                        <Send className="w-4 h-4 mr-2" />
+                                                        確認轉送
+                                                    </>
+                                                )}
+                                            </Button>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {transferError && (
+                                    <div className="flex items-center gap-2 p-3 bg-red-50 rounded-xl text-red-600 text-sm">
+                                        <AlertCircle className="w-4 h-4 flex-shrink-0" />
+                                        <span>{transferError}</span>
+                                    </div>
+                                )}
+
+                                <div className="bg-amber-50 border border-amber-200 rounded-xl p-3">
+                                    <p className="text-xs text-amber-700">
+                                        注意：轉送後此票券將從您的票夾移除且無法撤回，請確認接收者資訊正確。
+                                    </p>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
             )}

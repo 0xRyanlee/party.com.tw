@@ -9,7 +9,6 @@ import { mockEvents, tags } from '@/lib/mock-data';
 import CategoryFilter from '@/components/CategoryFilter';
 import PullToRefresh from '@/components/PullToRefresh';
 import { useDebounce } from '@/hooks/use-debounce';
-import DiscoveryRecommendations from '@/components/DiscoveryRecommendations';
 
 export default function DiscoverPage() {
   const [activeTags, setActiveTags] = useState<string[]>([]);
@@ -60,14 +59,14 @@ export default function DiscoverPage() {
       <div className="pt-6 md:pt-8 container mx-auto max-w-5xl">
         {/* Header Section */}
         <div className="mb-6 space-y-4 px-4 sm:px-0">
-          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">探索活動</h1>
+          <h1 className="text-2xl md:text-3xl font-bold text-gray-900">Discover Events</h1>
           <div className="relative">
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
             <input
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="搜尋活動、地點..."
+              placeholder="Search events, locations..."
               className="w-full h-11 md:h-12 bg-white border border-gray-200 rounded-xl pl-12 pr-4 text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-black/10 text-sm md:text-base"
             />
           </div>
@@ -81,13 +80,6 @@ export default function DiscoverPage() {
             onToggleTag={handleToggleTag}
           />
         </div>
-
-        {/* Personality Recommendations */}
-        {!searchQuery && activeTags.length === 0 && (
-          <div className="mb-8">
-            <DiscoveryRecommendations />
-          </div>
-        )}
 
         {/* Events Grid */}
         <div className="px-4 sm:px-0">

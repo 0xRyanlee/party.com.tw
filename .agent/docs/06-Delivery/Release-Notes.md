@@ -13,11 +13,32 @@
 - Supabase Storage 整合（直接上傳與自動命名）
 - SEO 圖片元數據編輯支援
 - Admin 與 Host 編輯介面同步優化
+- **Club 功能完整實裝**
+  - Club 列表頁、創建頁、詳情頁、管理頁
+  - Club 討論區（留言板）
+  - Club 活動關聯（API + UI）
+- Vendor/Supplier 角色說明頁面
+- **票券轉送多路徑**
+  - QR 碼面對面轉送
+  - 鏈接分享轉送（24 小時有效）
+  - Email 直接轉送
+- **Vendor 詳情頁重構**
+  - 統一 rounded-3xl 樣式
+  - 新增「成為 Vendor/Supplier」CTA
+- **聊天室 API 完善**
+  - `/api/events/[eventId]/messages` (GET/POST)
+  - `/api/clubs/[id]/discussions` (GET/POST)
+  - `/api/clubs/[id]/discussions/[discussionId]/like` (POST)
+- **聊天室安全機制**
+  - Rate Limiting（1 訊息/2 秒）
+  - Message Retention（500 條或 30 天）
 
 ### 變更
 
 - 全站樣式統一 (Nine Unities: `rounded-3xl`)
-- 全面中文化與 Emoji 清理
+- **全面中文化與 Emoji 清理**
+  - 移除所有 UI Emoji（dictionaries.ts, AuthModal, wallet, following, VibeAttributes）
+  - Club 頁面全面中文化（標題、標籤、toast、empty state）
 - 遷移文件規範化 (Supabase CLI Timestamped)
 
 ---

@@ -10,9 +10,9 @@ import { ArrowLeft, Crown, Users, Shield, Zap, X } from "lucide-react";
 import { toast } from "sonner";
 
 const CLUB_TYPES = [
-    { value: 'public', label: 'Public', desc: 'Anyone can join', icon: Users },
-    { value: 'private', label: 'Private', desc: 'Invite only', icon: Shield },
-    { value: 'vendor', label: 'Vendor', desc: 'For service providers', icon: Zap },
+    { value: 'public', label: 'Public', desc: '任何人可加入', icon: Users },
+    { value: 'private', label: 'Private', desc: '僅限邀請', icon: Shield },
+    { value: 'vendor', label: 'Vendor', desc: '服務提供者專用', icon: Zap },
 ];
 
 export default function CreateClubPage() {
@@ -43,7 +43,7 @@ export default function CreateClubPage() {
         e.preventDefault();
 
         if (!form.name.trim()) {
-            toast.error('Please enter a club name');
+            toast.error('請輸入俱樂部名稱');
             return;
         }
 
@@ -57,15 +57,15 @@ export default function CreateClubPage() {
 
             if (response.ok) {
                 const club = await response.json();
-                toast.success('Club created successfully!');
+                toast.success('俱樂部創建成功！');
                 router.push(`/club/${club.id}`);
             } else {
                 const data = await response.json();
-                toast.error(data.error || 'Failed to create club');
+                toast.error(data.error || '創建失敗');
             }
         } catch (error) {
             console.error('Error creating club:', error);
-            toast.error('Failed to create club');
+            toast.error('創建失敗');
         } finally {
             setIsLoading(false);
         }
@@ -78,7 +78,7 @@ export default function CreateClubPage() {
                 <Button variant="ghost" size="icon" onClick={() => router.back()} className="-ml-2">
                     <ArrowLeft className="w-6 h-6" />
                 </Button>
-                <h1 className="text-xl font-bold">Create Club</h1>
+                <h1 className="text-xl font-bold">創建俱樂部</h1>
             </header>
 
             <div className="container mx-auto px-4 py-6 max-w-xl">
@@ -92,12 +92,12 @@ export default function CreateClubPage() {
 
                     {/* Name */}
                     <div className="space-y-2">
-                        <Label htmlFor="name">Club Name *</Label>
+                        <Label htmlFor="name">俱樂部名稱 *</Label>
                         <Input
                             id="name"
                             value={form.name}
                             onChange={(e) => setForm(prev => ({ ...prev, name: e.target.value }))}
-                            placeholder="e.g., Taipei Tech Meetup"
+                            placeholder="例如：台北科技小聚"
                             className="rounded-full"
                             maxLength={50}
                         />
@@ -105,12 +105,12 @@ export default function CreateClubPage() {
 
                     {/* Description */}
                     <div className="space-y-2">
-                        <Label htmlFor="description">Description</Label>
+                        <Label htmlFor="description">俱樂部簡介</Label>
                         <Textarea
                             id="description"
                             value={form.description}
                             onChange={(e) => setForm(prev => ({ ...prev, description: e.target.value }))}
-                            placeholder="What's your club about?"
+                            placeholder="這個俱樂部的宗旨是什麼？"
                             className="rounded-xl resize-none"
                             rows={3}
                             maxLength={500}
@@ -144,7 +144,7 @@ export default function CreateClubPage() {
 
                     {/* Club Type */}
                     <div className="space-y-2">
-                        <Label>Club Type</Label>
+                        <Label>俱樂部類型</Label>
                         <div className="grid grid-cols-3 gap-3">
                             {CLUB_TYPES.map((type) => {
                                 const Icon = type.icon;
@@ -223,7 +223,7 @@ export default function CreateClubPage() {
                         disabled={isLoading || !form.name.trim()}
                         className="w-full h-12 rounded-full bg-black text-white hover:bg-zinc-800"
                     >
-                        {isLoading ? 'Creating...' : 'Create Club'}
+                        {isLoading ? '創建中...' : '創建俱樂部'}
                     </Button>
                 </form>
             </div>

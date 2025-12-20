@@ -74,7 +74,7 @@ export default function SettingsPage() {
                         <Link href="/settings/language" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors">
                             <div className="flex items-center gap-3">
                                 <span className="w-5 h-5 text-gray-400 text-center text-sm">A</span>
-                                <span className="font-medium">語言設定</span>
+                                <span className="font-medium">Language</span>
                             </div>
                             <div className="flex items-center gap-2">
                                 <span className="text-sm text-gray-400">繁體中文</span>
@@ -125,8 +125,8 @@ export default function SettingsPage() {
                                     <Users className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <span className="font-bold block">Club 管理</span>
-                                    <span className="text-xs text-gray-400">創建或管理您的俱樂部</span>
+                                    <span className="font-bold block">Club Management</span>
+                                    <span className="text-xs text-gray-400">Create or manage your clubs</span>
                                 </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
@@ -137,20 +137,20 @@ export default function SettingsPage() {
                                     <MessageSquare className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <span className="font-bold block">申訴與回報</span>
-                                    <span className="text-xs text-gray-400">檢舉違規、功能建議或合作洽談</span>
+                                    <span className="font-bold block">Report & Feedback</span>
+                                    <span className="text-xs text-gray-400">Report issues, suggest features</span>
                                 </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />
                         </Link>
                         <Link href="/settings/vendor" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
                             <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                                     <Briefcase className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <span className="font-bold block">{t('settings.businessCoop')}</span>
-                                    <span className="text-xs text-gray-400">成為 Vendor 供應商</span>
+                                    <span className="font-bold block">Become Vendor / Supplier</span>
+                                    <span className="text-xs text-gray-400">Offer services or resources</span>
                                 </div>
                             </div>
                             <ChevronRight className="w-5 h-5 text-gray-300" />

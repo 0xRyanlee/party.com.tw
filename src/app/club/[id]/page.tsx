@@ -285,7 +285,7 @@ export default function ClubDetailPage() {
                             <div className="space-y-4">
                                 {/* Admin can create event */}
                                 {(club?.membership?.role === 'owner' || club?.membership?.role === 'admin') && (
-                                    <Link href={`/host/create?clubId=${clubId}`}>
+                                    <Link href={`/host/edit?clubId=${clubId}`}>
                                         <Button variant="outline" className="w-full rounded-full mb-4">
                                             <Plus className="w-4 h-4 mr-2" />
                                             創建俱樂部活動
@@ -319,7 +319,7 @@ export default function ClubDetailPage() {
                                 <p className="text-zinc-500">尚無活動</p>
                                 <p className="text-sm text-zinc-400 mb-4">俱樂部活動將顯示在這裡</p>
                                 {(club?.membership?.role === 'owner' || club?.membership?.role === 'admin') && (
-                                    <Link href={`/host/create?clubId=${clubId}`}>
+                                    <Link href={`/host/edit?clubId=${clubId}`}>
                                         <Button variant="outline" className="rounded-full">
                                             <Plus className="w-4 h-4 mr-2" />
                                             創建第一個活動

@@ -104,55 +104,55 @@ export default function SettingsPage() {
 
                 {/* Community & Business */}
                 <section>
-                    <h2 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4 px-2">{t('settings.communityBusiness')}</h2>
-                    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 shadow-sm divide-y divide-gray-50">
-                        <Link href="/host/edit" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
+                    <h2 className="text-xs font-bold text-zinc-400 uppercase tracking-wider mb-4 px-2">{t('settings.communityBusiness')}</h2>
+                    <div className="bg-white rounded-2xl overflow-hidden border border-zinc-100 shadow-sm divide-y divide-zinc-50">
+                        <Link href="/settings/kol-apply" className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors group">
+                            <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-pink-500 to-rose-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
+                                    <Sparkles className="w-4 h-4" />
+                                </div>
+                                <div>
+                                    <span className="font-bold block">KOL 身份申請</span>
+                                    <span className="text-xs text-zinc-400">可免費獲得 Plus 會員試用</span>
+                                </div>
+                            </div>
+                            <ChevronRight className="w-5 h-5 text-zinc-300" />
+                        </Link>
+                        <Link href="/club" className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors group">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
                                     <Users className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <span className="font-bold block">{t('settings.becomeLead')}</span>
-                                    <span className="text-xs text-gray-400">{t('settings.becomeLeadDesc')}</span>
+                                    <span className="font-bold block">俱樂部管理</span>
+                                    <span className="text-xs text-zinc-400">創建或管理您的俱樂部</span>
                                 </div>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                            <ChevronRight className="w-5 h-5 text-zinc-300" />
                         </Link>
-                        <Link href="/club" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
-                            <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
-                                    <Users className="w-4 h-4" />
-                                </div>
-                                <div>
-                                    <span className="font-bold block">Club Management</span>
-                                    <span className="text-xs text-gray-400">Create or manage your clubs</span>
-                                </div>
-                            </div>
-                            <ChevronRight className="w-5 h-5 text-gray-300" />
-                        </Link>
-                        <Link href="/settings/report" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
+                        <Link href="/settings/report" className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors group">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 group-hover:scale-110 transition-transform">
                                     <MessageSquare className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <span className="font-bold block">Report & Feedback</span>
-                                    <span className="text-xs text-gray-400">Report issues, suggest features</span>
+                                    <span className="font-bold block">問題回報與建議</span>
+                                    <span className="text-xs text-zinc-400">回報問題或提出功能建議</span>
                                 </div>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                            <ChevronRight className="w-5 h-5 text-zinc-300" />
                         </Link>
-                        <Link href="/settings/vendor" className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors group">
+                        <Link href="/settings/vendor" className="flex items-center justify-between p-4 hover:bg-zinc-50 transition-colors group">
                             <div className="flex items-center gap-3">
                                 <div className="w-8 h-8 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white group-hover:scale-110 transition-transform">
                                     <Briefcase className="w-4 h-4" />
                                 </div>
                                 <div>
-                                    <span className="font-bold block">Become Vendor / Supplier</span>
-                                    <span className="text-xs text-gray-400">Offer services or resources</span>
+                                    <span className="font-bold block">成為合作夥伴</span>
+                                    <span className="text-xs text-zinc-400">提供服務或資源</span>
                                 </div>
                             </div>
-                            <ChevronRight className="w-5 h-5 text-gray-300" />
+                            <ChevronRight className="w-5 h-5 text-zinc-300" />
                         </Link>
                     </div>
                 </section>

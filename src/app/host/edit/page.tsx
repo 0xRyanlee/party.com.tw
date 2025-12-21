@@ -71,6 +71,7 @@ function EditEventContent() {
     const [duration, setDuration] = useState(2); // 活動時長（小時）
     const [location, setLocation] = useState<{ name: string; address: string; lat?: number; lng?: number }>({ name: '', address: '' });
     const [externalLinks, setExternalLinks] = useState<string[]>([]);
+    const [requirements, setRequirements] = useState<string[]>([]); // 參與條件
     const searchParams = useSearchParams();
     const eventId = searchParams.get('id');
     const copyFromId = searchParams.get('copyFrom'); // 複製模式
@@ -718,10 +719,12 @@ function EditEventContent() {
                             isAdultOnly={isAdultOnly}
                             invitationOnly={invitationOnly}
                             invitationCode={invitationCode}
+                            requirements={requirements}
                             onCapacityChange={setCapacity}
                             onAdultOnlyChange={setIsAdultOnly}
                             onInvitationOnlyChange={setInvitationOnly}
                             onInvitationCodeChange={setInvitationCode}
+                            onRequirementsChange={setRequirements}
                         />
                     </div>
 

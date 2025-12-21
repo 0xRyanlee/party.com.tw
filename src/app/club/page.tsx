@@ -126,42 +126,59 @@ export default function ClubPage() {
                         <div className="flex items-center justify-between mb-4 px-1">
                             <h2 className="text-lg font-bold">我的俱樂部</h2>
                         </div>
-                        <div className="grid gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {myClubs.map((club) => (
                                 <motion.div
                                     key={club.id}
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    className="bg-white p-4 rounded-2xl border border-zinc-100 shadow-sm flex items-center gap-4"
+                                    className="bg-white rounded-3xl border border-zinc-100 shadow-sm overflow-hidden"
+                                    onClick={() => router.push(`/club/${club.id}`)}
                                 >
-                                    <div className="w-16 h-16 rounded-xl bg-zinc-100 overflow-hidden shrink-0">
+                                    {/* Cover Image */}
+                                    <div className="h-28 bg-zinc-100 relative">
                                         {club.cover_image ? (
                                             <img src={club.cover_image} alt={club.name} className="w-full h-full object-cover" />
                                         ) : (
-                                            <div className="w-full h-full flex items-center justify-center bg-zinc-200">
-                                                <Crown className="w-6 h-6 text-zinc-400" />
+                                            <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-zinc-200 to-zinc-300">
+                                                <Crown className="w-10 h-10 text-zinc-400" />
                                             </div>
                                         )}
-                                    </div>
-                                    <div className="flex-1 min-w-0">
-                                        <div className="flex items-center gap-2 mb-1">
-                                            <h3 className="font-bold truncate">{club.name}</h3>
-                                            {club.club_type === 'private' && <Shield className="w-3 h-3 text-purple-500" />}
+                                        {/* Role Badge */}
+                                        <div className="absolute top-3 right-3 px-2 py-1 rounded-full bg-black/60 text-white text-xs font-medium backdrop-blur-sm">
+                                            {club.role === 'Owner' ? '👑 負責人' : club.role === 'Admin' ? '管理員' : '成員'}
                                         </div>
-                                        <p className="text-sm text-zinc-500">
-                                            <Users className="w-3 h-3 inline mr-1" />
-                                            {club.member_count} 人 ·
-                                            <span className="text-black font-medium ml-1">{club.role === 'Owner' ? '社長' : club.role === 'Member' ? '成員' : club.role}</span>
-                                        </p>
                                     </div>
-                                    <Button
-                                        size="icon"
-                                        variant="ghost"
-                                        className="shrink-0"
-                                        onClick={() => router.push(`/club/${club.id}/manage`)}
-                                    >
-                                        <Settings className="w-5 h-5 text-zinc-400" />
-                                    </Button>
+                                    {/* Content */}
+                                    <div className="p-4">
+                                        <div className="flex items-center gap-2 mb-2">
+                                            <h3 className="font-bold truncate flex-1">{club.name}</h3>
+                                            {club.club_type === 'private' && <Shield className="w-4 h-4 text-purple-500" />}
+                                        </div>
+                                        {club.description && (
+                                            <p className="text-sm text-zinc-500 line-clamp-2 mb-3">{club.description}</p>
+                                        )}
+                                        <div className="flex items-center justify-between text-sm">
+                                            <div className="flex items-center gap-3 text-zinc-400">
+                                                <span className="flex items-center gap-1">
+                                                    <Users className="w-4 h-4" />
+                                                    {club.member_count}
+                                                </span>
+                                            </div>
+                                            <Button
+                                                size="sm"
+                                                variant="ghost"
+                                                className="text-zinc-500 hover:text-black -mr-2"
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    router.push(`/club/${club.id}/manage`);
+                                                }}
+                                            >
+                                                <Settings className="w-4 h-4 mr-1" />
+                                                管理
+                                            </Button>
+                                        </div>
+                                    </div>
                                 </motion.div>
                             ))}
                         </div>
@@ -212,8 +229,8 @@ export default function ClubPage() {
                     <div className="relative z-10">
                         <Crown className="w-12 h-12 mx-auto mb-4 text-yellow-400" />
                         <h2 className="text-2xl font-bold mb-2">創建您的俱樂部</h2>
-                        <p className="text-zinc-400 mb-6 max-w-xs mx-auto">
-                            為您的社群創建專屬空間，管理活動並擴大影響力。
+                        <p className="text-zinc-400 mb-6 max-w-xs mx-auto leading-relaxed">
+                            為您的社群創建專屬空間，<br className="sm:hidden" />管理活動並擴大影響力。
                         </p>
                         <Button
                             className="rounded-full bg-white text-black hover:bg-zinc-200 px-8 h-12 font-bold"

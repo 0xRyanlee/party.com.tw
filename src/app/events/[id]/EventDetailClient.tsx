@@ -156,14 +156,9 @@ export default function EventDetailClient({
                     <div className="flex flex-col md:flex-row gap-6 justify-between items-start">
                         <div className="space-y-4 flex-1">
                             <div className="flex flex-wrap gap-2">
-                                <Badge className="bg-neutral-900 text-white hover:bg-neutral-800 rounded-full px-4 py-1.5 text-sm font-medium border-none">
-                                    {t(`types.${event.type}` as any)}
+                                <Badge className="bg-neutral-900 text-white hover:bg-neutral-800 rounded-full px-3 py-1 text-sm font-medium border-none">
+                                    {event.type}
                                 </Badge>
-                                {event.attributes.map(attr => (
-                                    <Badge key={attr} variant="outline" className="text-neutral-600 border-neutral-200 rounded-full px-4 py-1.5 text-sm font-medium">
-                                        {attr}
-                                    </Badge>
-                                ))}
                             </div>
 
                             {/* Enhanced Source/Ref Information */}
@@ -193,24 +188,13 @@ export default function EventDetailClient({
                             </div>
                         </div>
 
-                        <div className="flex flex-col items-end gap-3">
+                        <div className="flex flex-col items-end gap-2">
                             <div className="text-3xl font-bold text-neutral-950 tracking-tight">{event.price}</div>
                             {event.capacity && (
                                 <div className="text-sm text-neutral-500 font-medium bg-neutral-100 px-3 py-1 rounded-full">
                                     剩餘 {event.capacity - (event.attendees || 0)} 席
                                 </div>
                             )}
-                            {/* CTA next to price */}
-                            <QuickRegisterButton
-                                eventId={event.id}
-                                eventTitle={event.title}
-                                isLoggedIn={isLoggedIn}
-                                isAlreadyRegistered={isRegistered}
-                                onLoginRequired={() => setIsAuthModalOpen(true)}
-                                onSuccess={() => setIsRegistered(true)}
-                                size="default"
-                                className="hidden md:flex rounded-full px-6"
-                            />
                         </div>
                     </div>
                 </div>
@@ -245,48 +229,45 @@ export default function EventDetailClient({
                         {activeTab === 'info' ? (
                             <>
                                 {/* Card 1: Basic Info - 基本訊息 */}
-                                <div className="bg-white p-6 md:p-8 rounded-3xl border border-neutral-100 shadow-sm space-y-6">
-                                    <h2 className="text-xl font-bold tracking-tight text-neutral-900 flex items-center gap-2">
+                                <div className="bg-white p-5 md:p-6 rounded-2xl border border-neutral-100 shadow-sm space-y-4">
+                                    <h2 className="text-lg font-bold tracking-tight text-neutral-900">
                                         基本訊息
                                     </h2>
 
-                                    {/* Info Grid */}
-                                    <div className="grid grid-cols-2 gap-4">
+                                    {/* Info Grid - Compact */}
+                                    <div className="grid grid-cols-2 gap-3">
                                         {/* Date & Time */}
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
-                                                <Calendar className="w-4 h-4" />
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
+                                                <Calendar className="w-3.5 h-3.5" />
                                             </div>
                                             <div>
-                                                <p className="text-sm text-neutral-500">時間</p>
-                                                <p className="font-semibold text-neutral-900">{event.fullDate}</p>
-                                                <p className="text-sm text-neutral-600">{event.time}</p>
+                                                <p className="text-xs text-neutral-500">時間</p>
+                                                <p className="text-sm font-semibold text-neutral-900">{event.fullDate}</p>
+                                                <p className="text-xs text-neutral-600">{event.time}</p>
                                             </div>
                                         </div>
 
                                         {/* Capacity */}
-                                        <div className="flex items-start gap-3">
-                                            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
-                                                <Clock className="w-4 h-4" />
+                                        <div className="flex items-center gap-2">
+                                            <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
+                                                <Clock className="w-3.5 h-3.5" />
                                             </div>
                                             <div>
-                                                <p className="text-sm text-neutral-500">人數</p>
-                                                <p className="font-semibold text-neutral-900">{event.attendees} 人已報名</p>
-                                                {event.capacity && (
-                                                    <p className="text-sm text-neutral-600">剩餘 {event.capacity - (event.attendees || 0)} 席</p>
-                                                )}
+                                                <p className="text-xs text-neutral-500">人數</p>
+                                                <p className="text-sm font-semibold text-neutral-900">{event.attendees} 人已報名</p>
                                             </div>
                                         </div>
 
                                         {/* Location */}
-                                        <div className="flex items-start gap-3 col-span-2">
-                                            <div className="w-10 h-10 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
-                                                <MapPin className="w-4 h-4" />
+                                        <div className="flex items-center gap-2 col-span-2">
+                                            <div className="w-8 h-8 rounded-full bg-neutral-100 flex items-center justify-center text-neutral-600 shrink-0">
+                                                <MapPin className="w-3.5 h-3.5" />
                                             </div>
-                                            <div className="flex-1">
-                                                <p className="text-sm text-neutral-500">地點</p>
-                                                <p className="font-semibold text-neutral-900">{event.location}</p>
-                                                <button className="text-xs text-neutral-500 hover:text-neutral-700 font-medium mt-1 underline">
+                                            <div className="flex-1 min-w-0">
+                                                <p className="text-xs text-neutral-500">地點</p>
+                                                <p className="text-sm font-semibold text-neutral-900 truncate">{event.location}</p>
+                                                <button className="text-xs text-neutral-500 hover:text-neutral-700 font-medium underline">
                                                     在地圖上查看
                                                 </button>
                                             </div>

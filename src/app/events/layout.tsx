@@ -25,14 +25,14 @@ export default function EventsLayout({
             key: 'schedule',
             href: '/events/schedule',
             icon: Calendar,
-            label: '我的排程',
+            label: '行程時間線',
             matchPaths: ['/events/schedule']
         },
         {
             key: 'host',
             href: '/events/host',
             icon: Plus,
-            label: '舉辦活動',
+            label: '發起活動',
             matchPaths: ['/events/host']
         },
     ];

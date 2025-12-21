@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Switch } from '@/components/ui/switch';
 import { Button } from '@/components/ui/button';
-import { Users, Copy, RefreshCw, QrCode, Plus, Trash2, X } from 'lucide-react';
+import { Users, Copy, RefreshCw, QrCode, Plus, Trash2, X, Check, AlertCircle } from 'lucide-react';
 import QRCodeGenerator from '@/components/QRCodeGenerator';
 
 interface InvitationChannel {
@@ -14,15 +14,25 @@ interface InvitationChannel {
     code: string;
 }
 
+// 預設條件選項
+const DEFAULT_REQUIREMENTS = [
+    { id: 'free_entry', label: '可自由進場', labelEn: 'Free Entry' },
+    { id: 'adult_only', label: '須年滿 18 歲', labelEn: '18+' },
+    { id: 'bring_id', label: '請攜帶身分證件', labelEn: 'ID Required' },
+    { id: 'dress_code', label: '有服裝要求', labelEn: 'Dress Code' },
+];
+
 interface ParticipantSettingsProps {
     capacityTotal?: number;
     isAdultOnly?: boolean;
     invitationOnly?: boolean;
     invitationCode?: string;
+    requirements?: string[];
     onCapacityChange?: (capacity: number) => void;
     onAdultOnlyChange?: (isAdult: boolean) => void;
     onInvitationOnlyChange?: (invitationOnly: boolean) => void;
     onInvitationCodeChange?: (code: string) => void;
+    onRequirementsChange?: (requirements: string[]) => void;
 }
 
 export default function ParticipantSettings({
@@ -30,10 +40,12 @@ export default function ParticipantSettings({
     isAdultOnly = false,
     invitationOnly = false,
     invitationCode = '',
+    requirements = [],
     onCapacityChange,
     onAdultOnlyChange,
     onInvitationOnlyChange,
     onInvitationCodeChange,
+    onRequirementsChange,
 }: ParticipantSettingsProps) {
     const [customCapacity, setCustomCapacity] = useState(capacityTotal);
     const [showCustomInput, setShowCustomInput] = useState(false);
@@ -41,6 +53,7 @@ export default function ParticipantSettings({
         { id: '1', name: 'Default', code: '' }
     ]);
     const [activeQRChannel, setActiveQRChannel] = useState<InvitationChannel | null>(null);
+    const [customRequirement, setCustomRequirement] = useState('');
 
     const quickCapacities = [20, 50];
 
@@ -277,6 +290,100 @@ export default function ParticipantSettings({
                     </p>
                 </div>
             )}
+
+            {/* 參與條件 */}
+            <div className="pt-4 border-t border-gray-100">
+                <div className="flex items-center gap-2 mb-3">
+                    <AlertCircle className="w-5 h-5 text-gray-700" />
+                    <Label className="text-base font-semibold">參與條件</Label>
+                </div>
+
+                {/* 預設選項 */}
+                <div className="grid grid-cols-2 gap-2 mb-3">
+                    {DEFAULT_REQUIREMENTS.map((req) => {
+                        const isSelected = requirements.includes(req.id);
+                        return (
+                            <button
+                                key={req.id}
+                                type="button"
+                                onClick={() => {
+                                    const newReqs = isSelected
+                                        ? requirements.filter(r => r !== req.id)
+                                        : [...requirements, req.id];
+                                    onRequirementsChange?.(newReqs);
+                                }}
+                                className={`p-3 rounded-xl border-2 text-left transition-all text-sm ${isSelected
+                                    ? 'border-black bg-black text-white'
+                                    : 'border-gray-200 hover:border-gray-300 bg-white'
+                                    }`}
+                            >
+                                <div className="flex items-center gap-2">
+                                    {isSelected && <Check className="w-4 h-4 shrink-0" />}
+                                    <span className="font-medium">{req.label}</span>
+                                </div>
+                            </button>
+                        );
+                    })}
+                </div>
+
+                {/* 自訂條件 */}
+                <div className="space-y-2">
+                    <div className="flex gap-2">
+                        <Input
+                            type="text"
+                            value={customRequirement}
+                            onChange={(e) => setCustomRequirement(e.target.value)}
+                            placeholder="自訂條件，如「請自備餐點」"
+                            className="flex-1 text-sm"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter') {
+                                    e.preventDefault();
+                                    if (customRequirement.trim()) {
+                                        onRequirementsChange?.([...requirements, customRequirement.trim()]);
+                                        setCustomRequirement('');
+                                    }
+                                }
+                            }}
+                        />
+                        <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                                if (customRequirement.trim()) {
+                                    onRequirementsChange?.([...requirements, customRequirement.trim()]);
+                                    setCustomRequirement('');
+                                }
+                            }}
+                            className="gap-1"
+                        >
+                            <Plus className="w-3 h-3" />
+                            新增
+                        </Button>
+                    </div>
+
+                    {/* 已新增的自訂條件（非預設選項） */}
+                    {requirements.filter(r => !DEFAULT_REQUIREMENTS.find(d => d.id === r)).length > 0 && (
+                        <div className="flex flex-wrap gap-2 mt-2">
+                            {requirements.filter(r => !DEFAULT_REQUIREMENTS.find(d => d.id === r)).map((req, idx) => (
+                                <span
+                                    key={idx}
+                                    className="inline-flex items-center gap-1 px-3 py-1 bg-amber-50 text-amber-700 border border-amber-200 rounded-full text-sm"
+                                >
+                                    {req}
+                                    <button
+                                        type="button"
+                                        onClick={() => onRequirementsChange?.(requirements.filter(r => r !== req))}
+                                        className="hover:text-amber-900"
+                                    >
+                                        <X className="w-3 h-3" />
+                                    </button>
+                                </span>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
 
             {/* QR Code Modal */}
             {activeQRChannel && (

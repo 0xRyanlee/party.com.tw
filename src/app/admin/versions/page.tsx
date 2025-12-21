@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -37,40 +37,9 @@ const typeConfig: Record<string, { label: string; icon: typeof Sparkles; color: 
     breaking: { label: '重大變更', icon: AlertCircle, color: 'bg-red-100 text-red-600 border-red-200' },
 };
 
-// 模擬版本更新數據
-const mockUpdates: VersionUpdate[] = [
-    {
-        id: '1',
-        version: '1.2.0',
-        title: 'Admin 後台全面重構',
-        description: '新增里程碑管理、數據儀表板、推播通知、優惠碼管理等功能。導航支持跨類別拖拽。',
-        type: 'feature',
-        is_published: true,
-        created_at: new Date().toISOString(),
-    },
-    {
-        id: '2',
-        version: '1.1.5',
-        title: '密碼驗證安全性提升',
-        description: '管理後台密碼驗證改為 API 調用 Vercel 環境變量，移除前端硬編碼。',
-        type: 'fix',
-        is_published: true,
-        created_at: new Date(Date.now() - 86400000).toISOString(),
-    },
-    {
-        id: '3',
-        version: '1.1.4',
-        title: '設計規範統一',
-        description: '移除全項目 emoji，統一使用 Swiss International 設計風格。',
-        type: 'improvement',
-        is_published: true,
-        created_at: new Date(Date.now() - 86400000 * 2).toISOString(),
-    },
-];
-
 export default function VersionsPage() {
-    const [updates, setUpdates] = useState<VersionUpdate[]>(mockUpdates);
-    const [isLoading, setIsLoading] = useState(false);
+    const [updates, setUpdates] = useState<VersionUpdate[]>([]);
+    const [isLoading, setIsLoading] = useState(true);
     const [dialogOpen, setDialogOpen] = useState(false);
     const [editingUpdate, setEditingUpdate] = useState<VersionUpdate | null>(null);
 
@@ -79,6 +48,25 @@ export default function VersionsPage() {
     const [formTitle, setFormTitle] = useState('');
     const [formDescription, setFormDescription] = useState('');
     const [formType, setFormType] = useState<VersionUpdate['type']>('feature');
+
+    // 載入數據
+    const loadVersions = useCallback(async () => {
+        setIsLoading(true);
+        try {
+            const res = await fetch('/api/admin/versions');
+            const data = await res.json();
+            setUpdates(data.versions || []);
+        } catch (error) {
+            console.error('Load versions error:', error);
+            toast.error('載入失敗');
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        loadVersions();
+    }, [loadVersions]);
 
     const resetForm = () => {
         setFormVersion('');
@@ -90,7 +78,6 @@ export default function VersionsPage() {
 
     const openCreateDialog = () => {
         resetForm();
-        // 自動生成下一個版本號
         if (updates.length > 0) {
             const latestVersion = updates[0].version;
             const parts = latestVersion.split('.');
@@ -111,47 +98,77 @@ export default function VersionsPage() {
         setDialogOpen(true);
     };
 
-    const handleSave = () => {
+    const handleSave = async () => {
         if (!formVersion.trim() || !formTitle.trim()) {
             toast.error('請填寫版本號和標題');
             return;
         }
 
-        if (editingUpdate) {
-            setUpdates(prev => prev.map(u =>
-                u.id === editingUpdate.id
-                    ? { ...u, version: formVersion, title: formTitle, description: formDescription, type: formType }
-                    : u
-            ));
-            toast.success('版本更新已修改');
-        } else {
-            const newUpdate: VersionUpdate = {
-                id: Date.now().toString(),
-                version: formVersion.trim(),
-                title: formTitle.trim(),
-                description: formDescription.trim(),
-                type: formType,
-                is_published: false,
-                created_at: new Date().toISOString(),
-            };
-            setUpdates(prev => [newUpdate, ...prev]);
-            toast.success('版本更新已新增');
+        try {
+            if (editingUpdate) {
+                await fetch('/api/admin/versions', {
+                    method: 'PUT',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        id: editingUpdate.id,
+                        version: formVersion,
+                        title: formTitle,
+                        description: formDescription,
+                        type: formType,
+                    }),
+                });
+                toast.success('版本更新已修改');
+            } else {
+                await fetch('/api/admin/versions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        version: formVersion,
+                        title: formTitle,
+                        description: formDescription,
+                        type: formType,
+                        is_published: false,
+                    }),
+                });
+                toast.success('版本更新已新增');
+            }
+
+            setDialogOpen(false);
+            resetForm();
+            loadVersions();
+        } catch (error) {
+            console.error('Save error:', error);
+            toast.error('保存失敗');
         }
-
-        setDialogOpen(false);
-        resetForm();
     };
 
-    const handleDelete = (id: string) => {
-        setUpdates(prev => prev.filter(u => u.id !== id));
-        toast.success('版本更新已刪除');
+    const handleDelete = async (id: string) => {
+        try {
+            await fetch(`/api/admin/versions?id=${id}`, { method: 'DELETE' });
+            toast.success('版本更新已刪除');
+            loadVersions();
+        } catch (error) {
+            console.error('Delete error:', error);
+            toast.error('刪除失敗');
+        }
     };
 
-    const togglePublish = (id: string) => {
-        setUpdates(prev => prev.map(u =>
-            u.id === id ? { ...u, is_published: !u.is_published } : u
-        ));
-        toast.success('發布狀態已更新');
+    const togglePublish = async (update: VersionUpdate) => {
+        try {
+            await fetch('/api/admin/versions', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    id: update.id,
+                    is_published: !update.is_published,
+                }),
+            });
+            toast.success(update.is_published ? '已取消發布' : '已發布');
+            loadVersions();
+        } catch (error) {
+            console.error('Toggle publish error:', error);
+            toast.error('操作失敗');
+        }
     };
 
     const formatDate = (dateStr: string) => {
@@ -171,10 +188,10 @@ export default function VersionsPage() {
                         <History className="w-6 h-6" />
                         版本更新
                     </h2>
-                    <p className="text-zinc-500">管理平台版本更新記錄</p>
+                    <p className="text-zinc-500">管理平台版本更新記錄（已發布的會顯示在用戶端）</p>
                 </div>
                 <div className="flex gap-2">
-                    <Button variant="outline" size="sm" onClick={() => setIsLoading(true)} disabled={isLoading}>
+                    <Button variant="outline" size="sm" onClick={loadVersions} disabled={isLoading}>
                         <RefreshCw className={`w-4 h-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
                         刷新
                     </Button>
@@ -186,59 +203,71 @@ export default function VersionsPage() {
             </div>
 
             {/* Updates Timeline */}
-            <div className="relative">
-                <div className="absolute left-4 top-0 bottom-0 w-px bg-zinc-200" />
+            {isLoading ? (
+                <div className="text-center py-12 text-zinc-500">載入中...</div>
+            ) : updates.length === 0 ? (
+                <Card>
+                    <CardContent className="text-center py-12 text-zinc-500">
+                        <History className="w-12 h-12 mx-auto mb-4 opacity-30" />
+                        <p>暫無版本記錄</p>
+                        <p className="text-sm mt-2">請先執行數據庫 Migration</p>
+                    </CardContent>
+                </Card>
+            ) : (
+                <div className="relative">
+                    <div className="absolute left-4 top-0 bottom-0 w-px bg-zinc-200" />
 
-                <div className="space-y-4">
-                    {updates.map((update) => {
-                        const config = typeConfig[update.type];
-                        const Icon = config.icon;
+                    <div className="space-y-4">
+                        {updates.map((update) => {
+                            const config = typeConfig[update.type] || typeConfig.feature;
+                            const Icon = config.icon;
 
-                        return (
-                            <Card key={update.id} className={`ml-8 ${!update.is_published ? 'opacity-60' : ''}`}>
-                                <div className="absolute -left-4 w-8 h-8 rounded-full bg-white border-2 border-zinc-200 flex items-center justify-center">
-                                    <GitCommit className="w-4 h-4 text-zinc-400" />
-                                </div>
-                                <CardContent className="py-4">
-                                    <div className="flex items-start justify-between">
-                                        <div className="flex-1">
-                                            <div className="flex items-center gap-2 mb-1">
-                                                <code className="font-mono text-sm font-bold">v{update.version}</code>
-                                                <Badge variant="outline" className={config.color}>
-                                                    <Icon className="w-3 h-3 mr-1" />
-                                                    {config.label}
-                                                </Badge>
-                                                {!update.is_published && (
-                                                    <Badge variant="outline" className="bg-zinc-100 text-zinc-500">草稿</Badge>
-                                                )}
-                                            </div>
-                                            <p className="font-medium">{update.title}</p>
-                                            <p className="text-sm text-zinc-500 mt-1">{update.description}</p>
-                                            <p className="text-xs text-zinc-400 mt-2">{formatDate(update.created_at)}</p>
-                                        </div>
-                                        <div className="flex items-center gap-1 ml-4">
-                                            <Button
-                                                size="sm"
-                                                variant="ghost"
-                                                onClick={() => togglePublish(update.id)}
-                                                className="h-7 text-xs"
-                                            >
-                                                {update.is_published ? '取消發布' : '發布'}
-                                            </Button>
-                                            <Button size="sm" variant="ghost" onClick={() => openEditDialog(update)} className="h-7 w-7 p-0">
-                                                <Edit2 className="w-3 h-3" />
-                                            </Button>
-                                            <Button size="sm" variant="ghost" onClick={() => handleDelete(update.id)} className="h-7 w-7 p-0 text-red-500">
-                                                <Trash2 className="w-3 h-3" />
-                                            </Button>
-                                        </div>
+                            return (
+                                <Card key={update.id} className={`ml-8 ${!update.is_published ? 'opacity-60' : ''}`}>
+                                    <div className="absolute -left-4 w-8 h-8 rounded-full bg-white border-2 border-zinc-200 flex items-center justify-center">
+                                        <GitCommit className="w-4 h-4 text-zinc-400" />
                                     </div>
-                                </CardContent>
-                            </Card>
-                        );
-                    })}
+                                    <CardContent className="py-4">
+                                        <div className="flex items-start justify-between">
+                                            <div className="flex-1">
+                                                <div className="flex items-center gap-2 mb-1">
+                                                    <code className="font-mono text-sm font-bold">v{update.version}</code>
+                                                    <Badge variant="outline" className={config.color}>
+                                                        <Icon className="w-3 h-3 mr-1" />
+                                                        {config.label}
+                                                    </Badge>
+                                                    {!update.is_published && (
+                                                        <Badge variant="outline" className="bg-zinc-100 text-zinc-500">草稿</Badge>
+                                                    )}
+                                                </div>
+                                                <p className="font-medium">{update.title}</p>
+                                                <p className="text-sm text-zinc-500 mt-1">{update.description}</p>
+                                                <p className="text-xs text-zinc-400 mt-2">{formatDate(update.created_at)}</p>
+                                            </div>
+                                            <div className="flex items-center gap-1 ml-4">
+                                                <Button
+                                                    size="sm"
+                                                    variant="ghost"
+                                                    onClick={() => togglePublish(update)}
+                                                    className="h-7 text-xs"
+                                                >
+                                                    {update.is_published ? '取消發布' : '發布'}
+                                                </Button>
+                                                <Button size="sm" variant="ghost" onClick={() => openEditDialog(update)} className="h-7 w-7 p-0">
+                                                    <Edit2 className="w-3 h-3" />
+                                                </Button>
+                                                <Button size="sm" variant="ghost" onClick={() => handleDelete(update.id)} className="h-7 w-7 p-0 text-red-500">
+                                                    <Trash2 className="w-3 h-3" />
+                                                </Button>
+                                            </div>
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Create/Edit Dialog */}
             <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>

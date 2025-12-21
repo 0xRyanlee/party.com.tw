@@ -160,3 +160,245 @@ export async function sendTemplateEmail(
     const { subject, html } = generateEmailTemplate(template, data);
     return sendEmail({ to, subject, html });
 }
+
+// ==================== 管理通知模板 ====================
+
+export type AdminEmailTemplate =
+    | 'tier_expiring'
+    | 'promotion'
+    | 'system_announcement'
+    | 'welcome_new_user';
+
+// 管理通知模板生成
+export function generateAdminEmailTemplate(
+    template: AdminEmailTemplate,
+    data: Record<string, string>
+): { subject: string; html: string } {
+    const baseStyle = `
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        max-width: 600px;
+        margin: 0 auto;
+        background: #ffffff;
+        border-radius: 12px;
+        overflow: hidden;
+    `;
+
+    const headerStyle = `
+        background: #18181b;
+        color: #ffffff;
+        padding: 32px 24px;
+        text-align: center;
+    `;
+
+    const contentStyle = `
+        padding: 32px 24px;
+    `;
+
+    const buttonStyle = `
+        display: inline-block;
+        background: #18181b;
+        color: #ffffff;
+        padding: 14px 28px;
+        border-radius: 9999px;
+        text-decoration: none;
+        font-weight: 600;
+        margin-top: 24px;
+    `;
+
+    const footerStyle = `
+        padding: 24px;
+        text-align: center;
+        color: #71717a;
+        font-size: 12px;
+        border-top: 1px solid #e4e4e7;
+    `;
+
+    const templates: Record<AdminEmailTemplate, { subject: string; html: string }> = {
+        tier_expiring: {
+            subject: `您的 ${data.tier} 會員即將到期`,
+            html: `
+                <div style="${baseStyle}">
+                    <div style="${headerStyle}">
+                        <h1 style="margin: 0; font-size: 24px;">會員到期提醒</h1>
+                    </div>
+                    <div style="${contentStyle}">
+                        <p style="font-size: 18px; margin-bottom: 8px;">親愛的 ${data.user_name}，</p>
+                        <p style="color: #52525b; line-height: 1.6;">
+                            您的 <strong>${data.tier}</strong> 會員將於 <strong>${data.expire_date}</strong> 到期。
+                        </p>
+                        ${data.coupon_code ? `
+                            <div style="background: #fafafa; border-radius: 8px; padding: 20px; margin: 24px 0;">
+                                <p style="margin: 0 0 8px; font-weight: 600;">專屬優惠碼</p>
+                                <p style="margin: 0; font-size: 24px; font-family: monospace; color: #18181b;">${data.coupon_code}</p>
+                                <p style="margin: 8px 0 0; color: #71717a; font-size: 14px;">使用此優惠碼可享續訂折扣</p>
+                            </div>
+                        ` : ''}
+                        ${data.link ? `
+                            <a href="${data.link}" style="${buttonStyle}">立即續訂</a>
+                        ` : ''}
+                    </div>
+                    <div style="${footerStyle}">
+                        <p style="margin: 0;">Party - 城市活動行事曆</p>
+                        <p style="margin: 8px 0 0; font-size: 11px;">此郵件由系統自動發送，請勿直接回覆</p>
+                    </div>
+                </div>
+            `,
+        },
+        promotion: {
+            subject: data.subject || '專屬優惠等你來領取',
+            html: `
+                <div style="${baseStyle}">
+                    <div style="${headerStyle}">
+                        <h1 style="margin: 0; font-size: 24px;">專屬優惠</h1>
+                    </div>
+                    <div style="${contentStyle}">
+                        <p style="font-size: 18px; margin-bottom: 8px;">親愛的 ${data.user_name}，</p>
+                        <div style="color: #52525b; line-height: 1.8; white-space: pre-wrap;">${data.content || ''}</div>
+                        ${data.coupon_code ? `
+                            <div style="background: #fafafa; border-radius: 8px; padding: 20px; margin: 24px 0; text-align: center;">
+                                <p style="margin: 0 0 8px; font-weight: 600;">優惠碼</p>
+                                <p style="margin: 0; font-size: 28px; font-family: monospace; color: #18181b; letter-spacing: 2px;">${data.coupon_code}</p>
+                            </div>
+                        ` : ''}
+                        ${data.link ? `
+                            <div style="text-align: center;">
+                                <a href="${data.link}" style="${buttonStyle}">立即領取</a>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="${footerStyle}">
+                        <p style="margin: 0;">Party - 城市活動行事曆</p>
+                    </div>
+                </div>
+            `,
+        },
+        system_announcement: {
+            subject: data.subject || '系統公告',
+            html: `
+                <div style="${baseStyle}">
+                    <div style="${headerStyle}">
+                        <h1 style="margin: 0; font-size: 24px;">系統公告</h1>
+                    </div>
+                    <div style="${contentStyle}">
+                        <p style="font-size: 18px; margin-bottom: 8px;">親愛的 ${data.user_name}，</p>
+                        <div style="color: #52525b; line-height: 1.8; white-space: pre-wrap;">${data.content || ''}</div>
+                        ${data.link ? `
+                            <div style="text-align: center; margin-top: 24px;">
+                                <a href="${data.link}" style="${buttonStyle}">了解更多</a>
+                            </div>
+                        ` : ''}
+                    </div>
+                    <div style="${footerStyle}">
+                        <p style="margin: 0;">Party - 城市活動行事曆</p>
+                    </div>
+                </div>
+            `,
+        },
+        welcome_new_user: {
+            subject: '歡迎加入 Party！',
+            html: `
+                <div style="${baseStyle}">
+                    <div style="${headerStyle}">
+                        <h1 style="margin: 0; font-size: 24px;">歡迎加入</h1>
+                    </div>
+                    <div style="${contentStyle}">
+                        <p style="font-size: 18px; margin-bottom: 8px;">親愛的 ${data.user_name}，</p>
+                        <p style="color: #52525b; line-height: 1.6;">
+                            歡迎加入 Party 平台！我們很高興您成為我們的一員。
+                        </p>
+                        <p style="color: #52525b; line-height: 1.6;">在這裡，您可以：</p>
+                        <ul style="color: #52525b; line-height: 2;">
+                            <li>探索城市中各式各樣的活動</li>
+                            <li>發起屬於自己的活動</li>
+                            <li>認識志同道合的朋友</li>
+                        </ul>
+                        <div style="text-align: center; margin-top: 24px;">
+                            <a href="${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/events" style="${buttonStyle}">開始探索</a>
+                        </div>
+                    </div>
+                    <div style="${footerStyle}">
+                        <p style="margin: 0;">Party - 城市活動行事曆</p>
+                    </div>
+                </div>
+            `,
+        },
+    };
+
+    return templates[template];
+}
+
+// ==================== 批量發送 ====================
+
+export interface BatchEmailResult {
+    total: number;
+    sent: number;
+    failed: number;
+    errors: Array<{ email: string; error: string }>;
+}
+
+// 批量發送郵件（帶節流）
+export async function sendBatchEmails(
+    recipients: Array<{ email: string; data: Record<string, string> }>,
+    template: AdminEmailTemplate,
+    options?: {
+        delayMs?: number; // 每封郵件之間的延遲（毫秒）
+        batchSize?: number; // 每批發送數量
+    }
+): Promise<BatchEmailResult> {
+    const resend = getResendClient();
+    if (!resend) {
+        return {
+            total: recipients.length,
+            sent: 0,
+            failed: recipients.length,
+            errors: [{ email: 'all', error: 'RESEND_API_KEY not configured' }],
+        };
+    }
+
+    const delayMs = options?.delayMs || 100; // 默認 100ms 延遲
+    const result: BatchEmailResult = {
+        total: recipients.length,
+        sent: 0,
+        failed: 0,
+        errors: [],
+    };
+
+    for (const recipient of recipients) {
+        try {
+            const { subject, html } = generateAdminEmailTemplate(template, recipient.data);
+
+            await resend.emails.send({
+                from: 'Party <noreply@party.example.com>',
+                to: recipient.email,
+                subject,
+                html,
+            });
+
+            result.sent++;
+
+            // 添加延遲避免速率限制
+            if (delayMs > 0) {
+                await new Promise(resolve => setTimeout(resolve, delayMs));
+            }
+        } catch (error) {
+            result.failed++;
+            result.errors.push({
+                email: recipient.email,
+                error: String(error),
+            });
+        }
+    }
+
+    return result;
+}
+
+// 發送管理通知郵件
+export async function sendAdminEmail(
+    to: string,
+    template: AdminEmailTemplate,
+    data: Record<string, string>
+): Promise<{ success: boolean; error?: string; id?: string }> {
+    const { subject, html } = generateAdminEmailTemplate(template, data);
+    return sendEmail({ to, subject, html });
+}
+

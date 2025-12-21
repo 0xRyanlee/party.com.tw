@@ -65,15 +65,17 @@ const defaultNavItems: NavItem[] = [
     { id: 'coupons', href: "/admin/coupons", label: "優惠碼管理", icon: Ticket, group: "operations" },
     // 數據
     { id: 'analytics', href: "/admin/analytics", label: "數據儀表板", icon: BarChart3, group: "data" },
+    { id: 'milestones', href: "/admin/milestones", label: "里程碑", icon: Shield, group: "data" },
+    { id: 'versions', href: "/admin/versions", label: "版本更新", icon: FileText, group: "data" },
 ];
 
 const groupLabels: Record<string, string> = {
-    overview: "📊 概覽",
-    system: "🔬 系統",
-    users: "👥 用戶",
-    content: "📅 內容",
-    operations: "🚨 營運",
-    data: "📈 數據",
+    overview: "概覽",
+    system: "系統",
+    users: "用戶",
+    content: "內容",
+    operations: "營運",
+    data: "數據",
 };
 
 const STORAGE_KEY = 'admin_nav_order';
@@ -102,20 +104,20 @@ function SortableNavItem({ item, isActive }: { item: NavItem; isActive: boolean 
         <div
             ref={setNodeRef}
             style={style}
-            className={`flex items-center gap-1 rounded-lg transition-colors ${isActive
-                ? "bg-primary text-primary-foreground"
-                : "text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+            className={`flex items-center rounded transition-colors ${isActive
+                ? "bg-zinc-900 text-white"
+                : "text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                 }`}
         >
             <button
                 {...attributes}
                 {...listeners}
-                className="p-1.5 cursor-grab active:cursor-grabbing hover:bg-black/5 rounded-l-lg"
+                className="p-1 cursor-grab active:cursor-grabbing hover:bg-black/5 rounded-l"
             >
-                <GripVertical className="h-3 w-3 text-gray-400" />
+                <GripVertical className="h-2.5 w-2.5 text-zinc-400" />
             </button>
-            <Link href={item.href} className="flex items-center gap-2 px-2 py-2 flex-1 text-sm">
-                <Icon className="h-4 w-4" />
+            <Link href={item.href} className="flex items-center gap-1.5 px-1.5 py-1 flex-1 text-xs">
+                <Icon className="h-3.5 w-3.5" />
                 <span>{item.label}</span>
             </Link>
         </div>
@@ -294,7 +296,7 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
                     <h1 className="text-lg font-bold text-primary">管理後台</h1>
                 </div>
 
-                <nav className="flex-1 p-3 space-y-4 overflow-y-auto">
+                <nav className="flex-1 p-2 overflow-y-auto">
                     <DndContext
                         sensors={sensors}
                         collisionDetection={closestCenter}
@@ -304,25 +306,27 @@ export default function AdminClientLayout({ children }: { children: React.ReactN
                             items={navItems.map(i => i.id)}
                             strategy={verticalListSortingStrategy}
                         >
-                            {Object.entries(groupLabels).map(([groupId, label]) => {
-                                const items = groupedItems[groupId] || [];
-                                if (items.length === 0) return null;
+                            <div className="space-y-0.5">
+                                {navItems.map((item, index) => {
+                                    // 顯示分組標籤（當組別改變時）
+                                    const prevGroup = index > 0 ? navItems[index - 1].group : null;
+                                    const showGroupLabel = item.group !== prevGroup;
 
-                                return (
-                                    <div key={groupId}>
-                                        <p className="text-xs text-gray-400 mb-1 px-2">{label}</p>
-                                        <div className="space-y-0.5">
-                                            {items.map((item) => (
-                                                <SortableNavItem
-                                                    key={item.id}
-                                                    item={item}
-                                                    isActive={pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))}
-                                                />
-                                            ))}
+                                    return (
+                                        <div key={item.id}>
+                                            {showGroupLabel && (
+                                                <p className={`text-[10px] font-medium text-zinc-400 uppercase tracking-wider px-2 ${index > 0 ? 'mt-3' : ''} mb-1`}>
+                                                    {groupLabels[item.group]}
+                                                </p>
+                                            )}
+                                            <SortableNavItem
+                                                item={item}
+                                                isActive={pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))}
+                                            />
                                         </div>
-                                    </div>
-                                );
-                            })}
+                                    );
+                                })}
+                            </div>
                         </SortableContext>
                     </DndContext>
                 </nav>

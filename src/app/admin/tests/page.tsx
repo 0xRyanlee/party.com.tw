@@ -552,26 +552,34 @@ export default function AdminTestDashboard() {
         const total = results.length;
 
         const timestamp = new Date().toLocaleString('zh-TW');
+        const avgTime = total > 0
+            ? Math.round(results.reduce((sum, r) => sum + (r.duration || 0), 0) / total)
+            : 0;
 
-        let summary = `🧪 測試報告 - ${timestamp}\n\n`;
-        summary += `✅ 通過: ${passed}\n`;
-        summary += `❌ 失敗: ${failed}\n`;
-        summary += `📊 總計: ${total}\n\n`;
-        summary += `---\n\n`;
+        let summary = `# 系統健康檢查報告\n`;
+        summary += `${timestamp}\n\n`;
+        summary += `| 指標 | 數值 |\n`;
+        summary += `|------|------|\n`;
+        summary += `| 通過 | ${passed} |\n`;
+        summary += `| 失敗 | ${failed} |\n`;
+        summary += `| 總計 | ${total} |\n`;
+        summary += `| 平均耗時 | ${avgTime}ms |\n\n`;
 
         for (const category of testCategories) {
             const categoryResults = category.tests.map(t => testResults[t.id]).filter(Boolean);
             if (categoryResults.length === 0) continue;
 
-            summary += `## ${category.name}\n\n`;
+            const catPassed = categoryResults.filter(r => r.status === 'passed').length;
+            summary += `## ${category.name} [${catPassed}/${categoryResults.length}]\n\n`;
+
             for (const test of category.tests) {
                 const result = testResults[test.id];
                 if (!result) continue;
 
-                const icon = result.status === 'passed' ? '✅' : result.status === 'failed' ? '❌' : '⏳';
-                summary += `${icon} ${result.name}`;
+                const status = result.status === 'passed' ? 'PASS' : result.status === 'failed' ? 'FAIL' : 'PEND';
+                summary += `- [${status}] ${result.name}`;
                 if (result.duration) summary += ` (${result.duration}ms)`;
-                if (result.error) summary += ` - ${result.error}`;
+                if (result.error) summary += `\n  > ${result.error}`;
                 summary += '\n';
             }
             summary += '\n';

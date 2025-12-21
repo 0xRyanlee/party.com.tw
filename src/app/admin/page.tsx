@@ -238,14 +238,14 @@ export default function AdminDashboard() {
                         </Link>
                     );
                 })}
-                <Link href="/admin/management">
-                    <Card className="hover:shadow-lg transition-all cursor-pointer bg-neutral-900 text-white border-neutral-800">
+                <Link href="/admin/analytics">
+                    <Card className="hover:shadow-md transition-all cursor-pointer bg-zinc-900 text-white border-zinc-800">
                         <CardContent className="flex items-center justify-between py-4">
                             <div className="flex items-center gap-3">
-                                <BarChart3 className="h-5 w-5 text-neutral-300" />
-                                <span className="text-sm font-bold">管理中心</span>
+                                <BarChart3 className="h-5 w-5 text-zinc-300" />
+                                <span className="text-sm font-medium">數據分析</span>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-neutral-400" />
+                            <ArrowRight className="w-4 h-4 text-zinc-400" />
                         </CardContent>
                     </Card>
                 </Link>

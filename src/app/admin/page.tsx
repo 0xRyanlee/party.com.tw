@@ -5,11 +5,12 @@ import { createClient } from "@/lib/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import Link from "next/link";
 import {
-    Calendar, Users, Image as ImageIcon, Megaphone,
-    TrendingUp, Clock, AlertTriangle, CheckCircle,
-    ArrowRight, Activity, BarChart3, Ticket
+    Calendar, Users, TrendingUp, TrendingDown,
+    ArrowUpRight, Activity, CreditCard, DollarSign, Download
 } from "lucide-react";
 
 interface RecentEvent {
@@ -20,11 +21,11 @@ interface RecentEvent {
     created_at: string;
 }
 
-interface RecentReport {
+interface RecentUser {
     id: string;
-    type: string;
-    category: string;
-    status: string;
+    display_name: string;
+    email: string;
+    avatar_url: string | null;
     created_at: string;
 }
 
@@ -33,297 +34,379 @@ export default function AdminDashboard() {
         events: 0,
         publishedEvents: 0,
         users: 0,
-        banners: 0,
-        announcements: 0,
+        registrations: 0,
         reports: 0,
         pendingReports: 0,
-        registrations: 0,
+        weeklyGrowth: { events: 0, users: 0, registrations: 0 },
     });
     const [recentEvents, setRecentEvents] = useState<RecentEvent[]>([]);
-    const [recentReports, setRecentReports] = useState<RecentReport[]>([]);
+    const [recentUsers, setRecentUsers] = useState<RecentUser[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [activeTab, setActiveTab] = useState("overview");
     const supabase = createClient();
 
     useEffect(() => {
         const fetchData = async () => {
             setIsLoading(true);
 
-            // Stats queries
+            const oneWeekAgo = new Date();
+            oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
             const [
                 { count: eventsCount },
                 { count: publishedCount },
                 { count: usersCount },
-                { count: bannersCount },
-                { count: announcementsCount },
+                { count: registrationsCount },
                 { count: reportsCount },
                 { count: pendingReportsCount },
-                { count: registrationsCount },
+                { count: weeklyEvents },
+                { count: weeklyUsers },
+                { count: weeklyRegistrations },
+                { data: eventsData },
+                { data: usersData },
             ] = await Promise.all([
                 supabase.from("events").select("*", { count: "exact", head: true }),
                 supabase.from("events").select("*", { count: "exact", head: true }).eq("status", "published"),
                 supabase.from("profiles").select("*", { count: "exact", head: true }),
-                supabase.from("banners").select("*", { count: "exact", head: true }).eq("is_active", true),
-                supabase.from("announcements").select("*", { count: "exact", head: true }).eq("is_active", true),
+                supabase.from("event_registrations").select("*", { count: "exact", head: true }),
                 supabase.from("reports").select("*", { count: "exact", head: true }),
                 supabase.from("reports").select("*", { count: "exact", head: true }).eq("status", "pending"),
-                supabase.from("registrations").select("*", { count: "exact", head: true }),
-            ]);
-
-            // Recent data
-            const [
-                { data: eventsData },
-                { data: reportsData },
-            ] = await Promise.all([
+                supabase.from("events").select("*", { count: "exact", head: true }).gte("created_at", oneWeekAgo.toISOString()),
+                supabase.from("profiles").select("*", { count: "exact", head: true }).gte("created_at", oneWeekAgo.toISOString()),
+                supabase.from("event_registrations").select("*", { count: "exact", head: true }).gte("created_at", oneWeekAgo.toISOString()),
                 supabase.from("events").select("id, title, status, start_time, created_at").order("created_at", { ascending: false }).limit(5),
-                supabase.from("reports").select("id, type, category, status, created_at").order("created_at", { ascending: false }).limit(5),
+                supabase.from("profiles").select("id, display_name, email, avatar_url, created_at").order("created_at", { ascending: false }).limit(5),
             ]);
 
             setStats({
                 events: eventsCount || 0,
                 publishedEvents: publishedCount || 0,
                 users: usersCount || 0,
-                banners: bannersCount || 0,
-                announcements: announcementsCount || 0,
+                registrations: registrationsCount || 0,
                 reports: reportsCount || 0,
                 pendingReports: pendingReportsCount || 0,
-                registrations: registrationsCount || 0,
+                weeklyGrowth: {
+                    events: weeklyEvents || 0,
+                    users: weeklyUsers || 0,
+                    registrations: weeklyRegistrations || 0,
+                },
             });
             setRecentEvents(eventsData || []);
-            setRecentReports(reportsData || []);
+            setRecentUsers(usersData || []);
             setIsLoading(false);
         };
 
         fetchData();
     }, [supabase]);
 
-    const primaryStats = [
-        {
-            label: "活動總數",
-            value: stats.events,
-            subValue: `${stats.publishedEvents} 已發布`,
-            icon: Calendar,
-            color: "text-blue-500",
-            bgColor: "bg-blue-50",
-            href: "/admin/events"
-        },
-        {
-            label: "用戶總數",
-            value: stats.users,
-            icon: Users,
-            color: "text-emerald-500",
-            bgColor: "bg-emerald-50",
-            href: "/admin/users"
-        },
-        {
-            label: "報名人次",
-            value: stats.registrations,
-            icon: Ticket,
-            color: "text-violet-500",
-            bgColor: "bg-violet-50",
-            href: "#"
-        },
-        {
-            label: "待處理回報",
-            value: stats.pendingReports,
-            subValue: `共 ${stats.reports} 件`,
-            icon: AlertTriangle,
-            color: stats.pendingReports > 0 ? "text-amber-500" : "text-gray-400",
-            bgColor: stats.pendingReports > 0 ? "bg-amber-50" : "bg-gray-50",
-            href: "/admin/reports"
-        },
-    ];
-
-    const secondaryStats = [
-        { label: "啟用橫幅", value: stats.banners, icon: ImageIcon, href: "/admin/banners" },
-        { label: "系統公告", value: stats.announcements, icon: Megaphone, href: "/admin/announcements" },
-    ];
-
-    const getStatusBadge = (status: string) => {
-        const config: Record<string, { variant: "default" | "secondary" | "outline"; className: string }> = {
-            published: { variant: "default", className: "bg-green-100 text-green-700 border-green-200" },
-            draft: { variant: "outline", className: "text-gray-500" },
-            pending: { variant: "outline", className: "text-yellow-600 border-yellow-300 bg-yellow-50" },
-            reviewed: { variant: "outline", className: "text-blue-600 border-blue-300 bg-blue-50" },
-            resolved: { variant: "outline", className: "text-green-600 border-green-300 bg-green-50" },
-        };
-        const c = config[status] || { variant: "outline" as const, className: "" };
-        return <Badge variant={c.variant} className={c.className}>{status}</Badge>;
-    };
-
     const formatDate = (dateStr: string) => {
         return new Date(dateStr).toLocaleDateString("zh-TW", {
             month: "short",
             day: "numeric",
-            hour: "2-digit",
-            minute: "2-digit"
         });
+    };
+
+    const formatRelativeTime = (dateStr: string) => {
+        const now = new Date();
+        const date = new Date(dateStr);
+        const diffMs = now.getTime() - date.getTime();
+        const diffMins = Math.floor(diffMs / 60000);
+        const diffHours = Math.floor(diffMins / 60);
+        const diffDays = Math.floor(diffHours / 24);
+
+        if (diffMins < 60) return `${diffMins} 分鐘前`;
+        if (diffHours < 24) return `${diffHours} 小時前`;
+        return `${diffDays} 天前`;
     };
 
     if (isLoading) {
         return (
-            <div className="space-y-6 animate-pulse">
-                <div className="h-8 bg-gray-200 rounded w-48"></div>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {[1, 2, 3, 4].map(i => <div key={i} className="h-32 bg-gray-100 rounded-xl"></div>)}
+            <div className="flex flex-1 flex-col gap-4 p-4 md:gap-8 md:p-8">
+                <div className="grid gap-4 md:grid-cols-2 md:gap-8 lg:grid-cols-4">
+                    {[1, 2, 3, 4].map(i => (
+                        <Card key={i}>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <div className="h-4 w-24 bg-muted animate-pulse rounded" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="h-8 w-16 bg-muted animate-pulse rounded" />
+                            </CardContent>
+                        </Card>
+                    ))}
                 </div>
             </div>
         );
     }
 
     return (
-        <div className="space-y-6">
-            {/* 頁面標題 */}
+        <div className="flex flex-1 flex-col gap-4">
+            {/* Header */}
             <div className="flex items-center justify-between">
                 <div>
-                    <h2 className="text-3xl font-bold tracking-tight">管理儀表板</h2>
-                    <p className="text-gray-500 mt-1">平台概覽與快速操作</p>
+                    <h2 className="text-2xl font-bold tracking-tight">儀表板</h2>
+                    <p className="text-muted-foreground">平台核心數據概覽</p>
                 </div>
-                <div className="flex gap-2">
-                    <Button variant="outline" size="sm" asChild>
-                        <Link href="/admin/tests">
-                            <Activity className="w-4 h-4 mr-2" />
-                            系統測試
-                        </Link>
+                <div className="flex items-center gap-2">
+                    <Button variant="outline" size="sm">
+                        <Download className="mr-2 h-4 w-4" />
+                        下載報告
                     </Button>
                 </div>
             </div>
 
-            {/* 主要統計卡片 */}
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                {primaryStats.map((stat) => {
-                    const Icon = stat.icon;
-                    return (
-                        <Link key={stat.label} href={stat.href}>
-                            <Card className="hover:shadow-lg transition-all cursor-pointer group relative overflow-hidden bg-white/80 backdrop-blur-sm border-neutral-200">
-                                {/* Subtle texture overlay */}
-                                <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
-                                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-1 relative">
-                                    <CardTitle className="text-xs font-semibold text-neutral-500 uppercase tracking-wider">
-                                        {stat.label}
-                                    </CardTitle>
-                                    <div className={`p-1.5 rounded-lg ${stat.bgColor} group-hover:scale-110 transition-transform`}>
-                                        <Icon className={`h-4 w-4 ${stat.color}`} />
-                                    </div>
-                                </CardHeader>
-                                <CardContent className="relative">
-                                    <div className="text-4xl font-black tracking-tight text-neutral-900">{stat.value.toLocaleString()}</div>
-                                    {stat.subValue && (
-                                        <p className="text-[11px] text-neutral-400 mt-0.5 font-medium">{stat.subValue}</p>
-                                    )}
-                                </CardContent>
-                            </Card>
-                        </Link>
-                    );
-                })}
-            </div>
+            {/* Tabs */}
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
+                <TabsList>
+                    <TabsTrigger value="overview">總覽</TabsTrigger>
+                    <TabsTrigger value="analytics">數據分析</TabsTrigger>
+                    <TabsTrigger value="reports">回報處理</TabsTrigger>
+                </TabsList>
 
-            {/* 次要統計 + 快捷操作 */}
-            <div className="grid gap-4 md:grid-cols-3">
-                {secondaryStats.map((stat) => {
-                    const Icon = stat.icon;
-                    return (
-                        <Link key={stat.label} href={stat.href}>
-                            <Card className="hover:shadow-md transition-shadow cursor-pointer">
-                                <CardContent className="flex items-center justify-between py-4">
-                                    <div className="flex items-center gap-3">
-                                        <Icon className="h-5 w-5 text-gray-400" />
-                                        <span className="text-sm font-medium">{stat.label}</span>
-                                    </div>
-                                    <div className="flex items-center gap-2">
-                                        <span className="text-lg font-bold">{stat.value}</span>
-                                        <ArrowRight className="w-4 h-4 text-gray-400" />
-                                    </div>
+                <TabsContent value="overview" className="space-y-4">
+                    {/* Stats Cards */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">總營收</CardTitle>
+                                <DollarSign className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">$0</div>
+                                <p className="text-xs text-muted-foreground">
+                                    尚未開通付費功能
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">用戶數</CardTitle>
+                                <Users className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">+{stats.users}</div>
+                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                    {stats.weeklyGrowth.users > 0 ? (
+                                        <>
+                                            <TrendingUp className="h-3 w-3 text-green-500" />
+                                            <span className="text-green-500">+{stats.weeklyGrowth.users}</span>
+                                        </>
+                                    ) : (
+                                        <span className="text-muted-foreground">本週無新增</span>
+                                    )}
+                                    {" "}本週
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">活動數</CardTitle>
+                                <Calendar className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.events}</div>
+                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <span className="text-green-500">+{stats.weeklyGrowth.events}</span> 本週新增
+                                </p>
+                            </CardContent>
+                        </Card>
+
+                        <Card>
+                            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                                <CardTitle className="text-sm font-medium">報名數</CardTitle>
+                                <Activity className="h-4 w-4 text-muted-foreground" />
+                            </CardHeader>
+                            <CardContent>
+                                <div className="text-2xl font-bold">{stats.registrations}</div>
+                                <p className="text-xs text-muted-foreground flex items-center gap-1">
+                                    <span className="text-green-500">+{stats.weeklyGrowth.registrations}</span> 本週新增
+                                </p>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Main Content */}
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+                        {/* Recent Events */}
+                        <Card className="col-span-4">
+                            <CardHeader>
+                                <CardTitle>最近活動</CardTitle>
+                                <CardDescription>
+                                    平台上最新發布的活動
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    {recentEvents.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground text-center py-8">暫無活動</p>
+                                    ) : (
+                                        recentEvents.map((event) => (
+                                            <Link
+                                                key={event.id}
+                                                href={`/events/${event.id}`}
+                                                className="flex items-center gap-4 rounded-md p-2 hover:bg-accent transition-colors"
+                                            >
+                                                <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-accent">
+                                                    <Calendar className="h-4 w-4" />
+                                                </div>
+                                                <div className="flex-1 space-y-1">
+                                                    <p className="text-sm font-medium leading-none truncate">
+                                                        {event.title}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground">
+                                                        {event.start_time ? formatDate(event.start_time) : "未設定時間"}
+                                                    </p>
+                                                </div>
+                                                <Badge variant={event.status === "published" ? "default" : "secondary"}>
+                                                    {event.status === "published" ? "已發布" : "草稿"}
+                                                </Badge>
+                                            </Link>
+                                        ))
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+
+                        {/* Recent Users */}
+                        <Card className="col-span-3">
+                            <CardHeader>
+                                <CardTitle>新加入用戶</CardTitle>
+                                <CardDescription>
+                                    最近註冊的用戶
+                                </CardDescription>
+                            </CardHeader>
+                            <CardContent>
+                                <div className="space-y-4">
+                                    {recentUsers.length === 0 ? (
+                                        <p className="text-sm text-muted-foreground text-center py-8">暫無新用戶</p>
+                                    ) : (
+                                        recentUsers.map((user) => (
+                                            <div key={user.id} className="flex items-center gap-4">
+                                                <Avatar className="h-9 w-9">
+                                                    <AvatarFallback>
+                                                        {(user.display_name || user.email || "U")[0].toUpperCase()}
+                                                    </AvatarFallback>
+                                                </Avatar>
+                                                <div className="flex-1 space-y-1">
+                                                    <p className="text-sm font-medium leading-none">
+                                                        {user.display_name || "未命名"}
+                                                    </p>
+                                                    <p className="text-sm text-muted-foreground truncate">
+                                                        {user.email}
+                                                    </p>
+                                                </div>
+                                                <div className="text-sm text-muted-foreground">
+                                                    {formatRelativeTime(user.created_at)}
+                                                </div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            </CardContent>
+                        </Card>
+                    </div>
+
+                    {/* Quick Actions */}
+                    <div className="grid gap-4 md:grid-cols-3">
+                        <Link href="/admin/events">
+                            <Card className="hover:bg-accent/50 transition-colors cursor-pointer">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                    <CardTitle className="text-sm font-medium">活動管理</CardTitle>
+                                    <ArrowUpRight className="h-4 w-4" />
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-xs text-muted-foreground">
+                                        管理平台上的所有活動
+                                    </p>
                                 </CardContent>
                             </Card>
                         </Link>
-                    );
-                })}
-                <Link href="/admin/analytics">
-                    <Card className="hover:shadow-md transition-all cursor-pointer bg-zinc-900 text-white border-zinc-800">
-                        <CardContent className="flex items-center justify-between py-4">
-                            <div className="flex items-center gap-3">
-                                <BarChart3 className="h-5 w-5 text-zinc-300" />
-                                <span className="text-sm font-medium">數據分析</span>
+
+                        <Link href="/admin/users">
+                            <Card className="hover:bg-accent/50 transition-colors cursor-pointer">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                    <CardTitle className="text-sm font-medium">用戶管理</CardTitle>
+                                    <ArrowUpRight className="h-4 w-4" />
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-xs text-muted-foreground">
+                                        查看和管理用戶帳號
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+
+                        <Link href="/admin/reports">
+                            <Card className="hover:bg-accent/50 transition-colors cursor-pointer border-orange-200 bg-orange-50/50 dark:border-orange-900 dark:bg-orange-950/20">
+                                <CardHeader className="flex flex-row items-center justify-between space-y-0">
+                                    <CardTitle className="text-sm font-medium">待處理回報</CardTitle>
+                                    <Badge variant="outline" className="bg-orange-100 text-orange-700 border-orange-300">
+                                        {stats.pendingReports}
+                                    </Badge>
+                                </CardHeader>
+                                <CardContent>
+                                    <p className="text-xs text-muted-foreground">
+                                        {stats.pendingReports > 0 ? `有 ${stats.pendingReports} 件待處理` : "目前沒有待處理回報"}
+                                    </p>
+                                </CardContent>
+                            </Card>
+                        </Link>
+                    </div>
+                </TabsContent>
+
+                <TabsContent value="analytics" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>數據分析</CardTitle>
+                            <CardDescription>查看詳細的平台數據分析</CardDescription>
+                        </CardHeader>
+                        <CardContent className="h-[400px] flex items-center justify-center">
+                            <div className="text-center space-y-4">
+                                <Activity className="w-12 h-12 mx-auto text-muted-foreground" />
+                                <div>
+                                    <p className="text-lg font-medium">前往數據儀表板</p>
+                                    <p className="text-sm text-muted-foreground">查看完整的趨勢圖表和數據分析</p>
+                                </div>
+                                <Button asChild>
+                                    <Link href="/admin/analytics">
+                                        開啟數據儀表板
+                                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
                             </div>
-                            <ArrowRight className="w-4 h-4 text-zinc-400" />
                         </CardContent>
                     </Card>
-                </Link>
-            </div>
+                </TabsContent>
 
-            {/* 最近活動 + 最近回報 */}
-            <div className="grid gap-6 lg:grid-cols-2">
-                {/* 最近活動 */}
-                <Card className="bg-white/80 backdrop-blur-sm border-neutral-200 overflow-hidden relative">
-                    <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
-                    <CardHeader className="pb-3 relative">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">最近活動</CardTitle>
-                            <Button variant="ghost" size="sm" asChild>
-                                <Link href="/admin/events">查看全部 <ArrowRight className="w-4 h-4 ml-1" /></Link>
-                            </Button>
-                        </div>
-                        <CardDescription>最近建立的 5 場活動</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        {recentEvents.length === 0 ? (
-                            <p className="text-sm text-gray-500 text-center py-4">尚無活動</p>
-                        ) : (
-                            recentEvents.map((event) => (
-                                <Link
-                                    key={event.id}
-                                    href={`/events/${event.id}`}
-                                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                                >
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium truncate">{event.title}</p>
-                                        <p className="text-xs text-gray-500">
-                                            {event.start_time ? formatDate(event.start_time) : "未設定時間"}
-                                        </p>
-                                    </div>
-                                    {getStatusBadge(event.status)}
-                                </Link>
-                            ))
-                        )}
-                    </CardContent>
-                </Card>
-
-                {/* 最近回報 */}
-                <Card className="bg-white/80 backdrop-blur-sm border-neutral-200 overflow-hidden relative">
-                    <div className="absolute inset-0 opacity-[0.015]" style={{ backgroundImage: "url(\"data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E\")" }} />
-                    <CardHeader className="pb-3 relative">
-                        <div className="flex items-center justify-between">
-                            <CardTitle className="text-lg">最近回報</CardTitle>
-                            <Button variant="ghost" size="sm" asChild>
-                                <Link href="/admin/reports">處理回報 <ArrowRight className="w-4 h-4 ml-1" /></Link>
-                            </Button>
-                        </div>
-                        <CardDescription>用戶反饋與檢舉</CardDescription>
-                    </CardHeader>
-                    <CardContent className="space-y-3">
-                        {recentReports.length === 0 ? (
-                            <div className="text-center py-4">
-                                <CheckCircle className="w-8 h-8 text-green-400 mx-auto mb-2" />
-                                <p className="text-sm text-gray-500">沒有待處理的回報</p>
+                <TabsContent value="reports" className="space-y-4">
+                    <Card>
+                        <CardHeader>
+                            <CardTitle>回報處理</CardTitle>
+                            <CardDescription>管理用戶檢舉和回報</CardDescription>
+                        </CardHeader>
+                        <CardContent className="h-[400px] flex items-center justify-center">
+                            <div className="text-center space-y-4">
+                                <div className="flex items-center justify-center">
+                                    <Badge variant="outline" className="text-2xl px-4 py-2 bg-orange-100 text-orange-700 border-orange-300">
+                                        {stats.pendingReports}
+                                    </Badge>
+                                </div>
+                                <div>
+                                    <p className="text-lg font-medium">待處理回報</p>
+                                    <p className="text-sm text-muted-foreground">共 {stats.reports} 件回報記錄</p>
+                                </div>
+                                <Button asChild>
+                                    <Link href="/admin/reports">
+                                        前往處理
+                                        <ArrowUpRight className="ml-2 h-4 w-4" />
+                                    </Link>
+                                </Button>
                             </div>
-                        ) : (
-                            recentReports.map((report) => (
-                                <Link
-                                    key={report.id}
-                                    href="/admin/reports"
-                                    className="flex items-center justify-between p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-                                >
-                                    <div className="flex-1 min-w-0">
-                                        <p className="text-sm font-medium">{report.category}</p>
-                                        <p className="text-xs text-gray-500">{formatDate(report.created_at)}</p>
-                                    </div>
-                                    {getStatusBadge(report.status)}
-                                </Link>
-                            ))
-                        )}
-                    </CardContent>
-                </Card>
-            </div>
+                        </CardContent>
+                    </Card>
+                </TabsContent>
+            </Tabs>
         </div>
     );
 }

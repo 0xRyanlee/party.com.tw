@@ -2,7 +2,13 @@ import { NextResponse } from 'next/server';
 import { createClient } from '@/lib/supabase/server';
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+// 延遲初始化 Resend，避免 build 時報錯
+const getResend = () => {
+    if (!process.env.RESEND_API_KEY) {
+        throw new Error('RESEND_API_KEY is not configured');
+    }
+    return new Resend(process.env.RESEND_API_KEY);
+};
 
 interface SendNotificationRequest {
     title: string;
@@ -133,7 +139,7 @@ export async function POST(request: Request) {
                     const personalizedSubject = replaceVariables(subject, user, variables);
                     const personalizedBody = replaceVariables(emailBody, user, variables);
 
-                    await resend.emails.send({
+                    await getResend().emails.send({
                         from: 'Party <noreply@party.example.com>',
                         to: user.email,
                         subject: personalizedSubject,
